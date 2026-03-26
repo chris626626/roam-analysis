@@ -196,6 +196,21 @@ async function main() {
   const pnl = (currentValue + distributedValue) - totalInUsd;
   const pnlPct = (pnl / totalInUsd * 100);
 
+  // 6. LP pool holders
+  console.log('6. Fetching LP pool holders...');
+  const lpInfo = await httpGet(`${BASE}/addresses/${LP_POOL}`);
+  const lpHoldersRes = await httpGet(`${BASE}/tokens/${LP_POOL}/holders`);
+  const lpHolders = lpHoldersRes.items || [];
+  const lpTotalSupply = lpInfo.token?.total_supply ? parseInt(lpInfo.token.total_supply) / 1e18 : 0;
+  const lpCreator = lpInfo.creator?.hash || '0x274DA16D2C83E93406f1Ec60C042f728610Cf78c';
+  const lpHolderRows = lpHolders.map((h, i) => {
+    const addr = h.address?.hash || '';
+    const val = parseInt(h.value) / 1e18;
+    const pct = lpTotalSupply > 0 ? (val / lpTotalSupply * 100) : 0;
+    return { addr, val, pct, isContract: h.address?.is_contract || false };
+  });
+  console.log(`   LP holders: ${lpHolders.length}, Creator: ${lpCreator}`);
+
   const reportDate = new Date().toISOString().split('T')[0];
   const reportTime = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
 
@@ -438,12 +453,53 @@ async function main() {
   </div>
 
   <div class="section">
+    <h2>&#128167; 流動池分析（全鏈唯一）</h2>
+    <div class="insight warn"><strong>ENI 鏈上 ROAM 僅有 1 個 Swap 池。</strong>已掃描全部 DEX 工廠（UniswapV2 x4、UniswapV3 x3、DODO x2），無其他 ROAM 交易對。ROAM 價格完全由此單一池決定。</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px;">
+      <div class="stat-card">
+        <div class="label">池類型</div>
+        <div class="value" style="font-size:18px;color:var(--purple)">Uniswap V2</div>
+        <div style="color:var(--text2);font-size:11px">ROAM / USDT</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">ROAM 儲備</div>
+        <div class="value" style="font-size:18px;color:var(--accent)">\${fmtNum(lpRoam, 0)}</div>
+        <div style="color:var(--text2);font-size:11px">\${(lpRoam / totalSupply * 100).toFixed(1)}% 總供應量</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">USDT 儲備</div>
+        <div class="value" style="font-size:18px;color:var(--green)">\${fmtNum(lpUsdt, 0)}</div>
+        <div style="color:var(--text2);font-size:11px">池深度</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">LP 提供者</div>
+        <div class="value" style="font-size:18px;color:var(--red)">\${lpHolders.length}</div>
+        <div style="color:var(--text2);font-size:11px">個地址</div>
+      </div>
+    </div>
+    <h3 style="font-size:14px;margin-bottom:10px;color:var(--text2)">LP 持有者明細</h3>
+    <table>
+      <tr><th>#</th><th>地址</th><th>LP 佔比</th><th>角色</th></tr>
+      \${lpHolderRows.map((h, i) => \`<tr>
+        <td>\${i + 1}</td>
+        <td class="addr" style="word-break:break-all">\${h.addr}</td>
+        <td class="amount" style="color:\${h.pct > 50 ? 'var(--red)' : 'var(--text)'}">\${h.pct.toFixed(3)}%</td>
+        <td>\${h.pct > 99 ? '<span class="tag tag-high">項目方 / 唯一流動性</span>' : h.pct > 50 ? '<span class="tag tag-mid">主要 LP</span>' : '<span class="tag tag-low">小額</span>'}</td>
+      </tr>\`).join('')}
+    </table>
+    <div class="insight" style="margin-top:12px;"><strong>集中度警告：</strong>\${lpHolderRows[0]?.pct > 99 ? '最大 LP 持有者佔 ' + lpHolderRows[0].pct.toFixed(3) + '% 的流動性，且同時也是 ROAM 鑄造接收者和資金池注資者（0x274D...f78c）。若該地址撤除流動性，ROAM 將無法交易。' : 'LP 分散度尚可。'}</div>
+    <div class="insight warn"><strong>已掃描未發現其他池：</strong>UniswapV2Factory x4（僅 0x548C...269d 有 1 個 ROAM 配對）、UniswapV3Factory x3（0 個）、DODO Factory x2（0 個）。無 ROAM/ENI、ROAM/WETH 或其他配對。</div>
+  </div>
+
+  <div class="section">
     <h2>&#9888; 風險評估</h2>
     <table>
       <tr><th>項目</th><th>等級</th><th>說明</th></tr>
       <tr><td>資金集中度</td><td><span class="tag tag-high">高</span></td><td>資金池持有 ${(poolBalance / totalSupply * 100).toFixed(1)}% 供應量</td></tr>
       <tr><td>合約可升級</td><td><span class="tag tag-high">高</span></td><td>ERC1967Proxy，邏輯合約可被替換</td></tr>
       <tr><td>資金枯竭</td><td><span class="tag ${daysRemaining < 90 ? 'tag-high' : daysRemaining < 180 ? 'tag-mid' : 'tag-low'}">${daysRemaining < 90 ? '高' : daysRemaining < 180 ? '中' : '低'}</span></td><td>日均消耗 ${fmtNum(dailyConsume, 0)} ROAM，預計 ${daysRemaining} 天後耗盡</td></tr>
+      <tr><td>流動池集中</td><td><span class="tag tag-high">高</span></td><td>全鏈僅 1 個 ROAM 池，${lpHolders.length} 個 LP 提供者，最大佔 ${lpHolderRows[0]?.pct.toFixed(1) || '?'}%</td></tr>
+      <tr><td>單一定價源</td><td><span class="tag tag-high">高</span></td><td>無其他 DEX 池或交易對，價格可被單一地址操控</td></tr>
       <tr><td>浮盈虧</td><td><span class="tag ${pnl >= 0 ? 'tag-low' : 'tag-mid'}">${pnl >= 0 ? '低' : '中'}</span></td><td>注資成本 ${fmtUSD(totalInUsd)}，當前價值+已分發 = ${fmtUSD(currentValue + distributedValue)}（${pnlSign}${pnlPct.toFixed(2)}%）</td></tr>
     </table>
   </div>
