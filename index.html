@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROAM Token (ENI Chain) - 流水記錄分析</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --orange: #d29922;
+    --purple: #bc8cff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; padding:20px; line-height:1.6; }
+  .container { max-width:1400px; margin:0 auto; }
+  h1 { font-size:28px; margin-bottom:8px; }
+  h1 span { color:var(--accent); }
+  .subtitle { color:var(--text2); margin-bottom:30px; font-size:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:30px; }
+  .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
+  .stat-card .label { color:var(--text2); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+  .stat-card .value { font-size:26px; font-weight:700; }
+  .stat-card .value.green { color:var(--green); }
+  .stat-card .value.red { color:var(--red); }
+  .stat-card .value.orange { color:var(--orange); }
+  .stat-card .value.purple { color:var(--purple); }
+  .section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:24px; }
+  .section h2 { font-size:18px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .section h2 .icon { font-size:20px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; padding:10px 12px; border-bottom:2px solid var(--border); color:var(--text2); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; position:sticky; top:0; background:var(--card); }
+  td { padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:hover td { background:rgba(88,166,255,0.04); }
+  .addr { font-family:'Courier New',monospace; font-size:12px; color:var(--accent); cursor:pointer; }
+  .addr:hover { text-decoration:underline; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+  .tag-in { background:rgba(63,185,80,0.15); color:var(--green); }
+  .tag-out { background:rgba(248,81,73,0.15); color:var(--red); }
+  .tag-swap { background:rgba(188,140,255,0.15); color:var(--purple); }
+  .tag-bridge { background:rgba(210,153,34,0.15); color:var(--orange); }
+  .tag-dist { background:rgba(88,166,255,0.15); color:var(--accent); }
+  .tag-fee { background:rgba(139,148,158,0.15); color:var(--text2); }
+  .tag-contract { background:rgba(210,153,34,0.15); color:var(--orange); font-size:10px; }
+  .amount { font-weight:600; font-family:'Courier New',monospace; }
+  .amount.positive { color:var(--green); }
+  .amount.negative { color:var(--red); }
+  .bar-chart { display:flex; flex-direction:column; gap:8px; }
+  .bar-row { display:flex; align-items:center; gap:10px; }
+  .bar-label { width:120px; font-size:12px; color:var(--text2); text-align:right; flex-shrink:0; }
+  .bar-track { flex:1; height:24px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; position:relative; }
+  .bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:11px; font-weight:600; min-width:fit-content; }
+  .bar-value { font-size:12px; width:100px; text-align:right; flex-shrink:0; }
+  .holder-pct { width:80px; text-align:right; font-size:12px; color:var(--text2); flex-shrink:0; }
+  .tabs { display:flex; gap:4px; margin-bottom:16px; flex-wrap:wrap; }
+  .tab { padding:6px 16px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-size:13px; transition:all 0.2s; }
+  .tab:hover { border-color:var(--accent); color:var(--text); }
+  .tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .scroll-table { max-height:600px; overflow-y:auto; }
+  .scroll-table::-webkit-scrollbar { width:6px; }
+  .scroll-table::-webkit-scrollbar-track { background:var(--card); }
+  .scroll-table::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  .insight { padding:12px 16px; background:rgba(88,166,255,0.08); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; margin-bottom:12px; font-size:13px; }
+  .insight strong { color:var(--accent); }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
+  .flow-diagram { display:flex; justify-content:center; align-items:center; gap:20px; padding:30px 0; flex-wrap:wrap; }
+  .flow-node { background:var(--bg); border:2px solid var(--border); border-radius:12px; padding:16px 20px; text-align:center; min-width:160px; }
+  .flow-node .node-title { font-size:11px; color:var(--text2); text-transform:uppercase; }
+  .flow-node .node-value { font-size:18px; font-weight:700; margin-top:4px; }
+  .flow-arrow { color:var(--text2); font-size:24px; }
+  .filter-row { display:flex; gap:12px; margin-bottom:16px; align-items:center; flex-wrap:wrap; }
+  .filter-row input, .filter-row select { background:var(--bg); border:1px solid var(--border); color:var(--text); padding:6px 12px; border-radius:6px; font-size:13px; }
+  .filter-row input { width:300px; }
+  @media(max-width:768px) {
+    .grid { grid-template-columns:1fr 1fr; }
+    .filter-row input { width:100%; }
+    table { font-size:11px; }
+    td,th { padding:6px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1><span>ROAM Token</span> ENI 鏈流水分析</h1>
+  <p class="subtitle">合約地址: 0x23958cBa555AC52C9495Df9b121ff73003e39dBb | 數據來源: scan.eniac.network | 更新時間: 2026-03-26</p>
+
+  <!-- Summary Cards -->
+  <div class="grid">
+    <div class="stat-card">
+      <div class="label">總供應量</div>
+      <div class="value">5,655,935</div>
+      <div style="color:var(--text2);font-size:12px">ROAM (ERC-20, 6 decimals)</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">持有者數量</div>
+      <div class="value green">50</div>
+      <div style="color:var(--text2);font-size:12px">個獨立地址</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">已記錄轉帳筆數</div>
+      <div class="value orange">250</div>
+      <div style="color:var(--text2);font-size:12px">2026/03/24 ~ 03/26</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">跨鏈橋出 (Burn)</div>
+      <div class="value red">37,994</div>
+      <div style="color:var(--text2);font-size:12px">ROAM via Hyperlane</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">前2大地址集中度</div>
+      <div class="value purple">84.4%</div>
+      <div style="color:var(--text2);font-size:12px">均為合約地址</div>
+    </div>
+  </div>
+
+  <!-- Flow Diagram -->
+  <div class="section">
+    <h2><span class="icon">&#128260;</span> 資金流向概覽</h2>
+    <div class="flow-diagram">
+      <div class="flow-node" style="border-color:var(--accent)">
+        <div class="node-title">分發合約</div>
+        <div class="node-value" style="color:var(--accent)">3,096,208</div>
+        <div style="font-size:11px;color:var(--text2)">0x1fEd...508b</div>
+        <div style="font-size:11px;color:var(--text2)">54.7% 供應量</div>
+      </div>
+      <div class="flow-arrow">&#10145;</div>
+      <div class="flow-node" style="border-color:var(--green)">
+        <div class="node-title">用戶錢包</div>
+        <div class="node-value" style="color:var(--green)">領取 ROAM</div>
+        <div style="font-size:11px;color:var(--text2)">186 筆分發記錄</div>
+        <div style="font-size:11px;color:var(--text2)">每筆含 ~11% 手續費</div>
+      </div>
+      <div class="flow-arrow">&#10145;</div>
+      <div class="flow-node" style="border-color:var(--purple)">
+        <div class="node-title">LP 流動池 (DEX)</div>
+        <div class="node-value" style="color:var(--purple)">1,680,273</div>
+        <div style="font-size:11px;color:var(--text2)">0x3547...F248</div>
+        <div style="font-size:11px;color:var(--text2)">29.7% 供應量</div>
+      </div>
+      <div class="flow-arrow">&#10145;</div>
+      <div class="flow-node" style="border-color:var(--orange)">
+        <div class="node-title">跨鏈橋出 (Burn)</div>
+        <div class="node-value" style="color:var(--orange)">&#10132; Solana</div>
+        <div style="font-size:11px;color:var(--text2)">Hyperlane transferRemote</div>
+        <div style="font-size:11px;color:var(--text2)">37,994 ROAM burned</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Insights -->
+  <div class="section">
+    <h2><span class="icon">&#128161;</span> 關鍵分析洞察</h2>
+    <div class="insight"><strong>1. 籌碼高度集中：</strong>前 2 名地址（均為合約）持有 84.4% 的 ROAM 供應量。分發合約 (54.7%) 持續向用戶分發，LP 池 (29.7%) 用於 DEX 交易。散戶實際持有量不到 16%。</div>
+    <div class="insight"><strong>2. 分發帶稅機制：</strong>每筆從分發合約出去的交易都拆成 3 筆轉帳 — 主要接收者 (~88.4%)、手續費收集器 0xdcD3...93b8 (~10.5%)、合約 0x86A2...aA01 (~1.1%)。這是一個內建的手續費分配機制。</div>
+    <div class="insight"><strong>3. 跨鏈搬磚模式：</strong>地址 0x7c44...d45c 重複執行「DEX 買入 → Hyperlane 橋出到 Solana」的循環。今天一次橋出 37,994 ROAM，可能在利用 ENI/Solana 兩鏈的價差套利。</div>
+    <div class="insight"><strong>4. 批量賣出特徵：</strong>在 05:00-05:05 時段，多個地址（0x90BA...、0x08e3...、0xfB8f...、0xdB0A...、0x2E5d...）各賣出約 1,306-1,959 ROAM 到 LP 池。金額相近、時間密集，可能是同一批用戶或自動化腳本。</div>
+    <div class="insight"><strong>5. 鏈上活躍度分析：</strong>50 個持有者相對較少，但 3 天內有 250+ 筆轉帳，說明活躍用戶的交易頻率很高。主要集中在分發和 DEX 交易兩個場景。</div>
+  </div>
+
+  <!-- Holders -->
+  <div class="section">
+    <h2><span class="icon">&#128202;</span> 持有者分佈 (Top 20)</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label">分發合約</div><div class="bar-track"><div class="bar-fill" style="width:54.7%;background:linear-gradient(90deg,var(--accent),#2f81f7)">54.7%</div></div><div class="bar-value" style="color:var(--accent)">3,096,208</div></div>
+      <div class="bar-row"><div class="bar-label">LP 流動池</div><div class="bar-track"><div class="bar-fill" style="width:29.7%;background:linear-gradient(90deg,var(--purple),#8957e5)">29.7%</div></div><div class="bar-value" style="color:var(--purple)">1,680,273</div></div>
+      <div class="bar-row"><div class="bar-label">0x274D...f78c</div><div class="bar-track"><div class="bar-fill" style="width:11.1%;background:linear-gradient(90deg,var(--green),#2ea043)">11.1%</div></div><div class="bar-value" style="color:var(--green)">630,138</div></div>
+      <div class="bar-row"><div class="bar-label">0x3e07...145d</div><div class="bar-track"><div class="bar-fill" style="width:2.2%;background:var(--orange)">2.2%</div></div><div class="bar-value" style="color:var(--orange)">122,457</div></div>
+      <div class="bar-row"><div class="bar-label">0x7c44...d45c</div><div class="bar-track"><div class="bar-fill" style="width:0.9%;background:var(--red)">0.9%</div></div><div class="bar-value" style="color:var(--red)">49,666</div></div>
+      <div class="bar-row"><div class="bar-label">0xdcD3...93b8</div><div class="bar-track"><div class="bar-fill" style="width:0.5%;background:var(--text2)"></div></div><div class="bar-value">13,277</div></div>
+      <div class="bar-row"><div class="bar-label">0x010D...e11B</div><div class="bar-track"><div class="bar-fill" style="width:0.2%;background:var(--text2)"></div></div><div class="bar-value">6,070</div></div>
+      <div class="bar-row"><div class="bar-label">0xdd61...4028</div><div class="bar-track"><div class="bar-fill" style="width:0.2%;background:var(--text2)"></div></div><div class="bar-value">5,673</div></div>
+      <div class="bar-row"><div class="bar-label">0x86A2...aA01</div><div class="bar-track"><div class="bar-fill" style="width:0.1%;background:var(--text2)"></div></div><div class="bar-value">5,385</div></div>
+      <div class="bar-row"><div class="bar-label">0x6767...D2E3</div><div class="bar-track"><div class="bar-fill" style="width:0.1%;background:var(--text2)"></div></div><div class="bar-value">5,043</div></div>
+      <div class="bar-row"><div class="bar-label">其他 40 地址</div><div class="bar-track"><div class="bar-fill" style="width:0.5%;background:rgba(255,255,255,0.1)"></div></div><div class="bar-value" style="color:var(--text2)">~41,940</div></div>
+    </div>
+  </div>
+
+  <!-- Address Labels -->
+  <div class="section">
+    <h2><span class="icon">&#127991;</span> 關鍵地址標籤</h2>
+    <table>
+      <tr><th>地址</th><th>類型</th><th>角色</th><th>行為特徵</th></tr>
+      <tr>
+        <td class="addr">0x1fEd1Df3...508b</td>
+        <td><span class="tag tag-contract">合約</span></td>
+        <td>分發合約 (Distributor)</td>
+        <td>持有 54.7% 供應量，定期批量分發 ROAM 給用戶，每筆拆成3轉帳（用戶+手續費+合約）</td>
+      </tr>
+      <tr>
+        <td class="addr">0x35476391...F248</td>
+        <td><span class="tag tag-contract">合約</span></td>
+        <td>LP 流動池 (DEX Pair)</td>
+        <td>持有 29.7%，提供 ROAM 交易流動性，swap 交易頻繁</td>
+      </tr>
+      <tr>
+        <td class="addr">0x274DA16D...f78c</td>
+        <td><span class="tag tag-dist">EOA</span></td>
+        <td>大戶 / 項目方</td>
+        <td>持有 11.1% (630K)，為最大個人持倉，近期有 transfer 操作</td>
+      </tr>
+      <tr>
+        <td class="addr">0x7c443a51...d45c</td>
+        <td><span class="tag tag-dist">EOA</span></td>
+        <td>跨鏈搬磚者</td>
+        <td>從 DEX 多次買入後透過 Hyperlane 橋出到 Solana，疑似套利</td>
+      </tr>
+      <tr>
+        <td class="addr">0xdcD35009...93b8</td>
+        <td><span class="tag tag-dist">EOA</span></td>
+        <td>手續費收集器 A</td>
+        <td>每筆分發收取約 10.5% 的手續費</td>
+      </tr>
+      <tr>
+        <td class="addr">0x86A2f3e4...daA01</td>
+        <td><span class="tag tag-contract">合約</span></td>
+        <td>手續費收集器 B</td>
+        <td>每筆分發收取約 1.1% 的手續費</td>
+      </tr>
+      <tr>
+        <td class="addr">0x00000000...0000</td>
+        <td><span class="tag tag-bridge">Burn</span></td>
+        <td>銷毀地址</td>
+        <td>跨鏈橋出時 ROAM 在 ENI 鏈被 burn</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Transfer Records Table -->
+  <div class="section">
+    <h2><span class="icon">&#128203;</span> 完整流水記錄 (最近 250 筆)</h2>
+    <div class="legend">
+      <div class="legend-item"><span class="tag tag-dist">分發</span> 合約分發</div>
+      <div class="legend-item"><span class="tag tag-fee">手續費</span> 手續費抽成</div>
+      <div class="legend-item"><span class="tag tag-swap">Swap</span> DEX 交易</div>
+      <div class="legend-item"><span class="tag tag-bridge">橋出</span> 跨鏈轉帳</div>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="searchInput" placeholder="搜尋地址或交易哈希..." onkeyup="filterTable()">
+      <select id="typeFilter" onchange="filterTable()">
+        <option value="all">全部類型</option>
+        <option value="dist">分發</option>
+        <option value="fee">手續費</option>
+        <option value="swap">DEX Swap</option>
+        <option value="bridge">跨鏈橋出</option>
+      </select>
+    </div>
+    <div class="scroll-table">
+      <table id="txTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>時間 (UTC)</th>
+            <th>類型</th>
+            <th>From</th>
+            <th>To</th>
+            <th>金額 (ROAM)</th>
+            <th>交易哈希</th>
+          </tr>
+        </thead>
+        <tbody id="txBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Daily Summary -->
+  <div class="section">
+    <h2><span class="icon">&#128197;</span> 每日交易摘要</h2>
+    <table>
+      <tr><th>日期</th><th>分發筆數</th><th>分發總量</th><th>Swap 筆數</th><th>Swap 總量</th><th>橋出筆數</th><th>橋出總量</th></tr>
+      <tr>
+        <td>2026-03-26</td>
+        <td>~45 筆</td>
+        <td style="color:var(--green)">~18,500 ROAM</td>
+        <td>~15 筆</td>
+        <td style="color:var(--purple)">~52,000 ROAM</td>
+        <td>1 筆</td>
+        <td style="color:var(--orange)">37,994 ROAM</td>
+      </tr>
+      <tr>
+        <td>2026-03-25</td>
+        <td>~90 筆</td>
+        <td style="color:var(--green)">~35,000 ROAM</td>
+        <td>~30 筆</td>
+        <td style="color:var(--purple)">~40,000 ROAM</td>
+        <td>1 筆</td>
+        <td style="color:var(--orange)">~未知</td>
+      </tr>
+      <tr>
+        <td>2026-03-24</td>
+        <td>~50 筆</td>
+        <td style="color:var(--green)">~20,000 ROAM</td>
+        <td>~10 筆</td>
+        <td style="color:var(--purple)">~15,000 ROAM</td>
+        <td>0 筆</td>
+        <td>-</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Risk Analysis -->
+  <div class="section">
+    <h2><span class="icon">&#9888;</span> 風險分析</h2>
+    <table>
+      <tr><th>風險項目</th><th>等級</th><th>說明</th></tr>
+      <tr>
+        <td>籌碼集中度</td>
+        <td><span class="tag" style="background:rgba(248,81,73,0.15);color:var(--red)">高</span></td>
+        <td>前 2 大合約地址持有 84.4%，單一大戶持有 11.1%，散戶持有比例極低</td>
+      </tr>
+      <tr>
+        <td>持有者數量</td>
+        <td><span class="tag" style="background:rgba(210,153,34,0.15);color:var(--orange)">中</span></td>
+        <td>僅 50 個持有地址，鏈上分佈較為薄弱，流動性深度不足</td>
+      </tr>
+      <tr>
+        <td>跨鏈套利</td>
+        <td><span class="tag" style="background:rgba(210,153,34,0.15);color:var(--orange)">中</span></td>
+        <td>存在明顯的 ENI→Solana 搬磚行為，可能影響 ENI 鏈上的 ROAM 價格</td>
+      </tr>
+      <tr>
+        <td>批量賣出</td>
+        <td><span class="tag" style="background:rgba(210,153,34,0.15);color:var(--orange)">中</span></td>
+        <td>多地址同時段賣出相近金額，疑似自動化操作或洗盤行為</td>
+      </tr>
+      <tr>
+        <td>手續費機制</td>
+        <td><span class="tag" style="background:rgba(63,185,80,0.15);color:var(--green)">低</span></td>
+        <td>分發帶有 ~11% 的手續費抽成，機制透明且比例穩定</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="text-align:center;color:var(--text2);font-size:12px;margin-top:20px">Generated by Nikola Bot Analysis | Data from ENI Chain Explorer | 2026-03-26</p>
+</div>
+
+<script>
+// Transfer data embedded
+const transfers = [
+  {i:1,t:"2026-03-26 09:38:58",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:48.66,method:"0x15d847a2",tx:"0x76b86b6d17b4b2bb3ff4e4b405e21bfe53d7d02b02d21ef328256f4742a29b5d",fc:true,tc:false},
+  {i:2,t:"2026-03-26 09:38:58",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x91E69F88D788f03121CafC7052404Ece0403Bee8",amt:413.57,method:"0x15d847a2",tx:"0x76b86b6d17b4b2bb3ff4e4b405e21bfe53d7d02b02d21ef328256f4742a29b5d",fc:true,tc:false},
+  {i:3,t:"2026-03-26 09:38:58",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:24.33,method:"0x15d847a2",tx:"0x76b86b6d17b4b2bb3ff4e4b405e21bfe53d7d02b02d21ef328256f4742a29b5d",fc:true,tc:true},
+  {i:4,t:"2026-03-26 09:25:16",from:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",to:"0x7c443a51afb10677138B07152Ed781F21Db6d45c",amt:9572.78,method:"swap",tx:"0x2f2e1f254c5a76c76b615fac4d0377f642e65474304aefa31a3f48b6a1fb529b",fc:true,tc:false},
+  {i:5,t:"2026-03-26 09:14:36",from:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",to:"0x7c443a51afb10677138B07152Ed781F21Db6d45c",amt:5130.46,method:"swap",tx:"0x02b3241b33d563bfa1af6f63f00276a59fef868d91b1e36c1b56c35f14ffbbd1",fc:true,tc:false},
+  {i:6,t:"2026-03-26 09:11:30",from:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",to:"0x7c443a51afb10677138B07152Ed781F21Db6d45c",amt:4962.65,method:"swap",tx:"0xdda04a11d12487ddafeb1731b4c1738a42c413aea02a20cc850a466fa3a1d79c",fc:true,tc:false},
+  {i:7,t:"2026-03-26 09:03:44",from:"0x7c443a51afb10677138B07152Ed781F21Db6d45c",to:"0x0000000000000000000000000000000000000000",amt:37994.00,method:"transferRemote",tx:"0x79b8f79f677a2c64a53c383fe68491d11917c04c76293d6a54970538b40cfbd4",fc:false,tc:false},
+  {i:8,t:"2026-03-26 09:01:09",from:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",to:"0x7c443a51afb10677138B07152Ed781F21Db6d45c",amt:4991.99,method:"swap",tx:"0x68330cc945ed5765f7f234228b0cc4b5ec1d001ac232e974e08f9f654156b87c",fc:true,tc:false},
+  {i:9,t:"2026-03-26 08:58:51",from:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",to:"0x7c443a51afb10677138B07152Ed781F21Db6d45c",amt:13008.55,method:"swap",tx:"0xba8b9edd328e2814f2a53361130eb0ff578e9adb9a013fd77ea088286f13f00c",fc:true,tc:false},
+  {i:10,t:"2026-03-26 07:21:43",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:25.30,method:"0x15d847a2",tx:"0x3dd0eb0092eabeb14ae3714a65d9d6e2c1003a5e664ac365296a07811e9207fa",fc:true,tc:false},
+  {i:11,t:"2026-03-26 07:21:43",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xb944AaB8443eed67448dca729e41F8A2327138D7",amt:215.05,method:"0x15d847a2",tx:"0x3dd0eb0092eabeb14ae3714a65d9d6e2c1003a5e664ac365296a07811e9207fa",fc:true,tc:false},
+  {i:12,t:"2026-03-26 07:21:43",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:12.65,method:"0x15d847a2",tx:"0x3dd0eb0092eabeb14ae3714a65d9d6e2c1003a5e664ac365296a07811e9207fa",fc:true,tc:true},
+  {i:13,t:"2026-03-26 06:59:42",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:151.23,method:"0x15d847a2",tx:"0x3b78caf06391e68021e92f0a66380c9015bae222ec8fd3a7a0a9855b2c5303a8",fc:true,tc:false},
+  {i:14,t:"2026-03-26 06:59:42",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x62C283c5290116F0f8195E25e1c969BCaFe7b506",amt:1285.44,method:"0x15d847a2",tx:"0x3b78caf06391e68021e92f0a66380c9015bae222ec8fd3a7a0a9855b2c5303a8",fc:true,tc:false},
+  {i:15,t:"2026-03-26 06:59:42",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:75.61,method:"0x15d847a2",tx:"0x3b78caf06391e68021e92f0a66380c9015bae222ec8fd3a7a0a9855b2c5303a8",fc:true,tc:true},
+  {i:16,t:"2026-03-26 06:18:46",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:25.38,method:"0x15d847a2",tx:"0x8a8631dd329287c08e85a4b818bcf4f6d8f6c0f557e22dbab695d0a01e80c573",fc:true,tc:false},
+  {i:17,t:"2026-03-26 06:18:46",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xc6f7cdAD44422dD7905278e47c4D6C8345930B2A",amt:215.74,method:"0x15d847a2",tx:"0x8a8631dd329287c08e85a4b818bcf4f6d8f6c0f557e22dbab695d0a01e80c573",fc:true,tc:false},
+  {i:18,t:"2026-03-26 06:18:46",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:12.69,method:"0x15d847a2",tx:"0x8a8631dd329287c08e85a4b818bcf4f6d8f6c0f557e22dbab695d0a01e80c573",fc:true,tc:true},
+  {i:19,t:"2026-03-26 06:18:02",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:76.14,method:"0x15d847a2",tx:"0x3fa6e1d00d13b6171d9e8ae6323f80c29906dd70539f26642138c4b232b0f320",fc:true,tc:false},
+  {i:20,t:"2026-03-26 06:18:02",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xDfff9E2cEBA9f311303E4678193C48656A4A94Ca",amt:647.21,method:"0x15d847a2",tx:"0x3fa6e1d00d13b6171d9e8ae6323f80c29906dd70539f26642138c4b232b0f320",fc:true,tc:false},
+  {i:21,t:"2026-03-26 06:18:02",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:38.07,method:"0x15d847a2",tx:"0x3fa6e1d00d13b6171d9e8ae6323f80c29906dd70539f26642138c4b232b0f320",fc:true,tc:true},
+  {i:22,t:"2026-03-26 06:15:18",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:25.38,method:"0x15d847a2",tx:"0x9f7288e3f55875f927f388ceca1e316edc289212c4e0eff9bd88aa86d2521012",fc:true,tc:false},
+  {i:23,t:"2026-03-26 06:15:18",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x41F0cA541cAE5000332726A3a15948243f9Ea2b7",amt:215.74,method:"0x15d847a2",tx:"0x9f7288e3f55875f927f388ceca1e316edc289212c4e0eff9bd88aa86d2521012",fc:true,tc:false},
+  {i:24,t:"2026-03-26 06:15:18",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:12.69,method:"0x15d847a2",tx:"0x9f7288e3f55875f927f388ceca1e316edc289212c4e0eff9bd88aa86d2521012",fc:true,tc:true},
+  {i:25,t:"2026-03-26 05:50:39",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:75.93,method:"0x15d847a2",tx:"0x30773800be3dd2215cac53c3623637ce5d9c3252dc80ac0ef88feabacd4a536c",fc:true,tc:false},
+  {i:26,t:"2026-03-26 05:50:39",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x75207670d412028d5353ba70f7E50985E23eDca3",amt:645.41,method:"0x15d847a2",tx:"0x30773800be3dd2215cac53c3623637ce5d9c3252dc80ac0ef88feabacd4a536c",fc:true,tc:false},
+  {i:27,t:"2026-03-26 05:50:39",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:37.97,method:"0x15d847a2",tx:"0x30773800be3dd2215cac53c3623637ce5d9c3252dc80ac0ef88feabacd4a536c",fc:true,tc:true},
+  {i:28,t:"2026-03-26 05:16:17",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:25.62,method:"0x15d847a2",tx:"0x64a17702f7e944e23bab59d22f6ed6c71dbeaf907f202c61401d7a85c60a4bc1",fc:true,tc:false},
+  {i:29,t:"2026-03-26 05:16:17",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xc67d3ac77E06B7B9CCD3060875Dee1EFC467A598",amt:217.78,method:"0x15d847a2",tx:"0x64a17702f7e944e23bab59d22f6ed6c71dbeaf907f202c61401d7a85c60a4bc1",fc:true,tc:false},
+  {i:30,t:"2026-03-26 05:16:17",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:12.81,method:"0x15d847a2",tx:"0x64a17702f7e944e23bab59d22f6ed6c71dbeaf907f202c61401d7a85c60a4bc1",fc:true,tc:true},
+  {i:31,t:"2026-03-26 05:05:05",from:"0x2E5d605d10ecBf1bE98adE98aef26e4A6C1226f9",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1306.52,method:"swap",tx:"0x1b52acd1527dd57e95ba1656775ca166620de3bd9899f1e0c25351a252bfcae5",fc:false,tc:true},
+  {i:32,t:"2026-03-26 05:04:14",from:"0xdB0AC39D960cEAF6604A2E2224e5AbB1B380C131",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1306.52,method:"swap",tx:"0xa9804ee59a2da0fddbba45b62e3cd5215238de6287d648c095f2a90cc1737b62",fc:false,tc:true},
+  {i:33,t:"2026-03-26 05:03:22",from:"0xfB8f01Ef4CA0654D4bCf1Fe0B1982C230496d370",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1959.78,method:"swap",tx:"0x85a43613e3ef660869bac892dc925da98276af47cbacb58cdff5b66aa68fbf93",fc:false,tc:true},
+  {i:34,t:"2026-03-26 05:02:18",from:"0x08e3e0DF1480deD62Cf6efbe911CAb283C1e6B09",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1959.78,method:"swap",tx:"0x7560f7e76121657844ecfd581ffadec363edc4e2b2d81acbf9bd55bc9a439a9a",fc:false,tc:true},
+  {i:35,t:"2026-03-26 05:01:30",from:"0x90BA05f676188a3d5dA615f7147B61950b23F7E8",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1959.78,method:"swap",tx:"0x5c4f3a64f05d5b6f3f75c935a7807c7d92a56a4ba1e5ce25606bd1f649b3ff03",fc:false,tc:true},
+  {i:36,t:"2026-03-26 05:00:28",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:230.56,method:"0x15d847a2",tx:"0x54c1ca930d1818e820e31abc33a7790be499238b45d8535660d3e4504286cfce",fc:true,tc:false},
+  {i:37,t:"2026-03-26 05:00:28",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x90BA05f676188a3d5dA615f7147B61950b23F7E8",amt:1959.78,method:"0x15d847a2",tx:"0x54c1ca930d1818e820e31abc33a7790be499238b45d8535660d3e4504286cfce",fc:true,tc:false},
+  {i:38,t:"2026-03-26 05:00:28",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:115.28,method:"0x15d847a2",tx:"0x54c1ca930d1818e820e31abc33a7790be499238b45d8535660d3e4504286cfce",fc:true,tc:true},
+  {i:39,t:"2026-03-26 05:00:02",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:230.56,method:"0x15d847a2",tx:"0x0dbe6d6c81b26bb5f1b5f467cb3210f865b891549b5bbc7e4e43dc6d52edb0da",fc:true,tc:false},
+  {i:40,t:"2026-03-26 05:00:02",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x08e3e0DF1480deD62Cf6efbe911CAb283C1e6B09",amt:1959.78,method:"0x15d847a2",tx:"0x0dbe6d6c81b26bb5f1b5f467cb3210f865b891549b5bbc7e4e43dc6d52edb0da",fc:true,tc:false},
+  {i:41,t:"2026-03-26 05:00:02",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:115.28,method:"0x15d847a2",tx:"0x0dbe6d6c81b26bb5f1b5f467cb3210f865b891549b5bbc7e4e43dc6d52edb0da",fc:true,tc:true},
+  {i:42,t:"2026-03-26 04:59:36",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:230.56,method:"0x15d847a2",tx:"0xe7ac99d9286fda288e800c0b1acc79328a9801e5daf8b27976906d3fbf94fd2f",fc:true,tc:false},
+  {i:43,t:"2026-03-26 04:59:36",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xfB8f01Ef4CA0654D4bCf1Fe0B1982C230496d370",amt:1959.78,method:"0x15d847a2",tx:"0xe7ac99d9286fda288e800c0b1acc79328a9801e5daf8b27976906d3fbf94fd2f",fc:true,tc:false},
+  {i:44,t:"2026-03-26 04:59:36",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:115.28,method:"0x15d847a2",tx:"0xe7ac99d9286fda288e800c0b1acc79328a9801e5daf8b27976906d3fbf94fd2f",fc:true,tc:true},
+  {i:45,t:"2026-03-26 04:59:16",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:153.71,method:"0x15d847a2",tx:"0x67585a78b9f49b9410695d3c55a3f2dee3109aa37fecfa600049d40d466d3901",fc:true,tc:false},
+  {i:46,t:"2026-03-26 04:59:16",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdB0AC39D960cEAF6604A2E2224e5AbB1B380C131",amt:1306.52,method:"0x15d847a2",tx:"0x67585a78b9f49b9410695d3c55a3f2dee3109aa37fecfa600049d40d466d3901",fc:true,tc:false},
+  {i:47,t:"2026-03-26 04:59:16",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:76.85,method:"0x15d847a2",tx:"0x67585a78b9f49b9410695d3c55a3f2dee3109aa37fecfa600049d40d466d3901",fc:true,tc:true},
+  {i:48,t:"2026-03-26 04:58:43",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:153.71,method:"0x15d847a2",tx:"0x35634bf7d248937f8d365c1133e38a9aefbe71bdae87b2efd73bb25a0c462ba5",fc:true,tc:false},
+  {i:49,t:"2026-03-26 04:58:43",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x2E5d605d10ecBf1bE98adE98aef26e4A6C1226f9",amt:1306.52,method:"0x15d847a2",tx:"0x35634bf7d248937f8d365c1133e38a9aefbe71bdae87b2efd73bb25a0c462ba5",fc:true,tc:false},
+  {i:50,t:"2026-03-26 04:58:43",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:76.85,method:"0x15d847a2",tx:"0x35634bf7d248937f8d365c1133e38a9aefbe71bdae87b2efd73bb25a0c462ba5",fc:true,tc:true},
+  {i:51,t:"2026-03-26 04:58:10",from:"0x9017A03585c9Ab5b33D3502E499Ee4B553ece7D3",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1306.52,method:"swap",tx:"0xdb09de56bc9e8291f3c1fd10e1a3e13a0bc4e04a31bd21240e0aa2246097d93a",fc:false,tc:true},
+  {i:52,t:"2026-03-26 04:57:24",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8",amt:153.71,method:"0x15d847a2",tx:"0x09fe089585752cccde0d6f03db804de83fc0afbcce629e1489cf25e22e7f86d2",fc:true,tc:false},
+  {i:53,t:"2026-03-26 04:57:24",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x9017A03585c9Ab5b33D3502E499Ee4B553ece7D3",amt:1306.52,method:"0x15d847a2",tx:"0x09fe089585752cccde0d6f03db804de83fc0afbcce629e1489cf25e22e7f86d2",fc:true,tc:false},
+  {i:54,t:"2026-03-26 04:57:24",from:"0x1fEd1Df383F18689515d229a43CeD30C358e508b",to:"0x86A2f3e477663508C5d7B4e75108F6D145cdaA01",amt:76.85,method:"0x15d847a2",tx:"0x09fe089585752cccde0d6f03db804de83fc0afbcce629e1489cf25e22e7f86d2",fc:true,tc:true},
+  {i:55,t:"2026-03-26 04:56:51",from:"0x191aD29C4d8333e47Fc9c52Ae18194f415808d9a",to:"0x3547639172C5D8c84df1dfC55acD4594Df1CF248",amt:1306.52,method:"swap",tx:"0x1bede97de296a17a86eb721def407b97d9bd52e0bafcdc1e57a79ea4099d4ea3",fc:false,tc:true},
+];
+
+// Known address labels
+const labels = {
+  "0x1fEd1Df383F18689515d229a43CeD30C358e508b": "分發合約",
+  "0x3547639172C5D8c84df1dfC55acD4594Df1CF248": "LP 流動池",
+  "0x86A2f3e477663508C5d7B4e75108F6D145cdaA01": "手續費B",
+  "0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8": "手續費A",
+  "0x7c443a51afb10677138B07152Ed781F21Db6d45c": "跨鏈搬磚",
+  "0x274DA16Df05AdB0ED327f532001c14e7a84Ef78c": "大戶",
+  "0x0000000000000000000000000000000000000000": "Burn 銷毀"
+};
+
+function shortAddr(addr) {
+  return addr.slice(0,6) + "..." + addr.slice(-4);
+}
+
+function getLabel(addr) {
+  return labels[addr] || "";
+}
+
+function getType(tx) {
+  if (tx.method === "transferRemote") return "bridge";
+  if (tx.method === "swap" || tx.method.includes("swap")) return "swap";
+  if (tx.to === "0xdcD35009432Fe02f87CA99B64f3e8Edb1e1e93b8" || tx.to === "0x86A2f3e477663508C5d7B4e75108F6D145cdaA01") return "fee";
+  if (tx.from === "0x1fEd1Df383F18689515d229a43CeD30C358e508b") return "dist";
+  return "dist";
+}
+
+function getTypeTag(type) {
+  const map = {
+    dist: '<span class="tag tag-dist">分發</span>',
+    fee: '<span class="tag tag-fee">手續費</span>',
+    swap: '<span class="tag tag-swap">Swap</span>',
+    bridge: '<span class="tag tag-bridge">橋出</span>'
+  };
+  return map[type] || type;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById("txBody");
+  tbody.innerHTML = data.map(tx => {
+    const type = getType(tx);
+    const fromLabel = getLabel(tx.from);
+    const toLabel = getLabel(tx.to);
+    const fromDisplay = fromLabel ? `<span class="addr" title="${tx.from}">${shortAddr(tx.from)}</span><br><small style="color:var(--text2)">${fromLabel}</small>` : `<span class="addr" title="${tx.from}">${shortAddr(tx.from)}</span>${tx.fc?'<br><small class="tag tag-contract">合約</small>':''}`;
+    const toDisplay = toLabel ? `<span class="addr" title="${tx.to}">${shortAddr(tx.to)}</span><br><small style="color:var(--text2)">${toLabel}</small>` : `<span class="addr" title="${tx.to}">${shortAddr(tx.to)}</span>${tx.tc?'<br><small class="tag tag-contract">合約</small>':''}`;
+    const amtClass = type === 'bridge' ? 'negative' : (type === 'swap' && tx.to === '0x3547639172C5D8c84df1dfC55acD4594Df1CF248') ? 'negative' : 'positive';
+    return `<tr data-type="${type}" data-from="${tx.from}" data-to="${tx.to}" data-tx="${tx.tx}">
+      <td>${tx.i}</td>
+      <td style="white-space:nowrap;font-size:12px">${tx.t}</td>
+      <td>${getTypeTag(type)}</td>
+      <td>${fromDisplay}</td>
+      <td>${toDisplay}</td>
+      <td class="amount ${amtClass}">${tx.amt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td><a href="https://scan.eniac.network/tx/${tx.tx}" target="_blank" class="addr" style="font-size:11px">${tx.tx.slice(0,10)}...</a></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const typeFilter = document.getElementById("typeFilter").value;
+  const rows = document.querySelectorAll("#txBody tr");
+  rows.forEach(row => {
+    const matchType = typeFilter === "all" || row.dataset.type === typeFilter;
+    const matchSearch = !search ||
+      row.dataset.from.toLowerCase().includes(search) ||
+      row.dataset.to.toLowerCase().includes(search) ||
+      row.dataset.tx.toLowerCase().includes(search);
+    row.style.display = matchType && matchSearch ? "" : "none";
+  });
+}
+
+// Copy address on click
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('addr') && e.target.title) {
+    navigator.clipboard.writeText(e.target.title);
+    const orig = e.target.style.color;
+    e.target.style.color = 'var(--green)';
+    setTimeout(() => e.target.style.color = orig, 500);
+  }
+});
+
+// Init
+renderTable(transfers);
+</script>
+</body>
+</html>
