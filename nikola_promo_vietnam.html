@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikola Protocol · Tài Liệu Quảng Bá 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #08090c;
+    --dark: #0e1117;
+    --card: #13161f;
+    --gold: #d4a843;
+    --gold-light: #f0c96a;
+    --gold-dim: rgba(212,168,67,0.15);
+    --gold-border: rgba(212,168,67,0.3);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.12);
+    --teal-border: rgba(45,212,191,0.25);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.1);
+    --text: #e8eaf0;
+    --text-muted: #6b7280;
+    --text-soft: #9ca3af;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 65%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 90%, rgba(45,212,191,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 90% 10%, rgba(212,168,67,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    border-radius: 100px;
+    padding: 6px 18px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 7vw, 80px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-title .line1 { color: #fff; display: block; }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-soft);
+    max-width: 580px;
+    margin: 0 auto 48px;
+    font-weight: 300;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-stat { text-align: center; }
+  .hero-stat .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--gold-light);
+    display: block;
+  }
+  .hero-stat .lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .divider {
+    width: 1px; height: 40px;
+    background: var(--border);
+    margin: auto 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  section {
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .section-desc {
+    font-size: 16px;
+    color: var(--text-soft);
+    max-width: 620px;
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .trust-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .trust-card:hover {
+    border-color: var(--gold-border);
+    transform: translateY(-3px);
+  }
+
+  .trust-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .trust-card:hover::before { opacity: 1; }
+
+  .trust-icon { font-size: 28px; margin-bottom: 14px; }
+  .trust-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+  .trust-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+  .trust-tag {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+  }
+
+  .mechanism-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 24px;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 32px 0;
+  }
+
+  .flow-step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 130px;
+    transition: border-color 0.3s;
+  }
+  .flow-step:hover { border-color: var(--teal-border); }
+  .flow-step .fs-icon { font-size: 24px; margin-bottom: 6px; }
+  .flow-step .fs-label { font-size: 12px; color: var(--text-soft); }
+  .flow-step .fs-val { font-size: 14px; font-weight: 600; color: #fff; }
+
+  .flow-arrow { font-size: 20px; color: var(--gold); flex-shrink: 0; }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 640px) {
+    .tiers { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .partner-grid { grid-template-columns: 1fr; }
+    .income-row { grid-template-columns: 50px 1fr; }
+    .income-tag { display: none; }
+  }
+
+  .tier-card {
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    border: 1px solid;
+    transition: transform 0.3s;
+  }
+  .tier-card:hover { transform: translateY(-4px); }
+
+  .tier-card.t1 { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.25); }
+  .tier-card.t2 {
+    background: rgba(212,168,67,0.07);
+    border-color: var(--gold-border);
+    position: relative;
+  }
+  .tier-card.t2::before {
+    content: 'Phổ biến nhất';
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .tier-card.t3 { background: rgba(45,212,191,0.06); border-color: var(--teal-border); }
+
+  .tier-range { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .tier-mult {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .t1 .tier-mult { color: var(--green); }
+  .t2 .tier-mult { color: var(--gold-light); }
+  .t3 .tier-mult { color: var(--teal); }
+
+  .tier-label { font-size: 13px; color: var(--text-soft); margin-bottom: 16px; }
+  .tier-example {
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-soft);
+    line-height: 1.8;
+  }
+
+  .income-layers { display: flex; flex-direction: column; gap: 16px; }
+
+  .income-row {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: center;
+    gap: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 28px;
+    transition: border-color 0.3s;
+  }
+  .income-row:hover { border-color: var(--gold-border); }
+
+  .income-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1;
+  }
+  .income-num.o1 { color: var(--green); }
+  .income-num.o3 { color: var(--teal); }
+  .income-num.o4 { color: var(--gold-light); }
+
+  .income-info .income-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .income-info .income-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .income-tag {
+    white-space: nowrap;
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .income-tag.green { background: var(--green-dim); border-color: rgba(34,197,94,0.3); color: var(--green); }
+  .income-tag.teal { background: var(--teal-dim); border-color: var(--teal-border); color: var(--teal); }
+  .income-tag.gold { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .partner-card {
+    border-radius: 20px;
+    padding: 36px 28px;
+    border: 1px solid;
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .partner-card:hover { transform: translateY(-4px); }
+
+  .partner-card.community {
+    background: linear-gradient(135deg, rgba(123,92,240,0.08), rgba(13,22,40,0.5));
+    border-color: rgba(123,92,240,0.3);
+  }
+  .partner-card.cofounder {
+    background: linear-gradient(135deg, rgba(212,168,67,0.1), rgba(13,22,40,0.5));
+    border-color: var(--gold-border);
+  }
+  .partner-card.cofounder::after {
+    content: '★ Đề xuất';
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--gold);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  .partner-type {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .community .partner-type { color: #a78bfa; }
+  .cofounder .partner-type { color: var(--gold); }
+
+  .partner-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .partner-quota { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+
+  .partner-benefits { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .partner-benefits li {
+    font-size: 13px;
+    color: var(--text-soft);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .partner-benefits li::before { content: '▸'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  .partner-benefits li strong { color: #fff; }
+
+  .partner-highlight {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--gold-light);
+    line-height: 1.7;
+  }
+
+  .steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 28px; top: 40px; bottom: 40px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), var(--teal));
+  }
+
+  .step { display: grid; grid-template-columns: 56px 1fr; gap: 24px; padding: 24px 0; position: relative; }
+
+  .step-num {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step:nth-child(1) .step-num { background: var(--gold-dim); border: 2px solid var(--gold); color: var(--gold); }
+  .step:nth-child(2) .step-num { background: var(--teal-dim); border: 2px solid var(--teal); color: var(--teal); }
+  .step:nth-child(3) .step-num { background: var(--green-dim); border: 2px solid rgba(34,197,94,0.5); color: var(--green); }
+  .step:nth-child(4) .step-num { background: rgba(212,168,67,0.2); border: 2px solid var(--gold); color: var(--gold-light); }
+
+  .step-content { padding-top: 12px; }
+  .step-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  .step-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .step-link:hover { background: rgba(212,168,67,0.25); }
+
+  .disclaimer-box {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.8;
+    margin-top: 40px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 60px 24px 40px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    line-height: 2;
+  }
+  footer a { color: var(--teal); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .callout {
+    background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(45,212,191,0.05));
+    border: 1px solid var(--gold-border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 28px 0;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .callout-text { font-size: 15px; color: var(--text-soft); line-height: 1.8; }
+  .callout-text strong { color: var(--gold-light); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="badge">◆ Web4.0 · AI Quant · ENI Mainnet</div>
+  <h1 class="hero-title">
+    <span class="line1">Tài sản của bạn</span>
+    <span class="line2">tự động tăng trưởng mỗi ngày</span>
+  </h1>
+  <p class="hero-sub">Nikola Protocol — Giao thức ươm tạo AI Quant xây dựng trên blockchain ENI. Nạp USDT, hệ thống tự động tích lũy lợi nhuận theo chuẩn U mỗi ngày, rút tiền quy đổi sang ROAM.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="val">7,5 Triệu+</span>
+      <span class="lbl">Node ROAM toàn cầu</span>
+    </div>
+    <div class="divider"></div>
+    <div class="hero-stat">
+      <span class="val">CertiK A</span>
+      <span class="lbl">Chứng nhận bảo mật</span>
+    </div>
+    <div class="divider"></div>
+    <div class="hero-stat">
+      <span class="val">3x</span>
+      <span class="lbl">Hệ số hoàn vốn tối đa</span>
+    </div>
+    <div class="divider"></div>
+    <div class="hero-stat">
+      <span class="val">100U</span>
+      <span class="lbl">Tối thiểu đầu tư</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 01 BẢO CHỨNG DỰ ÁN ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">01 · Bảo chứng & Độ tin cậy</p>
+      <h2 class="section-title">Tại sao đáng tin tưởng?</h2>
+      <p class="section-desc">Nikola Protocol được xây dựng trên hệ sinh thái có nhiều bảo chứng uy tín, không phải dự án không có giá trị thực.</p>
+    </div>
+
+    <div class="trust-grid reveal">
+      <div class="trust-card">
+        <div class="trust-icon">📡</div>
+        <div class="trust-title">ROAM — Dự án DePIN WiFi lớn nhất thế giới</div>
+        <div class="trust-desc">7,5 triệu+ node toàn cầu, phủ 190+ quốc gia, 2,3 triệu+ người dùng thực. Dự án Web3 IDP duy nhất trong liên minh 11 doanh nghiệp WBA OpenRoaming.</div>
+        <span class="trust-tag">Node thực · Người dùng thực</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🏦</div>
+        <div class="trust-title">Samsung Next đầu tư chiến lược</div>
+        <div class="trust-desc">Samsung Next + Anagram + Volt Capital cùng bảo chứng, hoàn thành vòng gọi vốn 5 triệu USD chiến lược năm 2023. Dự án được các tổ chức hàng đầu công nhận.</div>
+        <span class="trust-tag">Bảo chứng tổ chức</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🔐</div>
+        <div class="trust-title">Chứng nhận bảo mật CertiK hạng A</div>
+        <div class="trust-desc">Blockchain ENI đạt kiểm toán bảo mật CertiK hạng A, Top 11 bảng xếp hạng chuỗi toàn cầu Ave.ai, 2,68 triệu+ địa chỉ on-chain, 9,6 triệu+ giao dịch.</div>
+        <span class="trust-tag">CertiK Hạng A</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🔷</div>
+        <div class="trust-title">Blockchain ENI cấp doanh nghiệp</div>
+        <div class="trust-desc">Nền tảng công nghệ Zero-Knowledge Proof (ZKP), kiến trúc đa chuỗi module hóa. Blockchain doanh nghiệp duy nhất của Nikola, mọi giao dịch đều có thể kiểm tra công khai on-chain.</div>
+        <span class="trust-tag">ZKP · Minh bạch on-chain</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">📈</div>
+        <div class="trust-title">Đã niêm yết Binance Alpha</div>
+        <div class="trust-desc">ROAM đã niêm yết trên Binance Alpha, đồng thời lưu hành trên Bybit, Bitget, Gate.io, KuCoin, MEXC và nhiều sàn giao dịch chính thống khác, thanh khoản được đảm bảo.</div>
+        <span class="trust-tag">Binance Alpha ✅</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🤖</div>
+        <div class="trust-title">Hệ thống AI Quant tự động</div>
+        <div class="trust-desc">Tích hợp BloombergGPT phân tích thị trường, DeepSeek R1 phân tích on-chain, Claude 3 thiết kế chiến lược. Đa tác nhân AI phối hợp, vận hành hoàn toàn tự động.</div>
+        <span class="trust-tag">AI Tự động hoàn toàn</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02 CƠ CHẾ LỢI NHUẬN ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">02 · Cơ chế lợi nhuận</p>
+      <h2 class="section-title">Tiền hoạt động như thế nào?</h2>
+      <p class="section-desc">Cơ chế minh bạch đơn giản. Ba tầng lợi nhuận đều tích lũy theo chuẩn U, không bị ảnh hưởng bởi biến động giá ROAM.</p>
+    </div>
+
+    <div class="mechanism-box reveal">
+      <div style="font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:12px">Quy trình cốt lõi</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="fs-icon">💵</div>
+          <div class="fs-label">Bạn nạp vào</div>
+          <div class="fs-val">USDT</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-icon">🤖</div>
+          <div class="fs-label">AI chạy hệ thống</div>
+          <div class="fs-val">ENI Mainnet</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-icon">📊</div>
+          <div class="fs-label">Tích lũy chuẩn U mỗi ngày</div>
+          <div class="fs-val">1% / ngày</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-icon">🪙</div>
+          <div class="fs-label">Rút → quy đổi</div>
+          <div class="fs-val">Nhận ROAM</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-icon">💡</div>
+        <div class="callout-text">
+          <strong>Cơ chế bảo toàn giá trị theo chuẩn U:</strong> Cả 3 tầng lợi nhuận O1 + O3 + O4 đều tích lũy theo USD (chuẩn U). Dù giá ROAM tăng hay giảm, hạn mức tích lũy hàng ngày của bạn không bị ảnh hưởng. Chỉ khi rút tiền mới quy đổi theo giá ROAM thực tế tại thời điểm đó.
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:16px">🏆 Hệ thống hoàn vốn phân tầng — Đầu tư càng nhiều, hệ số càng cao</div>
+      <div class="tiers">
+        <div class="tier-card t1">
+          <div class="tier-range">Đầu tư 100U – 999U</div>
+          <div class="tier-mult">2x</div>
+          <div class="tier-label">hoàn vốn</div>
+          <div class="tier-example">
+            Nạp 500U<br>
+            → Nhận về 1.000U<br>
+            Hoàn thành ~200 ngày
+          </div>
+        </div>
+        <div class="tier-card t2">
+          <div class="tier-range">Đầu tư 1.000U – 2.999U</div>
+          <div class="tier-mult">2.5x</div>
+          <div class="tier-label">hoàn vốn</div>
+          <div class="tier-example">
+            Nạp 1.000U<br>
+            → Nhận về 2.500U<br>
+            Hoàn thành ~250 ngày
+          </div>
+        </div>
+        <div class="tier-card t3">
+          <div class="tier-range">Đầu tư từ 3.000U trở lên</div>
+          <div class="tier-mult">3x</div>
+          <div class="tier-label">hoàn vốn</div>
+          <div class="tier-example">
+            Nạp 3.000U<br>
+            → Nhận về 9.000U<br>
+            Hoàn thành ~300 ngày
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center">📌 Tối thiểu 100U, số tiền đầu tư phải là bội số của 100</div>
+    </div>
+
+    <div style="margin-top:40px" class="reveal">
+      <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:20px">🎁 Cấu trúc 3 tầng lợi nhuận — Đa chiều tăng tốc hoàn vốn</div>
+      <div class="income-layers">
+        <div class="income-row">
+          <div class="income-num o1">O1</div>
+          <div class="income-info">
+            <div class="income-title">Tích lũy cơ bản hàng ngày</div>
+            <div class="income-desc">1%/ngày trên vốn gốc (chuẩn U). Khi rút, quy đổi theo giá ROAM thực tế. Ví dụ: Nạp 1.000U → tích lũy $10/ngày, ~250 ngày đạt 2,5x hoàn vốn.</div>
+          </div>
+          <div class="income-tag green">Vốn × 1%/ngày</div>
+        </div>
+        <div class="income-row">
+          <div class="income-num o3">O3</div>
+          <div class="income-info">
+            <div class="income-title">Thưởng tăng tốc chia sẻ (chuẩn U)</div>
+            <div class="income-desc">Giới thiệu càng nhiều, mở khóa được càng nhiều tầng thưởng. Tối đa 10 tầng, cộng dồn tối đa +15%/ngày. Giới thiệu 1 người +5%, 3 người +10%, 5 người +15%.</div>
+          </div>
+          <div class="income-tag teal">Tối đa +15%</div>
+        </div>
+        <div class="income-row">
+          <div class="income-num o4">O4</div>
+          <div class="income-info">
+            <div class="income-title">Thưởng đóng góp đội nhóm (chuẩn U)</div>
+            <div class="income-desc">Nhận tỷ lệ cố định từ tổng tích lũy hàng ngày của toàn bộ đội nhóm, tỷ lệ do cấp bậc V quyết định. V1 (15%) → V8 (50%). Đội nhóm càng lớn, O4 càng dồi dào.</div>
+          </div>
+          <div class="income-tag gold">V1 15% → V8 50%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 03 GIÁ TRỊ NODE ĐỐI TÁC ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">03 · Giá trị Node Đối tác</p>
+      <h2 class="section-title">Tham gia sớm, lợi ích hiếm có</h2>
+      <p class="section-desc">Node đối tác là cách tham gia mạnh mẽ nhất vào hệ sinh thái Nikola. Số lượng có hạn, tham gia càng sớm, lợi ích dài hạn càng lớn.</p>
+    </div>
+
+    <div class="partner-grid reveal">
+      <div class="partner-card community">
+        <div class="partner-type">🌟 Đối tác Cộng đồng</div>
+        <div class="partner-price">500U</div>
+        <div class="partner-quota">Giới hạn 999 suất toàn cầu</div>
+        <ul class="partner-benefits">
+          <li><strong>80.000</strong> điểm tích lũy blockchain ENI</li>
+          <li>Thăng hạng <strong>V2</strong> ngay lập tức (thưởng O4 20%)</li>
+          <li>Chia sẻ <strong>45%</strong> pool phí dịch vụ hàng ngày</li>
+          <li>Token NKT <strong>2.000 coin</strong> (nội sàn $2.000)</li>
+          <li>Chia sẻ lợi nhuận AI quant tự động</li>
+        </ul>
+      </div>
+
+      <div class="partner-card cofounder">
+        <div class="partner-type">💎 Đồng sáng lập</div>
+        <div class="partner-price">1.000U</div>
+        <div class="partner-quota">Giới hạn 299 suất toàn cầu</div>
+        <ul class="partner-benefits">
+          <li><strong>220.000</strong> điểm tích lũy blockchain ENI</li>
+          <li>Thăng hạng <strong>V3</strong> ngay lập tức (thưởng O4 25%)</li>
+          <li>Chia sẻ <strong>25%</strong> pool phí dịch vụ hàng ngày</li>
+          <li>Token NKT <strong>5.000 coin</strong> (nội sàn $5.000)</li>
+          <li>Chia sẻ lợi nhuận AI quant tự động</li>
+        </ul>
+        <div class="partner-highlight">
+          💡 <strong>Logic hoàn vốn ngay khi mua:</strong> Mua 1.000U, kèm theo 5.000 NKT (nội sàn $5.000) + thăng hạng V3 ngay, tương đương chi phí được NKT bù đắp, quyền chia sẻ V3 là lợi nhuận thuần túy.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <div class="callout-icon">🔑</div>
+      <div class="callout-text">
+        <strong>Logic lãi kép của phí dịch vụ:</strong> Mỗi lần người dùng nạp tiền sẽ phát sinh 5% phí dịch vụ, trong đó 70% hoàn trả lại cho hệ sinh thái đối tác. Càng nhiều người dùng nền tảng, pool phí ngày càng lớn, đối tác nhận chia sẻ thụ động càng cao. Suất có hạn (999/299), tham gia sớm tỷ lệ bình quân cao nhất.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 04 CÁCH BẮT ĐẦU ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">04 · Cách bắt đầu tham gia</p>
+      <h2 class="section-title">Bốn bước đơn giản</h2>
+      <p class="section-desc">Từ con số 0 đến bắt đầu tích lũy mỗi ngày, chỉ cần hoàn thành bốn bước sau.</p>
+    </div>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Tải Bitget Wallet, tạo ví</div>
+          <div class="step-desc">Tải ứng dụng Bitget Wallet (iOS / Android đều được), tạo hoặc nhập ví Web3. Bitget Wallet hỗ trợ ENI Mainnet, là ví chính thức để tham gia Nikola.</div>
+          <a href="https://web3.bitget.com" target="_blank" class="step-link">📲 Tải chính thức → web3.bitget.com</a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">Chuẩn bị USDT, chuyển vào ENI Mainnet</div>
+          <div class="step-desc">Mua USDT trên sàn giao dịch, chuyển cross-chain vào địa chỉ ENI Mainnet. Tối thiểu 100 USDT, số tiền đầu tư phải là bội số của 100 (100U, 500U, 1.000U, 3.000U...).</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Vào giao thức Nikola, chọn số tiền đầu tư</div>
+          <div class="step-desc">Vào trang giao thức chính thức, chọn số tiền đầu tư và xác nhận. Số tiền quyết định hệ số hoàn vốn của bạn (100U~999U×2 / 1.000U~2.999U×2,5 / 3.000U+×3).</div>
+          <a href="https://nikola.global/" target="_blank" class="step-link">🟣 Cổng giao thức → nikola.global</a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Tự động tích lũy mỗi ngày, chờ hoàn vốn</div>
+          <div class="step-desc">Hệ thống tự động tích lũy chuẩn U hàng ngày (O1 cơ bản + điểm NKT). Khi đạt hệ số hoàn vốn, rút tiền quy đổi theo giá ROAM thực tế, nhận ROAM vào ví. ROAM nhận được có thể giữ, tái đầu tư hoặc quy đổi.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liên kết chính thức -->
+    <div class="mechanism-box reveal" style="margin-top:40px">
+      <div style="font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:20px">📋 Liên kết chính thức & Địa chỉ hợp đồng ROAM</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+        <div>
+          <div style="color:var(--text-muted);margin-bottom:10px;font-size:12px;font-family:'DM Mono',monospace">Liên kết chính thức</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>🟣 Cổng giao thức: <a href="https://nikola.global/" style="color:var(--teal)">nikola.global</a></div>
+            <div>📱 TG chính thức: <a href="https://t.me/Nikola_Eni" style="color:var(--teal)">t.me/Nikola_Eni</a></div>
+            <div>🔷 Blockchain ENI: <a href="https://eniac.network/" style="color:var(--teal)">eniac.network</a></div>
+            <div>🟢 Web ROAM: <a href="https://weroam.xyz/" style="color:var(--teal)">weroam.xyz</a></div>
+            <div>💼 Bitget Wallet: <a href="https://web3.bitget.com" style="color:var(--teal)">web3.bitget.com</a></div>
+          </div>
+        </div>
+        <div>
+          <div style="color:var(--text-muted);margin-bottom:10px;font-size:12px;font-family:'DM Mono',monospace">Địa chỉ hợp đồng ROAM (Xác minh trước khi thao tác)</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px">
+              <span style="color:var(--teal)">🔷 ENI Mainnet:</span><br>
+              <span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">0x23958cBa555AC52C9495Df9b121ff73003e39dBb</span>
+            </div>
+            <div style="font-size:12px">
+              <span style="color:var(--gold)">🟡 BSC Chain:</span><br>
+              <span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">0x3fefe29dA25BEa166fB5f6ADe7b5976D2b0e586B</span>
+            </div>
+            <div style="font-size:12px">
+              <span style="color:#a78bfa">🟣 Solana:</span><br>
+              <span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">RoamA1USA8xjvpTJZ6RvvxyDRzNh6GCA1zVGKSiMVkn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-box reveal">
+      ⚠️ Tài liệu này chỉ dành cho mục đích quảng bá và giáo dục, không cấu thành bất kỳ lời khuyên đầu tư nào. Đầu tư tiền mã hóa có rủi ro thị trường, vui lòng đánh giá cẩn thận dựa trên tình hình tài chính của bản thân, không đầu tư vượt quá khả năng chịu đựng rủi ro. Dữ liệu lợi nhuận được tính toán dựa trên mô hình whitepaper chính thức, kết quả thực tế có thể khác nhau do biến động thị trường. Địa chỉ hợp đồng và thông tin chính thức dựa theo thông báo kênh TG chính thức Nikola Protocol. Cảnh giác lừa đảo phishing. Tuyệt đối không tiết lộ khóa riêng tư hoặc seed phrase cho bất kỳ ai.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom:12px;font-size:16px">
+    <a href="https://nikola.global/">nikola.global</a> &nbsp;·&nbsp;
+    <a href="https://t.me/Nikola_Eni">t.me/Nikola_Eni</a>
+  </div>
+  Nikola Protocol · Tài liệu quảng bá · 26 tháng 3 năm 2026<br>
+  Chỉ dành cho quảng bá cộng đồng · Không phải lời khuyên đầu tư
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
