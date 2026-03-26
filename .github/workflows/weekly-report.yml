@@ -1,0 +1,32 @@
+name: ROAM Weekly Report
+
+on:
+  schedule:
+    # 每週一 01:00 UTC = 09:00 UTC+8
+    - cron: '0 1 * * 1'
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  update-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run report script
+        run: node scripts/update-report.js
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add roam_pool_analysis.html
+          git diff --staged --quiet || (git commit -m "Weekly ROAM fund pool report - $(date -u +%Y-%m-%d)" && git push)
