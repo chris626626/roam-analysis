@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikola Protocol · 拉新推廣文件 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #08090c;
+    --dark: #0e1117;
+    --card: #13161f;
+    --gold: #d4a843;
+    --gold-light: #f0c96a;
+    --gold-dim: rgba(212,168,67,0.15);
+    --gold-border: rgba(212,168,67,0.3);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.12);
+    --teal-border: rgba(45,212,191,0.25);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.1);
+    --text: #e8eaf0;
+    --text-muted: #6b7280;
+    --text-soft: #9ca3af;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRAIN OVERLAY ─── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 65%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 90%, rgba(45,212,191,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 90% 10%, rgba(212,168,67,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    border-radius: 100px;
+    padding: 6px 18px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 8vw, 88px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-title .line1 { color: #fff; display: block; }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--text-soft);
+    max-width: 560px;
+    margin: 0 auto 48px;
+    font-weight: 300;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-stat { text-align: center; }
+  .hero-stat .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--gold-light);
+    display: block;
+  }
+  .hero-stat .lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .divider {
+    width: 1px; height: 40px;
+    background: var(--border);
+    margin: auto 0;
+  }
+
+  /* ─── LAYOUT ─── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  section {
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .section-desc {
+    font-size: 16px;
+    color: var(--text-soft);
+    max-width: 600px;
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+
+  /* ─── TRUST BADGES ─── */
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .trust-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .trust-card:hover {
+    border-color: var(--gold-border);
+    transform: translateY(-3px);
+  }
+
+  .trust-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .trust-card:hover::before { opacity: 1; }
+
+  .trust-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+
+  .trust-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .trust-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .trust-tag {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  .mechanism-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 24px;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 32px 0;
+  }
+
+  .flow-step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 140px;
+    transition: border-color 0.3s;
+  }
+  .flow-step:hover { border-color: var(--teal-border); }
+
+  .flow-step .fs-icon { font-size: 24px; margin-bottom: 6px; }
+  .flow-step .fs-label { font-size: 13px; color: var(--text-soft); }
+  .flow-step .fs-val { font-size: 15px; font-weight: 600; color: #fff; }
+
+  .flow-arrow {
+    font-size: 20px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ─── TIERS ─── */
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 640px) {
+    .tiers { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+
+  .tier-card {
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    border: 1px solid;
+    transition: transform 0.3s;
+  }
+  .tier-card:hover { transform: translateY(-4px); }
+
+  .tier-card.t1 {
+    background: rgba(34,197,94,0.06);
+    border-color: rgba(34,197,94,0.25);
+  }
+  .tier-card.t2 {
+    background: rgba(212,168,67,0.07);
+    border-color: var(--gold-border);
+    position: relative;
+  }
+  .tier-card.t2::before {
+    content: '最熱門';
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+  .tier-card.t3 {
+    background: rgba(45,212,191,0.06);
+    border-color: var(--teal-border);
+  }
+
+  .tier-range { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+  .tier-mult {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .t1 .tier-mult { color: var(--green); }
+  .t2 .tier-mult { color: var(--gold-light); }
+  .t3 .tier-mult { color: var(--teal); }
+
+  .tier-label { font-size: 13px; color: var(--text-soft); margin-bottom: 16px; }
+  .tier-example {
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-soft);
+    line-height: 1.8;
+  }
+
+  /* ─── INCOME LAYERS ─── */
+  .income-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .income-row {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: center;
+    gap: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 28px;
+    transition: border-color 0.3s;
+  }
+  .income-row:hover { border-color: var(--gold-border); }
+
+  .income-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1;
+  }
+  .income-num.o1 { color: var(--green); }
+  .income-num.o3 { color: var(--teal); }
+  .income-num.o4 { color: var(--gold-light); }
+
+  .income-info .income-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .income-info .income-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .income-tag {
+    white-space: nowrap;
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .income-tag.green { background: var(--green-dim); border-color: rgba(34,197,94,0.3); color: var(--green); }
+  .income-tag.teal { background: var(--teal-dim); border-color: var(--teal-border); color: var(--teal); }
+  .income-tag.gold { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+
+  /* ─── PARTNER ─── */
+  .partner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .partner-grid { grid-template-columns: 1fr; }
+    .income-row { grid-template-columns: 50px 1fr; }
+    .income-tag { display: none; }
+  }
+
+  .partner-card {
+    border-radius: 20px;
+    padding: 36px 32px;
+    border: 1px solid;
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .partner-card:hover { transform: translateY(-4px); }
+
+  .partner-card.community {
+    background: linear-gradient(135deg, rgba(123,92,240,0.08), rgba(13,22,40,0.5));
+    border-color: rgba(123,92,240,0.3);
+  }
+  .partner-card.cofounder {
+    background: linear-gradient(135deg, rgba(212,168,67,0.1), rgba(13,22,40,0.5));
+    border-color: var(--gold-border);
+  }
+
+  .partner-card.cofounder::after {
+    content: '★ 推薦';
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--gold);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .partner-type {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .community .partner-type { color: #a78bfa; }
+  .cofounder .partner-type { color: var(--gold); }
+
+  .partner-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .partner-quota {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .partner-benefits {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .partner-benefits li {
+    font-size: 13px;
+    color: var(--text-soft);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+
+  .partner-benefits li::before {
+    content: '▸';
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .partner-benefits li strong { color: #fff; }
+
+  .partner-highlight {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--gold-light);
+    line-height: 1.7;
+  }
+
+  /* ─── STEPS ─── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 40px;
+    bottom: 40px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), var(--teal));
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    position: relative;
+  }
+
+  .step-num {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step:nth-child(1) .step-num { background: var(--gold-dim); border: 2px solid var(--gold); color: var(--gold); }
+  .step:nth-child(2) .step-num { background: var(--teal-dim); border: 2px solid var(--teal); color: var(--teal); }
+  .step:nth-child(3) .step-num { background: var(--green-dim); border: 2px solid rgba(34,197,94,0.5); color: var(--green); }
+  .step:nth-child(4) .step-num { background: rgba(212,168,67,0.2); border: 2px solid var(--gold); color: var(--gold-light); }
+
+  .step-content { padding-top: 12px; }
+  .step-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  .step-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .step-link:hover { background: rgba(212,168,67,0.25); }
+
+  /* ─── DISCLAIMER ─── */
+  .disclaimer-box {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.8;
+    margin-top: 40px;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 60px 24px 40px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    line-height: 2;
+  }
+
+  footer a { color: var(--teal); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ─── HIGHLIGHT CALLOUT ─── */
+  .callout {
+    background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(45,212,191,0.05));
+    border: 1px solid var(--gold-border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 28px 0;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .callout-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .callout-text { font-size: 15px; color: var(--text-soft); line-height: 1.8; }
+  .callout-text strong { color: var(--gold-light); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="badge">◆ Web4.0 · AI 量化 · ENI 主網</div>
+  <h1 class="hero-title">
+    <span class="line1">讓資產</span>
+    <span class="line2">每天自動增值</span>
+  </h1>
+  <p class="hero-sub">Nikola Protocol — 建立在 ENI 公鏈的 AI 量化孵化協議。USDT 投入，系統每日自動以 U 本位累積收益，提現時換算 ROAM 提出。</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="val">750萬+</span>
+      <span class="lbl">ROAM 全球節點</span>
+    </div>
+    <div class="divider"></div>
+    <div class="hero-stat">
+      <span class="val">CertiK A</span>
+      <span class="lbl">安全評級</span>
+    </div>
+    <div class="divider"></div>
+    <div class="hero-stat">
+      <span class="val">3x</span>
+      <span class="lbl">最高本金出局倍數</span>
+    </div>
+    <div class="divider"></div>
+    <div class="hero-stat">
+      <span class="val">100U</span>
+      <span class="lbl">最低起投門檻</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 01 項目背書 ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">01 · 項目背書與安全性</p>
+      <h2 class="section-title">為什麼值得信任？</h2>
+      <p class="section-desc">Nikola Protocol 建立在多重有公信力背書的生態之上，不是空氣項目。</p>
+    </div>
+
+    <div class="trust-grid reveal">
+      <div class="trust-card">
+        <div class="trust-icon">📡</div>
+        <div class="trust-title">ROAM — 全球最大 DePIN WiFi 項目</div>
+        <div class="trust-desc">750萬+ 全球節點，覆蓋 190+ 國家，230萬+ 真實用戶。WBA OpenRoaming 計劃 11 個企業聯盟中唯一 Web3 IDP 項目方。</div>
+        <span class="trust-tag">真實節點 · 真實用戶</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🏦</div>
+        <div class="trust-title">Samsung Next 戰略投資</div>
+        <div class="trust-desc">Samsung Next + Anagram + Volt Capital 聯合背書，2023年完成 500 萬美元戰略融資。頂級機構認可的項目。</div>
+        <span class="trust-tag">機構背書</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🔐</div>
+        <div class="trust-title">CertiK A 級安全認證</div>
+        <div class="trust-desc">ENI 公鏈通過 CertiK A 級安全審計，Ave.ai 全球公鏈榜單 Top 11，268萬+ 鏈上地址數，960萬+ 總交易數。</div>
+        <span class="trust-tag">CertiK A 級</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🔷</div>
+        <div class="trust-title">ENI 企業級公鏈底座</div>
+        <div class="trust-desc">基於零知識證明（ZKP）技術，模組化多鏈架構。Nikola 唯一的企業級公鏈底座，所有交易可在鏈上公開查驗。</div>
+        <span class="trust-tag">ZKP 技術 · 鏈上可查</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">📈</div>
+        <div class="trust-title">Binance Alpha 已上線</div>
+        <div class="trust-desc">ROAM 已在 Binance Alpha 上架交易，同時在 Bybit、Bitget、Gate.io、KuCoin、MEXC 等多家主流交易所流通，流動性有保障。</div>
+        <span class="trust-tag">Binance Alpha ✅</span>
+      </div>
+
+      <div class="trust-card">
+        <div class="trust-icon">🤖</div>
+        <div class="trust-title">AI 算力量化系統</div>
+        <div class="trust-desc">融合 BloombergGPT 市場分析、DeepSeek R1 鏈上洞察、Claude 3 策略設計，多智能體協作，AI 全自動運行。</div>
+        <span class="trust-tag">AI 全自動</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02 收益機制 ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">02 · 收益機制說明</p>
+      <h2 class="section-title">錢是怎麼運作的？</h2>
+      <p class="section-desc">機制透明簡單，三層收益全部以 U 本位累積，不受 ROAM 幣價波動影響。</p>
+    </div>
+
+    <div class="mechanism-box reveal">
+      <div style="font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:12px">核心流程</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="fs-icon">💵</div>
+          <div class="fs-label">你投入</div>
+          <div class="fs-val">USDT</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-icon">🤖</div>
+          <div class="fs-label">AI 系統運行</div>
+          <div class="fs-val">ENI 主網</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-icon">📊</div>
+          <div class="fs-label">每日 U 本位累積</div>
+          <div class="fs-val">1% / 天</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-icon">🪙</div>
+          <div class="fs-label">提現時換算</div>
+          <div class="fs-val">ROAM 提出</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-icon">💡</div>
+        <div class="callout-text">
+          <strong>U 本位保值機制</strong>：O1 + O3 + O4 三層收益全部以美元（U 本位）累積，無論 ROAM 幣價漲跌，你的每日累積額度不受影響。提現時才依照當時 ROAM 實時價格換算提出。
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:16px">🏆 分層出局制度 — 投越多，倍數越高</div>
+      <div class="tiers">
+        <div class="tier-card t1">
+          <div class="tier-range">投入 100U – 999U</div>
+          <div class="tier-mult">2x</div>
+          <div class="tier-label">本金出局</div>
+          <div class="tier-example">
+            投 500U<br>
+            → 共領回 1,000U<br>
+            約 200 天完成
+          </div>
+        </div>
+        <div class="tier-card t2">
+          <div class="tier-range">投入 1,000U – 2,999U</div>
+          <div class="tier-mult">2.5x</div>
+          <div class="tier-label">本金出局</div>
+          <div class="tier-example">
+            投 1,000U<br>
+            → 共領回 2,500U<br>
+            約 250 天完成
+          </div>
+        </div>
+        <div class="tier-card t3">
+          <div class="tier-range">投入 3,000U 及以上</div>
+          <div class="tier-mult">3x</div>
+          <div class="tier-label">本金出局</div>
+          <div class="tier-example">
+            投 3,000U<br>
+            → 共領回 9,000U<br>
+            約 300 天完成
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center">📌 最低 100U 起投，投入金額須為 100 的倍數</div>
+    </div>
+
+    <div style="margin-top:40px" class="reveal">
+      <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:20px">🎁 三層收益結構 — 多維加速出局</div>
+      <div class="income-layers">
+        <div class="income-row">
+          <div class="income-num o1">O1</div>
+          <div class="income-info">
+            <div class="income-title">基礎每日累積</div>
+            <div class="income-desc">自己本金的 1%/天（U 本位）。提現時按 ROAM 實時價換算提出。例：投 1,000U → 每天累積 $10，約 250 天達到 2.5x 出局。</div>
+          </div>
+          <div class="income-tag green">本金 × 1%/天</div>
+        </div>
+        <div class="income-row">
+          <div class="income-num o3">O3</div>
+          <div class="income-info">
+            <div class="income-title">分享加速獎勵（U 本位）</div>
+            <div class="income-desc">直推人數越多，解鎖獎勵代數越深。最高解鎖 10 代，合計最高 +15%/天。直推 1 人解鎖 +5%，3 人解鎖 +10%，5 人解鎖 +15%。</div>
+          </div>
+          <div class="income-tag teal">最高 +15%</div>
+        </div>
+        <div class="income-row">
+          <div class="income-num o4">O4</div>
+          <div class="income-info">
+            <div class="income-title">團隊貢獻獎勵（U 本位）</div>
+            <div class="income-desc">每天獲得整個傘下團隊總日累積額的固定比例，由 V 等級決定。V1（15%）→ V8（50%）。團隊越大，每天 O4 越豐厚。</div>
+          </div>
+          <div class="income-tag gold">V1 15% → V8 50%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 03 合夥人節點 ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">03 · 合夥人節點價值</p>
+      <h2 class="section-title">早期加入，稀缺紅利</h2>
+      <p class="section-desc">合夥人節點是參與 Nikola 生態的最強姿態。名額有限，越早加入，長期收益越豐厚。</p>
+    </div>
+
+    <div class="partner-grid reveal">
+      <div class="partner-card community">
+        <div class="partner-type">🌟 社區合夥人</div>
+        <div class="partner-price">500U</div>
+        <div class="partner-quota">全球限 999 個名額</div>
+        <ul class="partner-benefits">
+          <li><strong>8 萬</strong> ENI 公鏈積分</li>
+          <li><strong>V2 等級</strong>直升（O4 獎勵 20%）</li>
+          <li>每日手續費分紅池 <strong>45%</strong> 均分</li>
+          <li>NKT 算力代幣 <strong>2,000 枚</strong>（內盤 $2,000）</li>
+          <li>AI 智能體量化算力分紅</li>
+        </ul>
+      </div>
+
+      <div class="partner-card cofounder">
+        <div class="partner-type">💎 聯創合夥人</div>
+        <div class="partner-price">1,000U</div>
+        <div class="partner-quota">全球限 299 個名額</div>
+        <ul class="partner-benefits">
+          <li><strong>22 萬</strong> ENI 公鏈積分</li>
+          <li><strong>V3 等級</strong>直升（O4 獎勵 25%）</li>
+          <li>每日手續費分紅池 <strong>25%</strong> 均分</li>
+          <li>NKT 算力代幣 <strong>5,000 枚</strong>（內盤 $5,000）</li>
+          <li>AI 智能體量化算力分紅</li>
+        </ul>
+        <div class="partner-highlight">
+          💡 <strong>買入即回本邏輯：</strong>1,000U 購買，附帶 5,000 枚 NKT（內盤價值 $5,000）+ V3 等級直升，相當於成本由 NKT 覆蓋，V3 分紅權為純額外收益。
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <div class="callout-icon">🔑</div>
+      <div class="callout-text">
+        <strong>手續費分紅的複利邏輯：</strong>平台每筆用戶投入產生 5% 服務費，其中 70% 回饋給合夥人生態。平台用戶越多、每天服務費池越大，合夥人每天被動分紅越豐厚。名額稀缺（999/299），早期加入人均佔比最高。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 04 如何開始 ===== -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">04 · 如何開始參與</p>
+      <h2 class="section-title">四步完成，全程簡單</h2>
+      <p class="section-desc">從零到開始每日累積，只需完成以下四個步驟。</p>
+    </div>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">下載 Bitget Wallet，創建錢包</div>
+          <div class="step-desc">下載 Bitget Wallet App（iOS / Android 均可），創建或導入 Web3 錢包。Bitget Wallet 支持 ENI 主網，是參與 Nikola 的指定錢包。</div>
+          <a href="https://web3.bitget.com" target="_blank" class="step-link">📲 官方下載 → web3.bitget.com</a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">準備 USDT，轉入 ENI 主網</div>
+          <div class="step-desc">在交易所購買 USDT，跨鏈轉入 ENI 主網地址。最低 100 USDT 起，投入金額須為 100 的倍數（如 100U、500U、1,000U、3,000U）。</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">進入 Nikola 協議，選擇投入金額</div>
+          <div class="step-desc">進入官方協議頁面，選擇投入金額並確認。投入金額決定你的出局倍數（100U~999U×2 / 1,000U~2,999U×2.5 / 3,000U+×3）。</div>
+          <a href="https://nikola.global/" target="_blank" class="step-link">🟣 協議入口 → nikola.global</a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">每日自動累積，靜待出局</div>
+          <div class="step-desc">系統每日自動以 U 本位累積收益（O1 基礎 + NKT 積分），達到出局倍數後提現，依照 ROAM 實時價格換算提出到錢包。收到的 ROAM 可持有、複投或兌換。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 官方链接 -->
+    <div class="mechanism-box reveal" style="margin-top:40px">
+      <div style="font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:20px">📋 官方連結 & ROAM 合約地址</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+        <div>
+          <div style="color:var(--text-muted);margin-bottom:10px;font-size:12px;font-family:'DM Mono',monospace">官方連結</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>🟣 協議入口：<a href="https://nikola.global/" style="color:var(--teal)">nikola.global</a></div>
+            <div>📱 官方 TG：<a href="https://t.me/Nikola_Eni" style="color:var(--teal)">t.me/Nikola_Eni</a></div>
+            <div>🔷 ENI 公鏈：<a href="https://eniac.network/" style="color:var(--teal)">eniac.network</a></div>
+            <div>🟢 ROAM 官網：<a href="https://weroam.xyz/" style="color:var(--teal)">weroam.xyz</a></div>
+            <div>💼 Bitget Wallet：<a href="https://web3.bitget.com" style="color:var(--teal)">web3.bitget.com</a></div>
+          </div>
+        </div>
+        <div>
+          <div style="color:var(--text-muted);margin-bottom:10px;font-size:12px;font-family:'DM Mono',monospace">ROAM 合約地址（核實後再操作）</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px">
+              <span style="color:var(--teal)">🔷 ENI 主網：</span><br>
+              <span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">0x23958cBa555AC52C9495Df9b121ff73003e39dBb</span>
+            </div>
+            <div style="font-size:12px">
+              <span style="color:var(--gold)">🟡 BSC 鏈：</span><br>
+              <span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">0x3fefe29dA25BEa166fB5f6ADe7b5976D2b0e586B</span>
+            </div>
+            <div style="font-size:12px">
+              <span style="color:#a78bfa">🟣 Solana：</span><br>
+              <span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">RoamA1USA8xjvpTJZ6RvvxyDRzNh6GCA1zVGKSiMVkn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-box reveal">
+      ⚠️ 本文件僅供推廣教育用途，不構成任何投資建議。加密貨幣投資存在市場風險，請根據自身財務狀況謹慎評估，切勿投入超出承受能力的資金。收益數據基於官方白皮書模型計算，實際結果因市場變動而有所差異。合約地址及官方資訊以 Nikola Protocol 官方 TG 頻道公告為準，謹防釣魚詐騙。切勿向任何人透露私鑰或助記詞。
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom:12px;font-size:16px">
+    <a href="https://nikola.global/">nikola.global</a> &nbsp;·&nbsp;
+    <a href="https://t.me/Nikola_Eni">t.me/Nikola_Eni</a>
+  </div>
+  Nikola Protocol 推廣資料庫 · 2026年3月26日<br>
+  僅供社區推廣使用 · 不構成投資建議
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
