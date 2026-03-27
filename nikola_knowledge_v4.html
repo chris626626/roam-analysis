@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nikola Protocol 說明</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0c10;--card:#14171e;--border:#1e2330;--text:#d8dce6;--muted:#6b7a90;--soft:#8e9bb3;--gold:#d4a843;--goldbg:rgba(212,168,67,.1);--goldbdr:rgba(212,168,67,.25);--teal:#2dd4bf;--tealbg:rgba(45,212,191,.08);--tealbdr:rgba(45,212,191,.2);--green:#3fb950;--greenbg:rgba(63,185,80,.08);--greenbdr:rgba(63,185,80,.2);--red:#f85149;--redbg:rgba(248,81,73,.08);--redbdr:rgba(248,81,73,.2)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;line-height:1.7;padding:0 0 60px;-webkit-text-size-adjust:100%}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;padding:10px 16px;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid transparent;transition:all .2s}
+.nav a:hover,.nav a:active{color:var(--gold);border-color:var(--goldbdr)}
+
+/* CONTENT */
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+
+/* HEADER */
+.hdr{padding:32px 0 24px;text-align:center}
+.hdr h1{font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.3}
+.hdr p{font-size:13px;color:var(--muted);line-height:1.6}
+.ver{display:inline-block;background:var(--greenbg);border:1px solid var(--greenbdr);color:var(--green);font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;margin-bottom:12px}
+
+/* SECTION */
+.sec{margin-top:20px}
+.sec-head{display:flex;align-items:center;gap:10px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px 12px 0 0}
+.sec-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.sec-head h2{font-size:16px;font-weight:700;color:#fff;flex:1}
+.sec-body{background:var(--card);border:1px solid var(--border);border-top:0;border-radius:0 0 12px 12px;padding:16px;font-size:14px}
+
+/* CALLOUT */
+.callout{border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.7;border-left:3px solid}
+.callout b,.callout strong{font-weight:700}
+.c-gold{background:var(--goldbg);border-color:var(--gold);color:#e0c070}
+.c-green{background:var(--greenbg);border-color:var(--green);color:#7dd89a}
+.c-teal{background:var(--tealbg);border-color:var(--teal);color:#6ee4d0}
+.c-red{background:var(--redbg);border-color:var(--red);color:#f88}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.tbl th{background:rgba(255,255,255,.04);color:var(--soft);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--soft);vertical-align:top;line-height:1.6}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl .lbl{color:var(--text);font-weight:500;white-space:nowrap}
+.tbl .hi{font-weight:700;color:#fff}
+
+/* TAG */
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.tag-green{background:var(--greenbg);border:1px solid var(--greenbdr);color:var(--green)}
+.tag-gold{background:var(--goldbg);border:1px solid var(--goldbdr);color:var(--gold)}
+.tag-teal{background:var(--tealbg);border:1px solid var(--tealbdr);color:var(--teal)}
+.tag-red{background:var(--redbg);border:1px solid var(--redbdr);color:var(--red)}
+
+/* SUB TITLE */
+.sub{font-size:14px;font-weight:700;color:#fff;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
+.sub:first-child{margin-top:0}
+
+/* LAYER CARD (O1/O3/O4) */
+.layer{border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.layer-h{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
+.layer-id{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.layer-id.o1{background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)}
+.layer-id.o3{background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)}
+.layer-id.o4{background:var(--goldbg);color:var(--gold);border:1px solid var(--goldbdr)}
+.layer-name{font-size:14px;font-weight:700;color:#fff}
+.layer-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.layer-b{padding:12px 14px;font-size:13px}
+
+/* TIER CARDS */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.tier{border-radius:10px;padding:14px 10px;text-align:center;border:1px solid}
+.tier .range{font-size:11px;color:var(--muted);margin-bottom:4px}
+.tier .mult{font-size:32px;font-weight:900;line-height:1}
+.tier .lbl2{font-size:11px;color:var(--soft);margin:4px 0 8px}
+.tier .ex{background:rgba(0,0,0,.3);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--muted);line-height:1.7;text-align:left}
+.t1{background:rgba(63,185,80,.05);border-color:var(--greenbdr)} .t1 .mult{color:var(--green)}
+.t2{background:rgba(212,168,67,.06);border-color:var(--goldbdr);position:relative} .t2 .mult{color:var(--gold)}
+.t2::after{content:'熱門';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:9px;font-weight:800;padding:2px 8px;border-radius:10px}
+.t3{background:rgba(45,212,191,.05);border-color:var(--tealbdr)} .t3 .mult{color:var(--teal)}
+
+/* PARTNER */
+.partners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.pcard{border-radius:12px;padding:16px 14px;border:1px solid}
+.pcard.cm{background:rgba(123,92,240,.06);border-color:rgba(123,92,240,.25)}
+.pcard.cf{background:var(--goldbg);border-color:var(--goldbdr)}
+.pcard .pt{font-size:11px;font-weight:700;margin-bottom:4px}
+.cm .pt{color:#a78bfa} .cf .pt{color:var(--gold)}
+.pcard .pp{font-size:28px;font-weight:900;color:#fff;line-height:1}
+.pcard .pq{font-size:11px;color:var(--muted);margin:4px 0 12px}
+.pcard ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.pcard li{font-size:12px;color:var(--soft);display:flex;gap:5px;line-height:1.5}
+.pcard li::before{content:'▸';color:var(--gold);flex-shrink:0}
+.pcard li strong{color:#fff}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:0;position:relative;padding-left:24px}
+.steps::before{content:'';position:absolute;left:11px;top:20px;bottom:20px;width:2px;background:linear-gradient(var(--gold),var(--teal))}
+.stp{position:relative;padding:12px 0}
+.stp-dot{position:absolute;left:-24px;top:16px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:var(--goldbg);border:2px solid var(--gold);color:var(--gold);z-index:1}
+.stp-t{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.stp-d{font-size:13px;color:var(--muted);line-height:1.7}
+.stp-d a{color:var(--teal);text-decoration:none}
+
+/* ADDR */
+.addr{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.addr .chain{font-size:12px;font-weight:600;color:var(--soft);margin-bottom:3px}
+.addr .val{font-family:monospace;font-size:11px;color:var(--teal);word-break:break-all}
+
+/* COMPARE TABLE highlight */
+.tbl .row-hi td{background:rgba(212,168,67,.06)}
+.tbl .row-green td{background:var(--greenbg)}
+.tbl .row-teal td{background:var(--tealbg)}
+.tbl .row-gold td{background:var(--goldbg)}
+
+/* WINNER BADGE */
+.win{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800}
+.win-a{background:var(--greenbg);border:1px solid var(--greenbdr);color:var(--green)}
+.win-b{background:var(--goldbg);border:1px solid var(--goldbdr);color:var(--gold)}
+
+/* CHANGELOG */
+.chg{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.chg:last-child{border-bottom:0}
+.chg-d{color:var(--soft);line-height:1.6}
+.chg-d strong{color:var(--text)}
+
+/* FOOTER */
+.ftr{text-align:center;padding:32px 16px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:24px;line-height:2}
+.ftr a{color:var(--teal);text-decoration:none}
+
+/* BTT */
+.btt{position:fixed;bottom:20px;right:16px;width:40px;height:40px;border-radius:50%;background:var(--gold);color:#000;border:0;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:99}
+
+@media(max-width:420px){
+  .tiers{grid-template-columns:1fr}
+  .partners{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#s1">項目概覽</a>
+  <a href="#s2">收益機制</a>
+  <a href="#s3">合夥人</a>
+  <a href="#s4">官方連結</a>
+  <a href="#s5">參與流程</a>
+  <a href="#s6">投資計算</a>
+  <a href="#s7">走向對照</a>
+</nav>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="ver">✅ v3.1 · 2026-03-27</div>
+  <h1>Nikola Protocol<br>資料庫內容說明</h1>
+  <p>涵蓋項目概覽、收益機制、合夥人方案、官方連結及參與流程</p>
+</div>
+
+<!-- 01 -->
+<div class="sec" id="s1">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--goldbg);color:var(--gold);border:1px solid var(--goldbdr)">01</div>
+    <h2>項目概覽與核心運作</h2>
+  </div>
+  <div class="sec-body">
+    <div class="sub">🌐 什麼是 Nikola Protocol？</div>
+    <div class="callout c-teal">Nikola Protocol 是建立在 <strong>ENI 公鏈</strong>上的 <strong>Web4.0 AI 量化孵化協議</strong>，以 TIF（Technology × Intelligent × Finance）為核心框架，融合多智能體協作系統與大規模 AI 模型數據能力，打造自我進化的智能孵化引擎。</div>
+
+    <div class="sub">💡 核心運作邏輯</div>
+    <table class="tbl">
+      <tr><td class="lbl">資金方向</td><td>USDT 投入 → AI 算力量化 → U 本位每日累積 → 提現換算 ROAM</td></tr>
+      <tr><td class="lbl">每日累積</td><td>本金 <strong style="color:#fff">1%/天</strong>（U 本位）</td></tr>
+      <tr><td class="lbl">收益分配</td><td>85% O1 + 10% NKT + 5% 服務費</td></tr>
+      <tr><td class="lbl">有效收益率</td><td><strong style="color:#fff">95%</strong></td></tr>
+      <tr><td class="lbl">最低投入</td><td>100 USDT（100 的倍數）</td></tr>
+      <tr><td class="lbl">運行網絡</td><td>ENI 主網</td></tr>
+      <tr><td class="lbl">NKT</td><td>AI Agent 算力積分，1 NKT = 1 USDT</td></tr>
+    </table>
+
+    <div class="sub">🔐 生態背書</div>
+    <table class="tbl">
+      <tr><th>項目</th><th>說明</th><th>狀態</th></tr>
+      <tr><td class="lbl">ROAM</td><td>WBA OpenRoaming 唯一 Web3 IDP，750萬+ 節點，190+ 國家</td><td><span class="tag tag-green">已上線</span></td></tr>
+      <tr><td class="lbl">ENI</td><td>ZKP 技術，Ave.ai Top 11，268萬+ 地址</td><td><span class="tag tag-green">運行中</span></td></tr>
+      <tr><td class="lbl">Binance Alpha</td><td>ROAM 已上架交易</td><td><span class="tag tag-green">✅</span></td></tr>
+      <tr><td class="lbl">交易所</td><td>Bybit、Bitget、Gate、KuCoin、MEXC 等</td><td><span class="tag tag-teal">流通中</span></td></tr>
+      <tr><td class="lbl">Samsung Next</td><td>$5M 戰略融資（2023）</td><td><span class="tag tag-gold">已背書</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 02 -->
+<div class="sec" id="s2">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)">02</div>
+    <h2>收益機制說明</h2>
+    <span class="tag tag-green">v2 修正</span>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-green">✅ <strong>核心修正：</strong>O1 + O3 + O4 三層收益全部以 U 本位（美元）累積。無論 ROAM 幣價漲跌，每日累積額度不受影響。提現時統一按 ROAM 實時價換算提出。</div>
+
+    <div class="sub">🏆 分層出局制度</div>
+    <div class="tiers">
+      <div class="tier t1"><div class="range">100U – 999U</div><div class="mult">2x</div><div class="lbl2">本金出局</div><div class="ex">投 500U<br>→ 領回 1,000U<br>約 200 天</div></div>
+      <div class="tier t2"><div class="range">1,000U – 2,999U</div><div class="mult">2.5x</div><div class="lbl2">本金出局</div><div class="ex">投 1,000U<br>→ 領回 2,500U<br>約 250 天</div></div>
+      <div class="tier t3"><div class="range">3,000U+</div><div class="mult">3x</div><div class="lbl2">本金出局</div><div class="ex">投 3,000U<br>→ 領回 9,000U<br>約 300 天</div></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:16px">📌 最低 100U，金額須為 100 的倍數</p>
+
+    <div class="sub">🎁 三層收益結構</div>
+
+    <!-- O1 -->
+    <div class="layer">
+      <div class="layer-h">
+        <div class="layer-id o1">O1</div>
+        <div><div class="layer-name">基礎每日累積</div><div class="layer-sub">本金 × 1%/天 · U 本位</div></div>
+      </div>
+      <div class="layer-b">
+        <table class="tbl">
+          <tr><td class="lbl">結算</td><td><strong style="color:#fff">U 本位累積</strong>，提現時按 ROAM 實時價換算</td></tr>
+          <tr><td class="lbl">幣價影響</td><td>✅ 不受影響，只影響提現時 ROAM 數量</td></tr>
+          <tr><td class="lbl">舉例</td><td>投 1,000U → 每天 $10<br>提現時 ROAM $0.5 → 20 ROAM<br>ROAM $1.0 → 10 ROAM<br>ROAM $2.0 → 5 ROAM</td></tr>
+          <tr><td class="lbl">NKT</td><td>同步累積：1,000U → 1 NKT/天</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- O3 -->
+    <div class="layer">
+      <div class="layer-h">
+        <div class="layer-id o3">O3</div>
+        <div><div class="layer-name">分享加速獎勵</div><div class="layer-sub">U 本位 · 最高 +15%</div></div>
+      </div>
+      <div class="layer-b">
+        <table class="tbl">
+          <tr><th>直推人數</th><th>解鎖代數</th><th>合計</th></tr>
+          <tr><td>≥ 1 人</td><td>1 代</td><td><strong style="color:#fff">5%</strong></td></tr>
+          <tr><td>≥ 3 人</td><td>5 代</td><td><strong style="color:#fff">10%</strong></td></tr>
+          <tr><td>≥ 5 人</td><td>10 代</td><td><strong style="color:var(--teal)">15%</strong></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- O4 -->
+    <div class="layer">
+      <div class="layer-h">
+        <div class="layer-id o4">O4</div>
+        <div><div class="layer-name">團隊貢獻獎勵</div><div class="layer-sub">U 本位 · V1(15%) → V8(50%)</div></div>
+      </div>
+      <div class="layer-b">
+        <table class="tbl">
+          <tr><th>等級</th><th>門檻</th><th>O4</th></tr>
+          <tr><td>V1</td><td>團隊 0.5 萬U</td><td>15%</td></tr>
+          <tr><td>V2</td><td>團隊 2 萬U</td><td>20%</td></tr>
+          <tr><td>V3</td><td>小區 10 萬U</td><td>25%</td></tr>
+          <tr><td>V4</td><td>小區 40 萬U</td><td>30%</td></tr>
+          <tr><td>V5</td><td>小區 150 萬U</td><td>35%</td></tr>
+          <tr><td>V6</td><td>小區 600 萬U</td><td>40%</td></tr>
+          <tr><td>V7</td><td>小區 1,500 萬U</td><td>45%</td></tr>
+          <tr><td class="hi">V8</td><td>小區 3,000 萬U</td><td class="hi" style="color:var(--gold)">50%</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout c-gold">🔑 <strong>三層結算一致性：</strong>O1+O3+O4 均以 USD 累積，提現時統一按 ROAM 實時價換算。幣價漲跌不影響每日累積額度。</div>
+  </div>
+</div>
+
+<!-- 03 -->
+<div class="sec" id="s3">
+  <div class="sec-head">
+    <div class="sec-num" style="background:rgba(123,92,240,.1);color:#a78bfa;border:1px solid rgba(123,92,240,.25)">03</div>
+    <h2>合夥人節點方案</h2>
+  </div>
+  <div class="sec-body">
+    <div class="sub">💎 兩種合夥人</div>
+    <div class="partners">
+      <div class="pcard cm">
+        <div class="pt">🌟 社區合夥人</div>
+        <div class="pp">500U</div>
+        <div class="pq">全球限 999 個</div>
+        <ul>
+          <li><strong>8 萬</strong> ENI 積分</li>
+          <li><strong>V2</strong> 直升（O4 20%）</li>
+          <li>分紅池 <strong>45%</strong></li>
+          <li>NKT <strong>2,000</strong>（$2,000）</li>
+          <li>AI 算力分紅</li>
+        </ul>
+      </div>
+      <div class="pcard cf">
+        <div class="pt">💎 聯創合夥人</div>
+        <div class="pp">1,000U</div>
+        <div class="pq">全球限 299 個</div>
+        <ul>
+          <li><strong>22 萬</strong> ENI 積分</li>
+          <li><strong>V3</strong> 直升（O4 25%）</li>
+          <li>分紅池 <strong>25%</strong></li>
+          <li>NKT <strong>5,000</strong>（$5,000）</li>
+          <li>AI 算力分紅</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout c-gold">💡 <strong>聯創性價比：</strong>1,000U 購買，附帶 5,000 NKT（$5,000）+ V3 直升。成本由 NKT 覆蓋，V3 分紅為純額外收益。</div>
+
+    <div class="sub">💰 手續費分紅</div>
+    <table class="tbl">
+      <tr><th>對象</th><th>佔比</th><th>名額</th></tr>
+      <tr><td class="lbl">🌟 社區</td><td><strong style="color:#fff">45%</strong></td><td>999 個</td></tr>
+      <tr><td class="lbl">💎 聯創</td><td><strong style="color:#fff">25%</strong></td><td>299 個</td></tr>
+      <tr><td class="lbl">⚙️ 平台</td><td>30%</td><td>—</td></tr>
+    </table>
+    <div class="callout c-teal">每筆投入產生 <strong>5% 服務費</strong>，其中 <strong>70% 回饋合夥人</strong>。用戶越多 → 手續費池越大 → 每日被動分紅越豐厚。</div>
+  </div>
+</div>
+
+<!-- 04 -->
+<div class="sec" id="s4">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)">04</div>
+    <h2>官方連結與合約</h2>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-red">⚠️ 所有連結以官方 TG @Nikola_Eni 公告為準。切勿向任何人透露私鑰或助記詞。</div>
+
+    <div class="sub">🔗 官方連結</div>
+    <table class="tbl">
+      <tr><td class="lbl">🟣 協議入口</td><td><a href="https://nikola.global/" style="color:var(--teal)">nikola.global</a></td></tr>
+      <tr><td class="lbl">📱 官方 TG</td><td><a href="https://t.me/Nikola_Eni" style="color:var(--teal)">t.me/Nikola_Eni</a></td></tr>
+      <tr><td class="lbl">🔷 ENI</td><td><a href="https://eniac.network/" style="color:var(--teal)">eniac.network</a></td></tr>
+      <tr><td class="lbl">🟢 ROAM</td><td><a href="https://weroam.xyz/" style="color:var(--teal)">weroam.xyz</a></td></tr>
+      <tr><td class="lbl">💼 錢包</td><td><a href="https://web3.bitget.com" style="color:var(--teal)">web3.bitget.com</a></td></tr>
+    </table>
+
+    <div class="sub">📋 ROAM 合約地址</div>
+    <div class="addr"><div class="chain">🔷 ENI 主網</div><div class="val">0x23958cBa555AC52C9495Df9b121ff73003e39dBb</div></div>
+    <div class="addr"><div class="chain">🟡 BSC 鏈</div><div class="val">0x3fefe29dA25BEa166fB5f6ADe7b5976D2b0e586B</div></div>
+    <div class="addr"><div class="chain">🟣 Solana</div><div class="val">RoamA1USA8xjvpTJZ6RvvxyDRzNh6GCA1zVGKSiMVkn</div></div>
+  </div>
+</div>
+
+<!-- 05 -->
+<div class="sec" id="s5">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--goldbg);color:var(--gold);border:1px solid var(--goldbdr)">05</div>
+    <h2>參與流程</h2>
+  </div>
+  <div class="sec-body">
+    <div class="steps">
+      <div class="stp"><div class="stp-dot">1</div><div class="stp-t">下載 Bitget Wallet</div><div class="stp-d">iOS / Android 均可，創建 Web3 錢包。<br><a href="https://web3.bitget.com">📲 web3.bitget.com</a></div></div>
+      <div class="stp"><div class="stp-dot">2</div><div class="stp-t">準備 USDT，轉入 ENI</div><div class="stp-d">交易所購買 USDT，跨鏈轉入 ENI 主網。最低 100U，須為 100 的倍數。</div></div>
+      <div class="stp"><div class="stp-dot">3</div><div class="stp-t">進入 Nikola 協議</div><div class="stp-d">選擇投入金額並確認。<br><a href="https://nikola.global/">🟣 nikola.global</a></div></div>
+      <div class="stp"><div class="stp-dot">4</div><div class="stp-t">每日自動累積</div><div class="stp-d">系統每日以 U 本位累積收益，達到倍數後提現換算 ROAM。</div></div>
+      <div class="stp"><div class="stp-dot">5</div><div class="stp-t">ROAM 用途</div><div class="stp-d">持有等升值 / 再投入複利 / 兌換 USDT</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 -->
+<div class="sec" id="s6">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)">06</div>
+    <h2>投資計算實例</h2>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-teal">📌 所有收益以 U 本位累積，不受幣價影響。回本周期 = 出局目標 ÷ 每日總收益。</div>
+
+    <div class="sub">📊 計算一：直推 1 組（3 人）</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A 投 1,000U｜B 投 1,000U｜C 投 1,000U｜D 投 3,000U<br>總業績 5,000U → V1 ✅ 直推 3 人 → O3 解鎖 5 代</p>
+    <table class="tbl">
+      <tr><th>收益層</th><th>計算</th><th>每日</th></tr>
+      <tr><td class="lbl">🟢 O1</td><td>1,000U × 1%</td><td style="color:var(--green)"><strong>$10</strong></td></tr>
+      <tr><td class="lbl">🔵 O3</td><td>$50 × 5%</td><td style="color:var(--teal)"><strong>$2.5</strong></td></tr>
+      <tr><td class="lbl">🟡 O4</td><td>$50 × 15%(V1)</td><td style="color:var(--gold)"><strong>$7.5</strong></td></tr>
+      <tr style="background:rgba(255,255,255,.03)"><td class="hi">合計</td><td></td><td class="hi" style="font-size:16px">$20/天</td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:20px">回本 <strong style="color:var(--teal)">50 天</strong>（$1,000÷$20）｜出局 <strong style="color:var(--gold)">125 天</strong>（$2,500÷$20）｜淨賺 <strong style="color:#fff">1,500U (+150%)</strong></p>
+
+    <div class="sub">📊 計算二：直推 4 組（12 人）</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A 投 1,000U｜4 組各 5,000U｜總業績 20,000U → V2 ✅<br>傘下各組 V1，極差 V2-V1 = 5%｜直推 12 人 → O3 解鎖 10 代</p>
+    <table class="tbl">
+      <tr><th>收益層</th><th>計算</th><th>每日</th></tr>
+      <tr><td class="lbl">🟢 O1</td><td>1,000U × 1%</td><td style="color:var(--green)"><strong>$10</strong></td></tr>
+      <tr><td class="lbl">🔵 O3</td><td>$200 × 5%</td><td style="color:var(--teal)"><strong>$10</strong></td></tr>
+      <tr><td class="lbl">🟡 O4</td><td>$200 × 5%(極差)</td><td style="color:var(--gold)"><strong>$10</strong></td></tr>
+      <tr style="background:rgba(255,255,255,.03)"><td class="hi">合計</td><td></td><td class="hi" style="font-size:16px">$30/天</td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:20px">回本 <strong style="color:var(--teal)">34 天</strong>（$1,000÷$30）｜出局 <strong style="color:var(--gold)">84 天</strong>（$2,500÷$30）｜淨賺 <strong style="color:#fff">1,500U (+150%)</strong></p>
+
+    <div class="sub">⚡ 對比總覽</div>
+    <table class="tbl">
+      <tr><th>項目</th><th>計算一</th><th>計算二</th></tr>
+      <tr><td class="lbl">直推</td><td>3 人</td><td>12 人</td></tr>
+      <tr><td class="lbl">V 等級</td><td><span class="tag tag-gold">V1</span></td><td><span class="tag tag-teal">V2</span></td></tr>
+      <tr><td class="lbl">O3</td><td>$2.5/天</td><td>$10/天</td></tr>
+      <tr><td class="lbl">O4</td><td>$7.5/天</td><td>$10/天</td></tr>
+      <tr class="row-green"><td class="hi">每日總計</td><td class="hi">$20/天</td><td class="hi" style="color:var(--teal)">$30/天</td></tr>
+      <tr class="row-teal"><td class="hi">回本</td><td>50 天</td><td class="hi" style="color:var(--teal)">34 天</td></tr>
+      <tr class="row-gold"><td class="hi">出局</td><td>125 天</td><td class="hi" style="color:var(--gold)">84 天</td></tr>
+    </table>
+    <div class="callout c-gold">💡 同樣 1,000U 本金、淨賺 1,500U。計算二透過極差獎勵，出局由 125 天縮短至 <strong>84 天</strong>，提早 41 天複投。</div>
+  </div>
+</div>
+
+<!-- 07 -->
+<div class="sec" id="s7">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)">07</div>
+    <h2>四種走向對照</h2>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-teal">A = 1,000U 買入 ROAM 持有｜B = 1,000U 參加 Nikola（每日 +$10 U 本位）</div>
+
+    <table class="tbl">
+      <tr><th>走向</th><th>市場</th><th style="color:#f85149">A</th><th style="color:var(--gold)">B</th><th>勝</th></tr>
+      <tr><td class="lbl">📈 一</td><td style="font-size:11px">連漲 100 天</td><td>$2,705</td><td>$2,500</td><td><span class="win win-a">A</span></td></tr>
+      <tr><td class="lbl">⛰️ 二</td><td style="font-size:11px">先漲後跌</td><td>$995</td><td>$2,500</td><td><span class="win win-b">B</span></td></tr>
+      <tr><td class="lbl">🏔️ 三</td><td style="font-size:11px">先跌後漲</td><td>$995</td><td>$2,500</td><td><span class="win win-b">B</span></td></tr>
+      <tr><td class="lbl">📉 四</td><td style="font-size:11px">連跌 100 天</td><td>$366</td><td>$2,500</td><td><span class="win win-b">B</span></td></tr>
+    </table>
+
+    <div class="callout c-gold">💡 <strong>結論：</strong>B（Nikola）在 4 種場景中 3 種勝出。只有持續牛市 A 略勝，但 B 仍穩定在第 150 天完成 2.5x 出局（<strong>ROI +150%</strong>）。U 本位保值機制讓收益路徑完全不受幣價影響。</div>
+  </div>
+</div>
+
+<!-- CHANGELOG -->
+<div class="sec">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)">📝</div>
+    <h2>更新紀錄</h2>
+  </div>
+  <div class="sec-body">
+    <div class="chg"><span class="tag tag-red">修正</span><div class="chg-d"><strong>O1 結算方式</strong>→ U 本位累積，提現時按 ROAM 實時價換算</div></div>
+    <div class="chg"><span class="tag tag-green">更新</span><div class="chg-d"><strong>三層收益統一</strong>→ O1+O3+O4 均為 U 本位</div></div>
+    <div class="chg"><span class="tag tag-green">更新</span><div class="chg-d"><strong>交易所</strong>→ 新增 Binance Alpha</div></div>
+    <div class="chg"><span class="tag tag-gold">替換</span><div class="chg-d"><strong>錢包</strong>→ DeBox 更換為 Bitget Wallet</div></div>
+    <div class="chg"><span class="tag tag-teal">新增</span><div class="chg-d"><strong>視覺對照</strong>→ 四種幣價走向 A vs B 對照</div></div>
+  </div>
+</div>
+
+</div><!-- wrap -->
+
+<div class="ftr">
+  <a href="https://nikola.global/">nikola.global</a> · <a href="https://t.me/Nikola_Eni">t.me/Nikola_Eni</a><br>
+  Nikola Protocol · 2026 · 僅供推廣用途 · 不構成投資建議
+</div>
+
+<button class="btt" id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+window.addEventListener('scroll',()=>{
+  document.getElementById('btt').style.display=window.scrollY>400?'flex':'none';
+});
+</script>
+</body>
+</html>
