@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikola Protocol · 資料庫內容說明 v3 · 20260327</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fc;
+    --white: #ffffff;
+    --border: #e4e8f0;
+    --border-dark: #d1d9e6;
+    --text: #1a2035;
+    --text-soft: #4a5568;
+    --text-muted: #8896aa;
+    --gold: #c8962a;
+    --gold-bg: #fdf8ee;
+    --gold-border: #f0d89a;
+    --teal: #0891b2;
+    --teal-bg: #f0fbff;
+    --teal-border: #bae6fd;
+    --green: #059669;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --purple: #6d28d9;
+    --purple-bg: #f5f3ff;
+    --purple-border: #ddd6fe;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    line-height: 1.75;
+    font-size: 14px;
+  }
+
+  /* ── HEADER ── */
+  .doc-header {
+    background: var(--white);
+    border-bottom: 2px solid var(--border);
+    padding: 40px 0 32px;
+    margin-bottom: 0;
+  }
+
+  .doc-header .inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  .doc-version {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    border-radius: 6px;
+    padding: 3px 12px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .doc-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .doc-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .doc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .doc-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── LAYOUT ── */
+  .layout {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: sticky;
+    top: 24px;
+  }
+
+  .toc {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .toc-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toc a {
+    display: block;
+    padding: 6px 8px;
+    font-size: 12px;
+    color: var(--text-soft);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s;
+    line-height: 1.4;
+    margin-bottom: 2px;
+  }
+
+  .toc a:hover {
+    background: var(--bg);
+    color: var(--gold);
+  }
+
+  .toc a.section { font-weight: 600; color: var(--text); margin-top: 6px; }
+  .toc a.sub { padding-left: 18px; color: var(--text-muted); }
+
+  /* ── CONTENT ── */
+  .content { min-width: 0; }
+
+  .section-block {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .section-head {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .section-head h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .section-body { padding: 24px; }
+
+  /* ── BLOCKS ── */
+  .info-block {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.8;
+    border: 1px solid;
+  }
+
+  .info-block.gold { background: var(--gold-bg); border-color: var(--gold-border); color: #7c5a0a; }
+  .info-block.teal { background: var(--teal-bg); border-color: var(--teal-border); color: #0c5a70; }
+  .info-block.green { background: var(--green-bg); border-color: var(--green-border); color: #065f46; }
+  .info-block.purple { background: var(--purple-bg); border-color: var(--purple-border); color: #4c1d95; }
+  .info-block.red { background: var(--red-bg); border-color: var(--red-border); color: #991b1b; }
+
+  .info-block strong { font-weight: 700; }
+
+  /* ── TABLE ── */
+  .doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .doc-table th {
+    background: var(--bg);
+    color: var(--text-soft);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .doc-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-soft);
+    vertical-align: top;
+    line-height: 1.7;
+  }
+
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table tr:hover td { background: var(--bg); }
+  .doc-table td.label { color: var(--text); font-weight: 500; white-space: nowrap; }
+  .doc-table td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; color: var(--teal); }
+
+  /* ── FIELD ── */
+  .field-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px 16px;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .field-row:last-child { border-bottom: none; }
+  .field-key { color: var(--text-muted); font-size: 12px; }
+  .field-val { color: var(--text); }
+  .field-val strong { color: var(--text); font-weight: 600; }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    margin-right: 4px;
+  }
+
+  .tag.green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .tag.gold { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+  .tag.teal { background: var(--teal-bg); color: var(--teal); border: 1px solid var(--teal-border); }
+  .tag.purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+  .tag.red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+
+  /* ── INCOME LAYER ── */
+  .layer-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .layer-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .layer-id {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .layer-id.o1 { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .layer-id.o3 { background: var(--teal-bg); color: var(--teal); border: 1px solid var(--teal-border); }
+  .layer-id.o4 { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+
+  .layer-meta { flex: 1; }
+  .layer-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .layer-tag-line { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .layer-body { padding: 14px 18px; font-size: 13px; color: var(--text-soft); line-height: 1.8; }
+  .layer-body ul { padding-left: 18px; }
+  .layer-body li { margin-bottom: 4px; }
+
+  /* ── STEP LIST ── */
+  .step-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--gold-bg);
+    border: 2px solid var(--gold-border);
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-text { font-size: 13px; color: var(--text-soft); line-height: 1.8; }
+  .step-text strong { color: var(--text); }
+
+  /* ── PARTNER COMPARE ── */
+  .partner-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .partner-box {
+    border-radius: 10px;
+    padding: 18px;
+    border: 1px solid;
+  }
+
+  .partner-box.community { background: var(--purple-bg); border-color: var(--purple-border); }
+  .partner-box.cofounder { background: var(--gold-bg); border-color: var(--gold-border); }
+
+  .partner-box .pt { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+  .community .pt { color: var(--purple); }
+  .cofounder .pt { color: var(--gold); }
+
+  .partner-box .pp { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+  .partner-box .pq { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+
+  .partner-box ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .partner-box li { font-size: 12px; color: var(--text-soft); display: flex; gap: 6px; }
+  .partner-box li::before { content: '▸'; color: var(--gold); flex-shrink: 0; }
+  .partner-box li strong { color: var(--text); }
+
+  /* ── ADDRESS BLOCK ── */
+  .addr-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+
+  .addr-chain { font-size: 12px; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
+  .addr-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    word-break: break-all;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .sub-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sub-title:first-child { margin-top: 0; }
+
+  /* ── UPDATE LOG ── */
+  .update-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .update-row:last-child { border-bottom: none; }
+  .update-badge { flex-shrink: 0; margin-top: 2px; }
+  .update-desc { color: var(--text-soft); line-height: 1.7; }
+  .update-desc strong { color: var(--text); }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    text-align: center;
+    padding: 32px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid var(--border);
+    background: var(--white);
+    line-height: 2;
+  }
+
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  @media (max-width: 680px) {
+    .layout { grid-template-columns: 1fr; padding: 16px 12px 60px; gap: 16px; }
+    .sidebar { display: none; }
+    .partner-row { grid-template-columns: 1fr; }
+    .field-row { grid-template-columns: 1fr; gap: 2px 0; }
+    .doc-header { padding: 24px 0 20px; }
+    .doc-header .inner { padding: 0 16px; }
+    .doc-title { font-size: 22px; }
+    .doc-subtitle { font-size: 13px; }
+    .doc-meta { gap: 10px; font-size: 11px; flex-direction: column; }
+    .section-block { border-radius: 10px; margin-bottom: 16px; }
+    .section-head { padding: 14px 16px; }
+    .section-head h2 { font-size: 15px; }
+    .section-body { padding: 16px; }
+    .doc-table { font-size: 12px; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .doc-table th { padding: 8px 10px; font-size: 10px; white-space: nowrap; }
+    .doc-table td { padding: 8px 10px; font-size: 12px; min-width: 80px; }
+    .info-block { padding: 12px; font-size: 12px; line-height: 1.7; }
+    .sub-title { font-size: 13px; margin: 14px 0 8px; }
+    .layer-card { margin-bottom: 10px; }
+    .layer-head { padding: 10px 12px; gap: 10px; }
+    .layer-id { width: 30px; height: 30px; font-size: 12px; }
+    .layer-name { font-size: 13px; }
+    .layer-tag-line { font-size: 10px; }
+    .layer-body { padding: 12px; font-size: 12px; }
+    .step-item { gap: 10px; }
+    .step-dot { width: 22px; height: 22px; font-size: 10px; }
+    .step-text { font-size: 12px; }
+    .partner-box { padding: 14px; }
+    .partner-box .pp { font-size: 20px; }
+    .partner-box .pq { font-size: 10px; }
+    .partner-box li { font-size: 11px; }
+    .addr-block { padding: 10px 12px; }
+    .addr-val { font-size: 11px; }
+    .callout { padding: 12px; font-size: 12px; gap: 8px; }
+    .callout-icon { font-size: 20px; }
+    .callout-text { font-size: 12px; line-height: 1.7; }
+    .tag { font-size: 10px; padding: 1px 6px; }
+    .update-row { font-size: 12px; gap: 8px; }
+    .doc-footer { font-size: 10px; padding: 24px 16px; }
+    /* 計算區 grid */
+    div[style*="grid-template-columns: repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+    div[style*="grid-template-columns: repeat(3"] { grid-template-columns: 1fr !important; }
+    div[style*="grid-template-columns: 1fr 4fr"] { grid-template-columns: 1fr !important; }
+    div[style*="grid-template-columns:repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+    div[style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; }
+    div[style*="grid-template-columns:1fr 4fr"] { grid-template-columns: 1fr !important; }
+    /* 走向按鈕 */
+    .sc-btn2 { font-size: 11px; padding: 8px 12px; flex: 1; min-width: 0; }
+    .sc-btn2 small { font-size: 9px; }
+    /* 圖表 */
+    canvas { max-height: 220px !important; }
+    /* 官方連結 grid */
+    div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+    div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+  }
+
+  .sc-btn2 {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px;
+    color: var(--text-soft); cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px; font-weight: 600; line-height: 1.5;
+    text-align: left; transition: all .2s;
+  }
+  .sc-btn2:hover { border-color: var(--gold-border); color: var(--gold); }
+  .sc-btn2.active { border-color: var(--gold-border); background: var(--gold-bg); color: var(--gold); }
+  .sc-btn2 small { font-size: 10px; font-weight: 400; color: var(--text-muted); display: block; }
+  .sc-btn2.active small { color: var(--gold); }
+
+
+.lang-bar{position:sticky;top:0;z-index:1000;background:rgba(248,249,252,.95);backdrop-filter:blur(12px);border-bottom:1px solid #e4e8f0;display:flex;justify-content:center;gap:6px;padding:10px 16px}
+.lang-btn{padding:6px 18px;border-radius:100px;border:1px solid #e4e8f0;background:transparent;color:#8896aa;cursor:pointer;font-size:13px;font-family:'Noto Sans TC',sans-serif;transition:all .2s}
+.lang-btn:hover{border-color:#f0d89a;color:#c8962a}
+.lang-btn.active{background:#c8962a;color:#fff;border-color:#c8962a;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+  <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+</div>
+
+
+<!-- HEADER -->
+<div class="doc-header">
+  <div class="inner">
+    <div class="doc-version" data-i18n="k1">✅ v3.1 · 修正視覺模組 · 2026-03-27</div>
+    <h1 class="doc-title" data-i18n="k2">Nikola Protocol 資料庫內容說明</h1>
+    <p class="doc-subtitle" data-i18n="k3">本文件為資料庫 v2 版本的完整內容說明，涵蓋項目概覽、收益機制（正確版）、合夥人方案、官方連結及參與流程，供社媒推廣、群組使用及 Bot 知識庫參考。</p>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <div class="toc-title" data-i18n="k4">目錄</div>
+      <a href="#overview" class="section" data-i18n="k5">01 項目概覽</a>
+      <a href="#overview-what" class="sub" data-i18n="k6">什麼是 Nikola</a>
+      <a href="#overview-eco" class="sub" data-i18n="k7">生態背書</a>
+      <a href="#mechanism" class="section" data-i18n="k8">02 收益機制</a>
+      <a href="#mech-base" class="sub" data-i18n="k9">每日釋放說明</a>
+      <a href="#mech-tier" class="sub" data-i18n="k10">分層出局制度</a>
+      <a href="#mech-o1" class="sub" data-i18n="k11">O1 正確說明</a>
+      <a href="#mech-o3" class="sub" data-i18n="k12">O3 分享獎勵</a>
+      <a href="#mech-o4" class="sub" data-i18n="k13">O4 團隊獎勵</a>
+      <a href="#partner" class="section" data-i18n="k14">03 合夥人方案</a>
+      <a href="#partner-types" class="sub" data-i18n="k15">兩種合夥人</a>
+      <a href="#partner-fee" class="sub" data-i18n="k16">手續費分紅</a>
+      <a href="#links" class="section" data-i18n="k17">04 官方連結</a>
+      <a href="#links-official" class="sub" data-i18n="k18">官方連結</a>
+      <a href="#links-contract" class="sub" data-i18n="k19">合約地址</a>
+      <a href="#steps" class="section" data-i18n="k20">05 參與流程</a>
+      <a href="#calc" class="section" data-i18n="k21">06 投資計算</a>
+      <a href="#calc1" class="sub" data-i18n="k22">計算一：1組直推</a>
+      <a href="#calc2" class="sub" data-i18n="k23">計算二：4組直推</a>
+      <a href="#calc-compare" class="sub" data-i18n="k24">對比總覽</a>
+      <a href="#chart-compare" class="section" data-i18n="k25">07 視覺對照</a>
+      <a href="#chart-compare" class="sub" data-i18n="k26">A vs B 走向對比</a>
+      <a href="#doc-summary-table" class="sub" data-i18n="k27">四走向匯總表</a>
+      <a href="#changelog" class="section" data-i18n="k28">📝 更新紀錄</a>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- ══ 01 項目概覽 ══ -->
+    <div class="section-block" id="overview">
+      <div class="section-head">
+        <div class="section-num" style="background:#fdf8ee;color:#c8962a;border:1px solid #f0d89a">01</div>
+        <h2 data-i18n="k29">項目概覽與核心運作</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="sub-title" id="overview-what" data-i18n="k30">🌐 什麼是 Nikola Protocol？</div>
+        <div class="info-block teal">
+          <span data-i18n="k31">Nikola Protocol 是建立在 <strong>ENI 公鏈</strong>上的 <strong>Web4.0 AI 量化孵化協議</strong>，以 TIF（Technology × Intelligent × Finance）為核心框架，融合多智能體協作系統與大規模 AI 模型數據能力，打造自我進化的智能孵化引擎。</span>
+        </div>
+
+        <div class="sub-title" data-i18n="k32">💡 核心運作邏輯</div>
+        <table class="doc-table">
+          <tbody>
+            <tr><td class="label" data-i18n="k33">資金方向</td><td data-i18n="k34">USDT 投入 → AI 算力量化系統運行 → U 本位每日累積 → 提現時換算 ROAM 提出</td></tr>
+            <tr><td class="label" data-i18n="k35">每日累積比例</td><td data-i18n="k36">本金的 <strong>1% / 天</strong>（U 本位，美元計價累積）</td></tr>
+            <tr><td class="label" data-i18n="k37">收益分配</td><td data-i18n="k38">85% O1（ROAM 方向）+ 10% NKT 算力積分 + 5% 服務費</td></tr>
+            <tr><td class="label" data-i18n="k39">實際有效收益率</td><td data-i18n="k40"><strong>95%</strong>（85% + 10%，5% 服務費 70% 回饋合夥人）</td></tr>
+            <tr><td class="label" data-i18n="k41">最低投入</td><td data-i18n="k42">100 USDT（須為 100 的倍數）</td></tr>
+            <tr><td class="label" data-i18n="k43">運行網絡</td><td data-i18n="k44">ENI 主網（ENI Mainnet）</td></tr>
+            <tr><td class="label" data-i18n="k45">NKT 定位</td><td data-i18n="k46">Nikola AI Agent 算力積分，內盤固定 1 NKT = 1 USDT，計劃上架 OKX</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" id="overview-eco" data-i18n="k47">🔐 生態背書</div>
+        <table class="doc-table">
+          <thead><tr><th data-i18n="k48">生態項目</th><th data-i18n="k49">背書說明</th><th data-i18n="k50">狀態</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="label">ROAM</td>
+              <td data-i18n="k51">WBA OpenRoaming 唯一 Web3 IDP，750萬+ 節點，190+ 國家，Samsung Next 投資，CertiK A 級</td>
+              <td><span class="tag green" data-i18n="k52">已上線</span></td>
+            </tr>
+            <tr>
+              <td class="label" data-i18n="k53">ENI 公鏈</td>
+              <td data-i18n="k54">ZKP 零知識證明技術，Ave.ai Top 11，268萬+ 鏈上地址，960萬+ 總交易數</td>
+              <td><span class="tag green" data-i18n="k55">運行中</span></td>
+            </tr>
+            <tr>
+              <td class="label">Binance Alpha</td>
+              <td data-i18n="k56">ROAM 已在 Binance Alpha 上架交易對</td>
+              <td><span class="tag green" data-i18n="k57">✅ 已上線</span></td>
+            </tr>
+            <tr>
+              <td class="label" data-i18n="k58">其他交易所</td>
+              <td>Bybit、Bitget、Gate.io、KuCoin、MEXC、LBank、CoinEx、BitMart</td>
+              <td><span class="tag teal" data-i18n="k59">流通中</span></td>
+            </tr>
+            <tr>
+              <td class="label">Samsung Next</td>
+              <td data-i18n="k60">+ Anagram + Volt Capital，2023年完成 500 萬美元戰略融資</td>
+              <td><span class="tag gold" data-i18n="k61">已背書</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+    <!-- ══ 02 收益機制 ══ -->
+    <div class="section-block" id="mechanism">
+      <div class="section-head">
+        <div class="section-num" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0">02</div>
+        <h2 data-i18n="k62">收益機制說明（正確版 v2）</h2>
+        <span class="tag green" data-i18n="k63">已修正</span>
+      </div>
+      <div class="section-body">
+
+        <div class="info-block green" id="mech-base" data-i18n="k64">
+          <strong>✅ v2 核心修正：O1 + O3 + O4 三層收益全部以 U 本位（美元）累積。</strong>無論 ROAM 幣價漲跌，每日累積額度不受影響。提現時統一依照 ROAM 實時價格換算，提出 ROAM 代幣到錢包。
+        </div>
+
+        <div class="sub-title" id="mech-tier" data-i18n="k65">🏆 分層出局制度</div>
+        <table class="doc-table">
+          <thead><tr><th data-i18n="k66">投入金額</th><th data-i18n="k67">出局倍數</th><th data-i18n="k68">舉例（總領回）</th><th data-i18n="k69">完成週期</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="label" data-i18n="k70">💰 100U — 999U</td>
+              <td><strong style="color:#059669;font-size:16px">2x</strong></td>
+              <td data-i18n="k71">投 500U → 領回 1,000U</td>
+              <td data-i18n="k72">約 200 天</td>
+            </tr>
+            <tr>
+              <td class="label" data-i18n="k73">💎 1,000U — 2,999U</td>
+              <td><strong style="color:#c8962a;font-size:16px">2.5x</strong></td>
+              <td data-i18n="k74">投 1,000U → 領回 2,500U</td>
+              <td data-i18n="k75">約 250 天</td>
+            </tr>
+            <tr>
+              <td class="label" data-i18n="k76">👑 3,000U 及以上</td>
+              <td><strong style="color:#0891b2;font-size:16px">3x</strong></td>
+              <td data-i18n="k77">投 3,000U → 領回 9,000U</td>
+              <td data-i18n="k78">約 300 天</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:20px"><span data-i18n="k79">📌 投入金額須為 100 的倍數（如 100U、500U、1,000U、3,000U）</span></p>
+
+        <div class="sub-title" data-i18n="k80">🎁 三層收益結構詳解</div>
+
+        <!-- O1 -->
+        <div class="layer-card" id="mech-o1">
+          <div class="layer-head">
+            <div class="layer-id o1">O1</div>
+            <div class="layer-meta">
+              <div class="layer-name" data-i18n="k81">基礎每日累積</div>
+              <div class="layer-tag-line" data-i18n="k82">本金 × 1% / 天 · U 本位 · 提現換算 ROAM 提出</div>
+            </div>
+            <span class="tag green" data-i18n="k83">✅ 修正版</span>
+          </div>
+          <div class="layer-body">
+            <table class="doc-table" style="margin-bottom:0">
+              <tbody>
+                <tr><td class="label" data-i18n="k84">結算方式</td><td data-i18n="k85"><strong>U 本位累積</strong>，提現時依照 ROAM 實時價格換算，提出 ROAM 代幣到錢包</td></tr>
+                <tr><td class="label" data-i18n="k86">幣價影響</td><td data-i18n="k87">✅ <strong>不受影響</strong>——每日 $10 累積額度鎖定，幣價只影響提現時換得的 ROAM 數量</td></tr>
+                <tr><td class="label" data-i18n="k88">計算公式</td><td data-i18n="k89">每日累積 = 本金 × 1%（例：投 1,000U → $10/天）</td></tr>
+                <tr><td class="label" data-i18n="k90">舉例說明</td><td data-i18n="k91">
+                  投 1,000U，每天累積 $10（U 本位）<br>
+                  提現時 ROAM $0.5 → 提出 20 ROAM<br>
+                  提現時 ROAM $1.0 → 提出 10 ROAM<br>
+                  提現時 ROAM $2.0 → 提出 5 ROAM
+                </td></tr>
+                <tr><td class="label" data-i18n="k92">NKT 積分</td><td data-i18n="k93">同時每日累積 NKT：投 1,000U → 1 NKT/天（內盤 $1）</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- O3 -->
+        <div class="layer-card" id="mech-o3">
+          <div class="layer-head">
+            <div class="layer-id o3">O3</div>
+            <div class="layer-meta">
+              <div class="layer-name" data-i18n="k94">分享與生態貢獻獎勵</div>
+              <div class="layer-tag-line" data-i18n="k95">U 本位累積 · 直推人數解鎖代數 · 最高 +15%</div>
+            </div>
+            <span class="tag teal" data-i18n="k295">U 本位</span>
+          </div>
+          <div class="layer-body">
+            <table class="doc-table" style="margin-bottom:12px">
+              <tbody>
+                <tr><td class="label" data-i18n="k84b">結算方式</td><td data-i18n="k96"><strong>U 本位累積</strong>，提現時才轉換為 ROAM，幣價波動不影響</td></tr>
+                <tr><td class="label" data-i18n="k97">獎勵性質</td><td data-i18n="k98">加速釋放獎勵，直接疊加進每日總累積額</td></tr>
+              </tbody>
+            </table>
+            <table class="doc-table" style="margin-bottom:0">
+              <thead><tr><th data-i18n="k99">直推人數</th><th data-i18n="k100">解鎖代數</th><th data-i18n="k101">獎勵比例明細</th><th data-i18n="k102">合計比例</th></tr></thead>
+              <tbody>
+                <tr><td data-i18n="k103">≥ 1 人</td><td data-i18n="k104">1 代</td><td data-i18n="k105">第 1 代：5%</td><td><strong>5%</strong></td></tr>
+                <tr><td data-i18n="k106">≥ 3 人</td><td data-i18n="k107">5 代</td><td data-i18n="k108">第 1 代：5%｜第 2 代：2%｜第 3~5 代：各 1%</td><td><strong>10%</strong></td></tr>
+                <tr><td data-i18n="k109">≥ 5 人</td><td data-i18n="k110">10 代</td><td data-i18n="k111">第 1 代：5%｜第 2 代：2%｜第 3~10 代：各 1%</td><td><strong style="color:#0891b2">15%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- O4 -->
+        <div class="layer-card" id="mech-o4">
+          <div class="layer-head">
+            <div class="layer-id o4">O4</div>
+            <div class="layer-meta">
+              <div class="layer-name" data-i18n="k112">團隊貢獻獎勵</div>
+              <div class="layer-tag-line" data-i18n="k113">U 本位累積 · V 等級決定比例 · V1（15%）→ V8（50%）</div>
+            </div>
+            <span class="tag gold" data-i18n="k295b">U 本位</span>
+          </div>
+          <div class="layer-body">
+            <table class="doc-table" style="margin-bottom:12px">
+              <tbody>
+                <tr><td class="label" data-i18n="k84c">結算方式</td><td data-i18n="k114"><strong>U 本位累積</strong>，提現時才轉換為 ROAM，幣價波動不影響</td></tr>
+                <tr><td class="label" data-i18n="k88b">計算公式</td><td data-i18n="k115">O4 日收益 = 小區（團隊）每日總累積額 × V 等級比例</td></tr>
+                <tr><td class="label" data-i18n="k116">V1/V2 門檻</td><td data-i18n="k117">以整體團隊業績計算（V1：0.5萬U；V2：2萬U）</td></tr>
+                <tr><td class="label" data-i18n="k118">V3–V8 門檻</td><td data-i18n="k119">以小區（最大腿以外的支線）業績計算</td></tr>
+              </tbody>
+            </table>
+            <table class="doc-table" style="margin-bottom:0">
+              <thead><tr><th data-i18n="k120">等級</th><th data-i18n="k121">業績門檻</th><th data-i18n="k122">O4 比例</th></tr></thead>
+              <tbody>
+                <tr><td>V1</td><td data-i18n="k123">團隊 0.5 萬U</td><td>15%</td></tr>
+                <tr><td>V2</td><td data-i18n="k124">團隊 2 萬U</td><td>20%</td></tr>
+                <tr><td>V3</td><td data-i18n="k125">小區 10 萬U</td><td>25%</td></tr>
+                <tr><td>V4</td><td data-i18n="k126">小區 40 萬U</td><td>30%</td></tr>
+                <tr><td>V5</td><td data-i18n="k127">小區 150 萬U</td><td>35%</td></tr>
+                <tr><td>V6</td><td data-i18n="k128">小區 600 萬U</td><td>40%</td></tr>
+                <tr><td>V7</td><td data-i18n="k129">小區 1,500 萬U</td><td>45%</td></tr>
+                <tr><td><strong>V8</strong></td><td data-i18n="k130">小區 3,000 萬U</td><td><strong style="color:#c8962a">50%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="info-block gold" style="margin-top:16px;margin-bottom:0">
+          <span data-i18n="k131"><strong>🔑 三層收益結算一致性：</strong>O1 + O3 + O4 三層均以 U 本位（美元）累積，提現時統一按 ROAM 實時價換算提出。幣價上漲時，提現可換到較少 ROAM 但等值 USD 不變；幣價下跌時，可換到更多 ROAM。三層收益的 USD 累積額度不受影響。</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ 03 合夥人方案 ══ -->
+    <div class="section-block" id="partner">
+      <div class="section-head">
+        <div class="section-num" style="background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe">03</div>
+        <h2 data-i18n="k132">合夥人節點方案</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="sub-title" id="partner-types" data-i18n="k133">💎 兩種合夥人對比</div>
+        <div class="partner-row">
+          <div class="partner-box community">
+            <div class="pt" data-i18n="k134">🌟 社區合夥人</div>
+            <div class="pp">500U</div>
+            <div class="pq" data-i18n="k135">全球限 999 個名額</div>
+            <ul>
+              <li data-i18n="k136"><strong>8 萬</strong> ENI 公鏈積分</li>
+              <li data-i18n="k137"><strong>V2 等級</strong>直升（O4 獎勵 20%）</li>
+              <li data-i18n="k138">手續費分紅池 <strong>45%</strong> 均分</li>
+              <li data-i18n="k139">NKT <strong>2,000 枚</strong>（內盤 $2,000）</li>
+              <li data-i18n="k140">AI 智能體量化算力分紅</li>
+            </ul>
+          </div>
+          <div class="partner-box cofounder">
+            <div class="pt" data-i18n="k141">💎 聯創合夥人</div>
+            <div class="pp">1,000U</div>
+            <div class="pq" data-i18n="k142">全球限 299 個名額</div>
+            <ul>
+              <li data-i18n="k143"><strong>22 萬</strong> ENI 公鏈積分</li>
+              <li data-i18n="k144"><strong>V3 等級</strong>直升（O4 獎勵 25%）</li>
+              <li data-i18n="k145">手續費分紅池 <strong>25%</strong> 均分</li>
+              <li data-i18n="k146">NKT <strong>5,000 枚</strong>（內盤 $5,000）</li>
+              <li data-i18n="k140b">AI 智能體量化算力分紅</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-block gold">
+          <span data-i18n="k147">💡 <strong>聯創合夥人性價比：</strong>購買 1,000U，附帶 5,000 枚 NKT（內盤價值 $5,000）+ V3 等級直升。等同於成本由 NKT 覆蓋，V3 分紅權及手續費分紅為純額外收益。</span>
+        </div>
+
+        <div class="sub-title" id="partner-fee" data-i18n="k148">💰 手續費分紅機制</div>
+        <table class="doc-table">
+          <thead><tr><th data-i18n="k149">分配對象</th><th data-i18n="k150">佔比</th><th data-i18n="k151">名額</th><th data-i18n="k152">說明</th></tr></thead>
+          <tbody>
+            <tr><td class="label" data-i18n="k134b">🌟 社區合夥人</td><td><strong>45%</strong></td><td data-i18n="k153">限 999 個</td><td data-i18n="k154">每日均分，用戶越多每人分得越多</td></tr>
+            <tr><td class="label" data-i18n="k141b">💎 聯創合夥人</td><td><strong>25%</strong></td><td data-i18n="k155">限 299 個</td><td data-i18n="k156">每日均分，名額更稀缺，人均佔比更高</td></tr>
+            <tr><td class="label" data-i18n="k157">⚙️ 平台</td><td>30%</td><td>—</td><td data-i18n="k158">平台運營及技術維護</td></tr>
+          </tbody>
+        </table>
+        <div class="info-block teal" style="margin-top:0">
+          <span data-i18n="k159">每筆用戶投入產生 <strong>5% 服務費</strong>，其中 <strong>70% 回饋合夥人生態</strong>。平台用戶規模越大，每日手續費池越大，合夥人每日被動分紅越豐厚。</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ 04 官方連結 ══ -->
+    <div class="section-block" id="links">
+      <div class="section-head">
+        <div class="section-num" style="background:#f0fbff;color:#0891b2;border:1px solid #bae6fd">04</div>
+        <h2 data-i18n="k160">官方連結與合約地址</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="info-block red"><span data-i18n="k161">⚠️ <strong>安全提醒：</strong>所有合約地址及官方連結以官方 TG 頻道 @Nikola_Eni 公告為準。遇可疑連結請在官方群組求證，切勿向任何人透露私鑰或助記詞。</span></div>
+
+        <div class="sub-title" id="links-official" data-i18n="k162">🔗 官方連結</div>
+        <table class="doc-table">
+          <tbody>
+            <tr><td class="label" data-i18n="k163">🟣 Nikola 協議入口</td><td><a href="https://nikola.global/" target="_blank">https://nikola.global/</a></td></tr>
+            <tr><td class="label" data-i18n="k164">📱 官方 TG 頻道</td><td><a href="https://t.me/Nikola_Eni" target="_blank">https://t.me/Nikola_Eni</a></td></tr>
+            <tr><td class="label" data-i18n="k165">🔷 ENI 公鏈官網</td><td><a href="https://eniac.network/" target="_blank">https://eniac.network/</a></td></tr>
+            <tr><td class="label" data-i18n="k166">🌐 ENI 區塊鏈瀏覽器</td><td><a href="https://scan.eniac.network" target="_blank">https://scan.eniac.network</a></td></tr>
+            <tr><td class="label" data-i18n="k167">🟢 ROAM 官網</td><td><a href="https://weroam.xyz/" target="_blank">https://weroam.xyz/</a></td></tr>
+            <tr><td class="label" data-i18n="k168">💼 Bitget Wallet 下載</td><td><a href="https://web3.bitget.com" target="_blank">https://web3.bitget.com</a></td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" id="links-contract" data-i18n="k169">📋 ROAM 合約地址（三鏈）</div>
+        <div class="addr-block">
+          <div class="addr-chain" data-i18n="k170">🔷 ENI 主網 — Nikola 協議使用此鏈</div>
+          <div class="addr-val">0x23958cBa555AC52C9495Df9b121ff73003e39dBb</div>
+        </div>
+        <div class="addr-block">
+          <div class="addr-chain" data-i18n="k171">🟡 BSC 鏈 — PancakeSwap / Binance Alpha</div>
+          <div class="addr-val">0x3fefe29dA25BEa166fB5f6ADe7b5976D2b0e586B</div>
+        </div>
+        <div class="addr-block" style="margin-bottom:0">
+          <div class="addr-chain" data-i18n="k172">🟣 Solana — Meteora DEX</div>
+          <div class="addr-val">RoamA1USA8xjvpTJZ6RvvxyDRzNh6GCA1zVGKSiMVkn</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ 05 參與流程 ══ -->
+    <div class="section-block" id="steps">
+      <div class="section-head">
+        <div class="section-num" style="background:#fdf8ee;color:#c8962a;border:1px solid #f0d89a">05</div>
+        <h2 data-i18n="k173">參與流程</h2>
+      </div>
+      <div class="section-body">
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-dot">01</div>
+            <div class="step-text">
+              <span data-i18n="k174"><strong>下載 Bitget Wallet App</strong>（iOS / Android 均可）<br>
+              官方下載：<a href="https://web3.bitget.com" target="_blank">https://web3.bitget.com</a><br>
+              創建或導入 Web3 錢包，確保支援 ENI 主網。</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">02</div>
+            <div class="step-text">
+              <span data-i18n="k175"><strong>準備 USDT，轉入 ENI 主網</strong><br>
+              在交易所購買 USDT，跨鏈轉入 ENI 主網地址。<br>
+              最低 100 USDT，投入金額須為 100 的倍數。</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">03</div>
+            <div class="step-text">
+              <span data-i18n="k176"><strong>進入 Nikola 協議頁面</strong>：<a href="https://nikola.global/" target="_blank">https://nikola.global/</a><br>
+              選擇投入金額，確認投入。投入金額決定出局倍數：<br>
+              100U~999U × 2 ｜ 1,000U~2,999U × 2.5 ｜ 3,000U+ × 3</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">04</div>
+            <div class="step-text">
+              <span data-i18n="k177"><strong>每日系統自動以 U 本位累積收益</strong><br>
+              O1（85%）+ NKT（10%）+ 服務費（5%）每日自動計入。<br>
+              達到對應出局倍數後，提現時依照 ROAM 實時價格換算，提出 ROAM 代幣到錢包。</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">05</div>
+            <div class="step-text">
+              <span data-i18n="k178"><strong>收到的 ROAM 可選擇：</strong>持有等待升值 ／ 再投入 Nikola 複利 ／ 提現兌換 USDT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══ 06 投資計算 ══ -->
+    <div class="section-block" id="calc">
+      <div class="section-head">
+        <div class="section-num" style="background:#f0fbff;color:#0891b2;border:1px solid #bae6fd">06</div>
+        <h2 data-i18n="k179">投資計算實例</h2>
+        <span class="tag teal" data-i18n="k300">U 本位</span>
+      </div>
+      <div class="section-body">
+
+        <div class="info-block teal" style="margin-bottom:20px">
+          <span data-i18n="k180">📌 <strong>計算前提：</strong>所有收益均以 U 本位（美元）累積，不受 ROAM 幣價影響。O3 按直推人數解鎖代數，O4 按傘下總業績晉升 V 等級。回本周期 = 出局目標 ÷ 每日總收益。</span>
+        </div>
+
+        <!-- 計算一 -->
+        <div class="sub-title" id="calc1" data-i18n="k181">📊 計算一：A 直推 1 組（B + C + D）</div>
+
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;font-family:'JetBrains Mono',monospace" data-i18n="k301">結構配置</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+            <div style="background:var(--white);border:2px solid var(--gold-border);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">👤</div>
+              <div style="font-size:13px;font-weight:700;color:var(--gold)" data-i18n="k183">A（你）</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px" data-i18n="k302">投入 1,000U</div>
+              <div style="font-size:11px;color:var(--text-muted)" data-i18n="k303">O1 = $10/天</div>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">👤</div>
+              <div style="font-size:13px;font-weight:600;color:var(--teal)" data-i18n="k185">B（直推）</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px" data-i18n="k304">投入 1,000U</div>
+              <div style="font-size:11px;color:var(--text-muted)" data-i18n="k305">O1 = $10/天</div>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">👤</div>
+              <div style="font-size:13px;font-weight:600;color:var(--teal)" data-i18n="k186">C（直推）</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px" data-i18n="k306">投入 1,000U</div>
+              <div style="font-size:11px;color:var(--text-muted)" data-i18n="k307">O1 = $10/天</div>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">👤</div>
+              <div style="font-size:13px;font-weight:600;color:var(--teal)" data-i18n="k187">D（直推）</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px" data-i18n="k308">投入 3,000U</div>
+              <div style="font-size:11px;color:var(--text-muted)" data-i18n="k309">O1 = $30/天</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-soft)">
+            <span data-i18n="k189">傘下總業績：1,000 + 1,000 + 3,000 = <strong style="color:var(--text)">5,000U</strong> → V1 門檻（0.5萬U）✅ 直推人數：3 人 → 解鎖 O3 <strong style="color:var(--text)">1~5 代</strong></span>
+          </div>
+        </div>
+
+        <table class="doc-table" style="margin-bottom:16px">
+          <thead><tr><th data-i18n="k190">收益層</th><th data-i18n="k191">計算過程</th><th data-i18n="k192">每日收益（U 本位）</th></tr></thead>
+          <tbody>
+            <tr><td class="label" data-i18n="k193">🟢 O1 基礎累積</td><td data-i18n="k194">A 本金 1,000U × 1%</td><td><strong style="color:var(--green)" data-i18n="k335">$10.00 / 天</strong></td></tr>
+            <tr><td class="label" data-i18n="k195">🔵 O3 第 1 代（5%）</td><td data-i18n="k196">(B $10 + C $10 + D $30) × 5% = $50 × 5%</td><td><strong style="color:var(--teal)" data-i18n="k326">$2.50 / 天</strong></td></tr>
+            <tr><td class="label" data-i18n="k197">🔵 O3 第 2~5 代</td><td data-i18n="k198">B、C、D 無下線 → $0</td><td style="color:var(--text-muted)">$0</td></tr>
+            <tr><td class="label" data-i18n="k199">🟡 O4（V1，15%）</td><td data-i18n="k200">團隊日總 $50 × 15%</td><td><strong style="color:var(--gold)" data-i18n="k327">$7.50 / 天</strong></td></tr>
+            <tr style="background:var(--bg)">
+              <td class="label" style="font-weight:700;color:var(--text)" data-i18n="k201">每日總計</td>
+              <td style="color:var(--text-soft)">$10.00 + $2.50 + $0 + $7.50</td>
+              <td><strong style="font-size:18px;color:var(--text)" data-i18n="k310">$20.00 / 天</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+          <div style="background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--purple);font-weight:600;margin-bottom:4px" data-i18n="k202">V 等級</div>
+            <div style="font-size:24px;font-weight:900;color:var(--purple)">V1</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k203">業績 5,000U（≥ 0.5萬U）</div>
+          </div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px" data-i18n="k204">每日總收益</div>
+            <div style="font-size:24px;font-weight:900;color:var(--green)">$20</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k286">U 本位 / 天</div>
+          </div>
+          <div style="background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--teal);font-weight:600;margin-bottom:4px" data-i18n="k205">回本周期</div>
+            <div style="font-size:24px;font-weight:900;color:var(--teal)" data-i18n="k311">50 天</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k287">$1,000 ÷ $20/天</div>
+          </div>
+          <div style="background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--gold);font-weight:600;margin-bottom:4px" data-i18n="k206">出局周期</div>
+            <div style="font-size:24px;font-weight:900;color:var(--gold)" data-i18n="k312">125 天</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k288">$2,500 ÷ $20/天</div>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text-soft);margin-bottom:28px">
+          <span data-i18n="k207"><strong style="color:var(--text)">計算說明：</strong>A 投入 1,000U，出局倍數 2.5x，需累積 $2,500。每日收益 $20。<br>
+          回本（收回本金 $1,000）：$1,000 ÷ $20 = <strong style="color:var(--teal)">50 天</strong>　｜　出局（累積達 $2,500）：$2,500 ÷ $20 = <strong style="color:var(--gold)">125 天</strong>。<br>
+          總領回 2,500U，淨賺 <strong>1,500U（ROI +150%）</strong>。</span>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 計算二 -->
+        <div class="sub-title" id="calc2" data-i18n="k208">📊 計算二：A 直推 4 組（共 12 人）</div>
+
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;font-family:'JetBrains Mono',monospace" data-i18n="k301">結構配置</div>
+          <div style="display:grid;grid-template-columns:1fr 4fr;gap:12px;align-items:start">
+            <div style="background:var(--white);border:2px solid var(--gold-border);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">👤</div>
+              <div style="font-size:13px;font-weight:700;color:var(--gold)" data-i18n="k183b">A（你）</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px" data-i18n="k313">投入 1,000U</div>
+              <div style="font-size:11px;color:var(--text-muted)" data-i18n="k314">O1 = $10/天</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <div style="background:var(--white);border:1px solid var(--teal-border);border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px" data-i18n="k209">第 1 組</div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8">B1: 1,000U<br>C1: 1,000U<br>D1: 3,000U</div>
+                <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:6px">= 5,000U</div>
+              </div>
+              <div style="background:var(--white);border:1px solid var(--teal-border);border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px" data-i18n="k210">第 2 組</div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8">B2: 1,000U<br>C2: 1,000U<br>D2: 3,000U</div>
+                <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:6px">= 5,000U</div>
+              </div>
+              <div style="background:var(--white);border:1px solid var(--teal-border);border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px" data-i18n="k211">第 3 組</div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8">B3: 1,000U<br>C3: 1,000U<br>D3: 3,000U</div>
+                <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:6px">= 5,000U</div>
+              </div>
+              <div style="background:var(--white);border:1px solid var(--teal-border);border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px" data-i18n="k212">第 4 組</div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8">B4: 1,000U<br>C4: 1,000U<br>D4: 3,000U</div>
+                <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:6px">= 5,000U</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-soft)">
+            <span data-i18n="k213">傘下總業績：4 × 5,000 = <strong style="color:var(--text)">20,000U</strong> → A 晉升 <strong style="color:var(--teal)">V2</strong>（20%）✅ 傘下 4 組各達 5,000U → 各晉 <strong style="color:var(--purple)">V1</strong>（15%）✅ 極差獎勵：V2 - V1 = <strong style="color:var(--gold)">5%</strong> 直推人數：12 人 → 解鎖 O3 1~10 代</span>
+          </div>
+        </div>
+
+        <table class="doc-table" style="margin-bottom:16px">
+          <thead><tr><th data-i18n="k190b">收益層</th><th data-i18n="k191b">計算過程</th><th data-i18n="k192b">每日收益（U 本位）</th></tr></thead>
+          <tbody>
+            <tr><td class="label" data-i18n="k193b">🟢 O1 基礎累積</td><td data-i18n="k194b">A 本金 1,000U × 1%</td><td><strong style="color:var(--green)" data-i18n="k336">$10.00 / 天</strong></td></tr>
+            <tr><td class="label" data-i18n="k214">🔵 O3 第 1 代（5%）</td><td data-i18n="k215">4組 × (B $10 + C $10 + D $30) × 5% = $200 × 5%</td><td><strong style="color:var(--teal)" data-i18n="k329">$10.00 / 天</strong></td></tr>
+            <tr><td class="label" data-i18n="k216">🔵 O3 第 2~10 代</td><td data-i18n="k217">各組無下線 → $0</td><td style="color:var(--text-muted)">$0</td></tr>
+            <tr><td class="label" data-i18n="k218">🟡 O4 極差獎勵（V2-V1=5%）</td><td data-i18n="k219">A 拿極差部分：團隊日總 $200 × 5%<br><span style="font-size:11px;color:var(--text-muted)">（V1 各組自領 15%，A 僅領超出部分 5%）</span></td><td><strong style="color:var(--gold)" data-i18n="k330">$10.00 / 天</strong></td></tr>
+            <tr style="background:var(--bg)">
+              <td class="label" style="font-weight:700;color:var(--text)" data-i18n="k201b">每日總計</td>
+              <td style="color:var(--text-soft)">$10.00 + $10.00 + $0 + $10.00</td>
+              <td><strong style="font-size:18px;color:var(--text)" data-i18n="k315">$30.00 / 天</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+          <div style="background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--teal);font-weight:600;margin-bottom:4px" data-i18n="k220">A 等級 / 傘下等級</div>
+            <div style="font-size:24px;font-weight:900;color:var(--teal)">V2</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k221">A: V2（20%）<br>傘下 4 組各: V1（15%）<br>極差: 5%</div>
+          </div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px" data-i18n="k204b">每日總收益</div>
+            <div style="font-size:24px;font-weight:900;color:var(--green)">$30</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k316">U 本位 / 天</div>
+          </div>
+          <div style="background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:8px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--gold);font-weight:600;margin-bottom:4px" data-i18n="k222">回本 / 出局</div>
+            <div style="font-size:22px;font-weight:900;color:var(--gold)" data-i18n="k317">34 / 84 天</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" data-i18n="k223">回本 $1,000÷$30<br>出局 $2,500÷$30</div>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text-soft);margin-bottom:28px">
+          <span data-i18n="k224"><strong style="color:var(--text)">出局計算：</strong>A 投入 1,000U，出局倍數 2.5x，需累積 $2,500。每日收益 $30（極差 O4 $10），回本（$1,000）需 <strong style="color:var(--teal)">34 天</strong>，出局（$2,500）需 <strong style="color:var(--gold)">84 天</strong>。總領回 2,500U，淨賺 <strong>1,500U（ROI +150%）</strong>。</span>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 對比總覽 -->
+        <div class="sub-title" id="calc-compare" data-i18n="k225">⚡ 計算一 vs 計算二 對比總覽</div>
+
+        <table class="doc-table" style="margin-bottom:16px">
+          <thead>
+            <tr>
+              <th data-i18n="k226">項目</th>
+              <th style="color:#6d28d9" data-i18n="k227">計算一（1 組直推）</th>
+              <th style="color:#0891b2" data-i18n="k228">計算二（4 組直推）</th>
+              <th data-i18n="k229">差距</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="label" data-i18n="k230">A 本金投入</td><td>1,000U</td><td>1,000U</td><td>—</td></tr>
+            <tr><td class="label" data-i18n="k231">直推人數</td><td data-i18n="k232">3 人</td><td data-i18n="k233">12 人</td><td data-i18n="k234">4 倍</td></tr>
+            <tr><td class="label" data-i18n="k235">傘下總業績</td><td>5,000U</td><td>20,000U</td><td>4 倍</td></tr>
+            <tr><td class="label" data-i18n="k318">V 等級</td><td><span class="tag purple">V1</span></td><td><span class="tag teal">V2</span></td><td>—</td></tr>
+            <tr><td class="label" data-i18n="k236">O1 基礎</td><td data-i18n="k331">$10 / 天</td><td data-i18n="k332">$10 / 天</td><td>—</td></tr>
+            <tr><td class="label" data-i18n="k237">O3 推薦加速</td><td data-i18n="k333">$2.50 / 天</td><td data-i18n="k334">$10.00 / 天</td><td style="color:var(--teal)"><strong>+4x</strong></td></tr>
+            <tr><td class="label" data-i18n="k238">O4 團隊獎勵</td><td data-i18n="k239">$7.50 / 天（V1 15%）</td><td data-i18n="k240">$10.00 / 天（極差 V2-V1=5%）</td><td style="color:var(--gold)"><strong>+1.3x</strong></td></tr>
+            <tr style="background:var(--green-bg)">
+              <td class="label" style="font-weight:700" data-i18n="k241">每日總收益</td>
+              <td><strong style="color:#6d28d9;font-size:16px" data-i18n="k319">$20 / 天</strong></td>
+              <td><strong style="color:#0891b2;font-size:16px" data-i18n="k320">$30 / 天</strong></td>
+              <td style="color:var(--green)"><strong style="font-size:15px" data-i18n="k242">1.5x 速度</strong></td>
+            </tr>
+            <tr style="background:var(--teal-bg)">
+              <td class="label" style="font-weight:700" data-i18n="k243">回本周期</td>
+              <td><strong style="color:#6d28d9;font-size:16px" data-i18n="k321">50 天</strong></td>
+              <td><strong style="color:#0891b2;font-size:16px" data-i18n="k322">34 天</strong></td>
+              <td style="color:var(--green)"><strong data-i18n="k244">快 16 天</strong></td>
+            </tr>
+            <tr style="background:var(--gold-bg)">
+              <td class="label" style="font-weight:700" data-i18n="k245">出局周期</td>
+              <td><strong style="color:#6d28d9;font-size:16px" data-i18n="k323">125 天</strong></td>
+              <td><strong style="color:#0891b2;font-size:16px" data-i18n="k324">84 天</strong></td>
+              <td style="color:var(--green)"><strong data-i18n="k246">快 41 天</strong></td>
+            </tr>
+            <tr><td class="label" data-i18n="k247">淨賺（ROI）</td><td>1,500U（+150%）</td><td>1,500U（+150%）</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="info-block gold">
+          <span data-i18n="k249">💡 <strong>關鍵洞察：</strong>A 的本金與最終淨利完全相同（1,000U 本金，淨賺 1,500U），計算二引入 <strong>極差獎勵機制</strong>（V2-V1=5%），A 的 O4 由 $7.50 調整為 $10，每日收益 $30，出局由 125 天縮短至 <strong>84 天</strong>，回本由 50 天縮短至 <strong>34 天</strong>，提早 41 天出局複投。同時傘下 4 個 V1 各自也在領取 15% 的 O4，形成多層收益結構。</span>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ══ 07 視覺對照模組 ══ -->
+    <div class="section-block" id="chart-compare">
+      <div class="section-head">
+        <div class="section-num" style="background:#f0fbff;color:#0891b2;border:1px solid #bae6fd">07</div>
+        <h2 data-i18n="k250">視覺對照 — 四種市場走向投資結果</h2>
+        <span class="tag teal" data-i18n="k251">互動圖表</span>
+      </div>
+      <div class="section-body">
+
+        <div class="info-block teal" style="margin-bottom:20px">
+          <span data-i18n="k252">📌 <strong>對照說明：</strong>A = 1,000U 一次性買入 ROAM 持有；B = 1,000U 參加 Nikola（每日 U 本位累積 1%，不受 ROAM 幣價波動影響）。以下四種走向模擬 100 天後的資產變化。</span>
+        </div>
+
+        <!-- A vs B 說明 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+          <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:16px;display:flex;align-items:center;gap:12px">
+            <div style="width:34px;height:34px;border-radius:7px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:700;color:rgba(239,68,68,0.9)">A</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px" data-i18n="k253">A — 持有 ROAM</div>
+              <div style="font-size:12px;color:var(--text-muted)" data-i18n="k254">1,000U 買入 ROAM，長期持有。資產完全跟隨幣價漲跌。</div>
+            </div>
+          </div>
+          <div style="background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:12px">
+            <div style="width:34px;height:34px;border-radius:7px;background:var(--gold-bg);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:700;color:var(--gold)">B</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px" data-i18n="k255">B — 參加 Nikola</div>
+              <div style="font-size:12px;color:var(--text-muted)" data-i18n="k256">1,000U 投入 Nikola，每日 U 本位累積 1%（$10/天），三層收益不受幣價影響。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 走向按鈕 -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+          <button class="sc-btn2 active" onclick="setScenario2(1)" id="btn2-1"><span data-i18n="k257">📈 走向一</span><br><small data-i18n="k258">連漲 100 天</small></button>
+          <button class="sc-btn2" onclick="setScenario2(2)" id="btn2-2"><span data-i18n="k259">⛰️ 走向二</span><br><small data-i18n="k260">先漲後跌各 50 天</small></button>
+          <button class="sc-btn2" onclick="setScenario2(3)" id="btn2-3"><span data-i18n="k261">🏔️ 走向三</span><br><small data-i18n="k262">先跌後漲各 50 天</small></button>
+          <button class="sc-btn2" onclick="setScenario2(4)" id="btn2-4"><span data-i18n="k263">📉 走向四</span><br><small data-i18n="k264">連跌 100 天</small></button>
+        </div>
+
+        <!-- 場景說明 -->
+        <div id="sc-desc2" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text-soft);line-height:1.7"></div>
+
+        <!-- 圖表 -->
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)">
+          <canvas id="docChart" height="300"></canvas>
+        </div>
+
+        <!-- 結果卡片 -->
+        <div id="doc-result-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px"></div>
+
+        <!-- 匯總表 -->
+        <div class="sub-title" style="margin-top:0" data-i18n="k265">📋 四種走向第 100 天結果匯總</div>
+        <table class="doc-table" style="margin-bottom:14px">
+          <thead>
+            <tr>
+              <th data-i18n="k266">走向</th>
+              <th data-i18n="k267">市場情況</th>
+              <th style="text-align:right;color:rgba(239,68,68,0.85)" data-i18n="k268">A 持有 ROAM</th>
+              <th style="text-align:right;color:var(--gold)" data-i18n="k269">B Nikola</th>
+              <th style="text-align:right" data-i18n="k270">差距</th>
+              <th style="text-align:center" data-i18n="k271">勝出</th>
+            </tr>
+          </thead>
+          <tbody id="doc-summary-table"></tbody>
+        </table>
+
+        <div class="info-block gold">
+          <span data-i18n="k272">💡 <strong>核心結論：</strong>B（Nikola）在走向二、三、四共 3 種場景勝出。走向一（持續牛市）A 勝出，但 B 仍在第 150 天完整出局，領回 <strong>2,500U（ROI +150%）</strong>。B 的核心優勢是 <strong>U 本位保值機制</strong>——無論幣價如何波動，B 都在第 150 天穩定完成 2.5x 出局，收益路徑完全不受市場影響。</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ 更新紀錄 ══ -->
+    <div class="section-block" id="changelog">
+      <div class="section-head">
+        <div class="section-num" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0">📝</div>
+        <h2 data-i18n="k273">v2 更新紀錄</h2>
+        <span class="tag green">2026-03-27</span>
+      </div>
+      <div class="section-body">
+        <div class="update-row">
+          <div class="update-badge"><span class="tag red" data-i18n="k274">修正</span></div>
+          <div class="update-desc"><span data-i18n="k275"><strong>O1 結算方式修正：</strong>原描述「每日以當天幣價換算，直接進入錢包」→ 正確為「U 本位累積，提現時依照 ROAM 實時價格換算提出」</span></div>
+        </div>
+        <div class="update-row">
+          <div class="update-badge"><span class="tag green" data-i18n="k276">更新</span></div>
+          <div class="update-desc"><span data-i18n="k277"><strong>三層收益說明統一：</strong>明確 O1 + O3 + O4 三層均為 U 本位累積，不受 ROAM 幣價波動影響</span></div>
+        </div>
+        <div class="update-row">
+          <div class="update-badge"><span class="tag green" data-i18n="k276">更新</span></div>
+          <div class="update-desc"><span data-i18n="k278"><strong>交易所列表新增：</strong>ROAM 已在 Binance Alpha 上架交易對，列入官方交易所清單</span></div>
+        </div>
+        <div class="update-row">
+          <div class="update-badge"><span class="tag gold" data-i18n="k279">替換</span></div>
+          <div class="update-desc"><span data-i18n="k280"><strong>錢包替換：</strong>參與錢包由 DeBox App 更換為 <strong>Bitget Wallet</strong>，官方下載連結：https://web3.bitget.com</span></div>
+        </div>
+        <div class="update-row">
+          <div class="update-badge"><span class="tag teal" data-i18n="k281">新增</span></div>
+          <div class="update-desc"><span data-i18n="k282"><strong>視覺對照模組（v3 新增）：</strong>加入互動式圖表 — 四種 ROAM 幣價走向下，A（持有 ROAM）vs B（Nikola）100 天資產對照，含結果卡片、匯總表與核心結論</span></div>
+        </div>
+        <div class="update-row">
+          <div class="update-badge"><span class="tag teal" data-i18n="k281">新增</span></div>
+          <div class="update-desc"><span data-i18n="k283"><strong>FAQ Q2 修正：</strong>每日 1% 釋放機制說明更新為正確版本，加入 U 本位累積說明與提現換算舉例</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <span data-i18n="k284">Nikola Protocol 資料庫說明文件 · v2 · 2026年3月26日</span><br>
+  <a href="https://nikola.global/">nikola.global</a> &nbsp;·&nbsp;
+  <a href="https://t.me/Nikola_Eni">t.me/Nikola_Eni</a><br>
+  <span data-i18n="k285">僅供社區推廣及教育用途 · 不構成任何投資建議</span>
+</div>
+
+<script>
+
+const DATA2 = {"s1": {"A": [1000.0, 1010.0, 1020.1, 1030.3, 1040.6, 1051.01, 1061.52, 1072.14, 1082.86, 1093.69, 1104.62, 1115.67, 1126.83, 1138.09, 1149.47, 1160.97, 1172.58, 1184.3, 1196.15, 1208.11, 1220.19, 1232.39, 1244.72, 1257.16, 1269.73, 1282.43, 1295.26, 1308.21, 1321.29, 1334.5, 1347.85, 1361.33, 1374.94, 1388.69, 1402.58, 1416.6, 1430.77, 1445.08, 1459.53, 1474.12, 1488.86, 1503.75, 1518.79, 1533.98, 1549.32, 1564.81, 1580.46, 1596.26, 1612.23, 1628.35, 1644.63, 1661.08, 1677.69, 1694.47, 1711.41, 1728.52, 1745.81, 1763.27, 1780.9, 1798.71, 1816.7, 1834.86, 1853.21, 1871.74, 1890.46, 1909.37, 1928.46, 1947.74, 1967.22, 1986.89, 2006.76, 2026.83, 2047.1, 2067.57, 2088.25, 2109.13, 2130.22, 2151.52, 2173.04, 2194.77, 2216.72, 2238.88, 2261.27, 2283.88, 2306.72, 2329.79, 2353.09, 2376.62, 2400.38, 2424.39, 2448.63, 2473.12, 2497.85, 2522.83, 2548.06, 2573.54, 2599.27, 2625.27, 2651.52, 2678.03, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81, 2704.81], "B": [1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070, 1080, 1090, 1100, 1110, 1120, 1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1260, 1270, 1280, 1290, 1300, 1310, 1320, 1330, 1340, 1350, 1360, 1370, 1380, 1390, 1400, 1410, 1420, 1430, 1440, 1450, 1460, 1470, 1480, 1490, 1500, 1510, 1520, 1530, 1540, 1550, 1560, 1570, 1580, 1590, 1600, 1610, 1620, 1630, 1640, 1650, 1660, 1670, 1680, 1690, 1700, 1710, 1720, 1730, 1740, 1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100, 2110, 2120, 2130, 2140, 2150, 2160, 2170, 2180, 2190, 2200, 2210, 2220, 2230, 2240, 2250, 2260, 2270, 2280, 2290, 2300, 2310, 2320, 2330, 2340, 2350, 2360, 2370, 2380, 2390, 2400, 2410, 2420, 2430, 2440, 2450, 2460, 2470, 2480, 2490, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500], "P": [1.0, 1.01, 1.0201, 1.0303, 1.0406, 1.051, 1.0615, 1.0721, 1.0829, 1.0937, 1.1046, 1.1157, 1.1268, 1.1381, 1.1495, 1.161, 1.1726, 1.1843, 1.1961, 1.2081, 1.2202, 1.2324, 1.2447, 1.2572, 1.2697, 1.2824, 1.2953, 1.3082, 1.3213, 1.3345, 1.3478, 1.3613, 1.3749, 1.3887, 1.4026, 1.4166, 1.4308, 1.4451, 1.4595, 1.4741, 1.4889, 1.5038, 1.5188, 1.534, 1.5493, 1.5648, 1.5805, 1.5963, 1.6122, 1.6283, 1.6446, 1.6611, 1.6777, 1.6945, 1.7114, 1.7285, 1.7458, 1.7633, 1.7809, 1.7987, 1.8167, 1.8349, 1.8532, 1.8717, 1.8905, 1.9094, 1.9285, 1.9477, 1.9672, 1.9869, 2.0068, 2.0268, 2.0471, 2.0676, 2.0882, 2.1091, 2.1302, 2.1515, 2.173, 2.1948, 2.2167, 2.2389, 2.2613, 2.2839, 2.3067, 2.3298, 2.3531, 2.3766, 2.4004, 2.4244, 2.4486, 2.4731, 2.4979, 2.5228, 2.5481, 2.5735, 2.5993, 2.6253, 2.6515, 2.678, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048, 2.7048]}, "s2": {"A": [1000.0, 1010.0, 1020.1, 1030.3, 1040.6, 1051.01, 1061.52, 1072.14, 1082.86, 1093.69, 1104.62, 1115.67, 1126.83, 1138.09, 1149.47, 1160.97, 1172.58, 1184.3, 1196.15, 1208.11, 1220.19, 1232.39, 1244.72, 1257.16, 1269.73, 1282.43, 1295.26, 1308.21, 1321.29, 1334.5, 1347.85, 1361.33, 1374.94, 1388.69, 1402.58, 1416.6, 1430.77, 1445.08, 1459.53, 1474.12, 1488.86, 1503.75, 1518.79, 1533.98, 1549.32, 1564.81, 1580.46, 1596.26, 1612.23, 1628.35, 1644.63, 1628.19, 1611.9, 1595.78, 1579.83, 1564.03, 1548.39, 1532.9, 1517.58, 1502.4, 1487.38, 1472.5, 1457.78, 1443.2, 1428.77, 1414.48, 1400.33, 1386.33, 1372.47, 1358.74, 1345.16, 1331.7, 1318.39, 1305.2, 1292.15, 1279.23, 1266.44, 1253.77, 1241.24, 1228.82, 1216.53, 1204.37, 1192.33, 1180.4, 1168.6, 1156.91, 1145.34, 1133.89, 1122.55, 1111.33, 1100.21, 1089.21, 1078.32, 1067.53, 1056.86, 1046.29, 1035.83, 1025.47, 1015.22, 1005.06, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01], "B": [1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070, 1080, 1090, 1100, 1110, 1120, 1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1260, 1270, 1280, 1290, 1300, 1310, 1320, 1330, 1340, 1350, 1360, 1370, 1380, 1390, 1400, 1410, 1420, 1430, 1440, 1450, 1460, 1470, 1480, 1490, 1500, 1510, 1520, 1530, 1540, 1550, 1560, 1570, 1580, 1590, 1600, 1610, 1620, 1630, 1640, 1650, 1660, 1670, 1680, 1690, 1700, 1710, 1720, 1730, 1740, 1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100, 2110, 2120, 2130, 2140, 2150, 2160, 2170, 2180, 2190, 2200, 2210, 2220, 2230, 2240, 2250, 2260, 2270, 2280, 2290, 2300, 2310, 2320, 2330, 2340, 2350, 2360, 2370, 2380, 2390, 2400, 2410, 2420, 2430, 2440, 2450, 2460, 2470, 2480, 2490, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500], "P": [1.0, 1.01, 1.0201, 1.0303, 1.0406, 1.051, 1.0615, 1.0721, 1.0829, 1.0937, 1.1046, 1.1157, 1.1268, 1.1381, 1.1495, 1.161, 1.1726, 1.1843, 1.1961, 1.2081, 1.2202, 1.2324, 1.2447, 1.2572, 1.2697, 1.2824, 1.2953, 1.3082, 1.3213, 1.3345, 1.3478, 1.3613, 1.3749, 1.3887, 1.4026, 1.4166, 1.4308, 1.4451, 1.4595, 1.4741, 1.4889, 1.5038, 1.5188, 1.534, 1.5493, 1.5648, 1.5805, 1.5963, 1.6122, 1.6283, 1.6446, 1.6282, 1.6119, 1.5958, 1.5798, 1.564, 1.5484, 1.5329, 1.5176, 1.5024, 1.4874, 1.4725, 1.4578, 1.4432, 1.4288, 1.4145, 1.4003, 1.3863, 1.3725, 1.3587, 1.3452, 1.3317, 1.3184, 1.3052, 1.2922, 1.2792, 1.2664, 1.2538, 1.2412, 1.2288, 1.2165, 1.2044, 1.1923, 1.1804, 1.1686, 1.1569, 1.1453, 1.1339, 1.1226, 1.1113, 1.1002, 1.0892, 1.0783, 1.0675, 1.0569, 1.0463, 1.0358, 1.0255, 1.0152, 1.0051, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995]}, "s3": {"A": [1000.0, 990.0, 980.1, 970.3, 960.6, 950.99, 941.48, 932.07, 922.74, 913.52, 904.38, 895.34, 886.38, 877.52, 868.75, 860.06, 851.46, 842.94, 834.51, 826.17, 817.91, 809.73, 801.63, 793.61, 785.68, 777.82, 770.04, 762.34, 754.72, 747.17, 739.7, 732.3, 724.98, 717.73, 710.55, 703.45, 696.41, 689.45, 682.55, 675.73, 668.97, 662.28, 655.66, 649.1, 642.61, 636.19, 629.82, 623.53, 617.29, 611.12, 605.01, 611.06, 617.17, 623.34, 629.57, 635.87, 642.23, 648.65, 655.13, 661.69, 668.3, 674.99, 681.74, 688.55, 695.44, 702.39, 709.42, 716.51, 723.68, 730.91, 738.22, 745.6, 753.06, 760.59, 768.2, 775.88, 783.64, 791.47, 799.39, 807.38, 815.46, 823.61, 831.85, 840.17, 848.57, 857.05, 865.62, 874.28, 883.02, 891.85, 900.77, 909.78, 918.88, 928.07, 937.35, 946.72, 956.19, 965.75, 975.41, 985.16, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01, 995.01], "B": [1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070, 1080, 1090, 1100, 1110, 1120, 1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1260, 1270, 1280, 1290, 1300, 1310, 1320, 1330, 1340, 1350, 1360, 1370, 1380, 1390, 1400, 1410, 1420, 1430, 1440, 1450, 1460, 1470, 1480, 1490, 1500, 1510, 1520, 1530, 1540, 1550, 1560, 1570, 1580, 1590, 1600, 1610, 1620, 1630, 1640, 1650, 1660, 1670, 1680, 1690, 1700, 1710, 1720, 1730, 1740, 1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100, 2110, 2120, 2130, 2140, 2150, 2160, 2170, 2180, 2190, 2200, 2210, 2220, 2230, 2240, 2250, 2260, 2270, 2280, 2290, 2300, 2310, 2320, 2330, 2340, 2350, 2360, 2370, 2380, 2390, 2400, 2410, 2420, 2430, 2440, 2450, 2460, 2470, 2480, 2490, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500], "P": [1.0, 0.99, 0.9801, 0.9703, 0.9606, 0.951, 0.9415, 0.9321, 0.9227, 0.9135, 0.9044, 0.8953, 0.8864, 0.8775, 0.8687, 0.8601, 0.8515, 0.8429, 0.8345, 0.8262, 0.8179, 0.8097, 0.8016, 0.7936, 0.7857, 0.7778, 0.77, 0.7623, 0.7547, 0.7472, 0.7397, 0.7323, 0.725, 0.7177, 0.7106, 0.7034, 0.6964, 0.6894, 0.6826, 0.6757, 0.669, 0.6623, 0.6557, 0.6491, 0.6426, 0.6362, 0.6298, 0.6235, 0.6173, 0.6111, 0.605, 0.6111, 0.6172, 0.6233, 0.6296, 0.6359, 0.6422, 0.6486, 0.6551, 0.6617, 0.6683, 0.675, 0.6817, 0.6886, 0.6954, 0.7024, 0.7094, 0.7165, 0.7237, 0.7309, 0.7382, 0.7456, 0.7531, 0.7606, 0.7682, 0.7759, 0.7836, 0.7915, 0.7994, 0.8074, 0.8155, 0.8236, 0.8318, 0.8402, 0.8486, 0.8571, 0.8656, 0.8743, 0.883, 0.8919, 0.9008, 0.9098, 0.9189, 0.9281, 0.9373, 0.9467, 0.9562, 0.9657, 0.9754, 0.9852, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995]}, "s4": {"A": [1000.0, 990.0, 980.1, 970.3, 960.6, 950.99, 941.48, 932.07, 922.74, 913.52, 904.38, 895.34, 886.38, 877.52, 868.75, 860.06, 851.46, 842.94, 834.51, 826.17, 817.91, 809.73, 801.63, 793.61, 785.68, 777.82, 770.04, 762.34, 754.72, 747.17, 739.7, 732.3, 724.98, 717.73, 710.55, 703.45, 696.41, 689.45, 682.55, 675.73, 668.97, 662.28, 655.66, 649.1, 642.61, 636.19, 629.82, 623.53, 617.29, 611.12, 605.01, 598.96, 592.97, 587.04, 581.17, 575.35, 569.6, 563.91, 558.27, 552.68, 547.16, 541.69, 536.27, 530.91, 525.6, 520.34, 515.14, 509.99, 504.89, 499.84, 494.84, 489.89, 484.99, 480.14, 475.34, 470.59, 465.88, 461.22, 456.61, 452.04, 447.52, 443.05, 438.62, 434.23, 429.89, 425.59, 421.33, 417.12, 412.95, 408.82, 404.73, 400.68, 396.68, 392.71, 388.78, 384.9, 381.05, 377.24, 373.46, 369.73, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03, 366.03], "B": [1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070, 1080, 1090, 1100, 1110, 1120, 1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1260, 1270, 1280, 1290, 1300, 1310, 1320, 1330, 1340, 1350, 1360, 1370, 1380, 1390, 1400, 1410, 1420, 1430, 1440, 1450, 1460, 1470, 1480, 1490, 1500, 1510, 1520, 1530, 1540, 1550, 1560, 1570, 1580, 1590, 1600, 1610, 1620, 1630, 1640, 1650, 1660, 1670, 1680, 1690, 1700, 1710, 1720, 1730, 1740, 1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100, 2110, 2120, 2130, 2140, 2150, 2160, 2170, 2180, 2190, 2200, 2210, 2220, 2230, 2240, 2250, 2260, 2270, 2280, 2290, 2300, 2310, 2320, 2330, 2340, 2350, 2360, 2370, 2380, 2390, 2400, 2410, 2420, 2430, 2440, 2450, 2460, 2470, 2480, 2490, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500], "P": [1.0, 0.99, 0.9801, 0.9703, 0.9606, 0.951, 0.9415, 0.9321, 0.9227, 0.9135, 0.9044, 0.8953, 0.8864, 0.8775, 0.8687, 0.8601, 0.8515, 0.8429, 0.8345, 0.8262, 0.8179, 0.8097, 0.8016, 0.7936, 0.7857, 0.7778, 0.77, 0.7623, 0.7547, 0.7472, 0.7397, 0.7323, 0.725, 0.7177, 0.7106, 0.7034, 0.6964, 0.6894, 0.6826, 0.6757, 0.669, 0.6623, 0.6557, 0.6491, 0.6426, 0.6362, 0.6298, 0.6235, 0.6173, 0.6111, 0.605, 0.599, 0.593, 0.587, 0.5812, 0.5754, 0.5696, 0.5639, 0.5583, 0.5527, 0.5472, 0.5417, 0.5363, 0.5309, 0.5256, 0.5203, 0.5151, 0.51, 0.5049, 0.4998, 0.4948, 0.4899, 0.485, 0.4801, 0.4753, 0.4706, 0.4659, 0.4612, 0.4566, 0.452, 0.4475, 0.443, 0.4386, 0.4342, 0.4299, 0.4256, 0.4213, 0.4171, 0.4129, 0.4088, 0.4047, 0.4007, 0.3967, 0.3927, 0.3888, 0.3849, 0.381, 0.3772, 0.3735, 0.3697, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366, 0.366]}};
+
+const SCENARIOS2_ZH = {
+  1: { key:'s1', label:'走向一：連漲100天 → 持平', icon:'📈', color:'#059669', desc:'ROAM 幣價連漲 100 天（每天+1%，累計+170.5%），第 101 天起幣價維持不變。B 在第 150 天完成出局，領回 2,500U。' },
+  2: { key:'s2', label:'走向二：先漲後跌 → 持平', icon:'⛰️', color:'#c8962a', desc:'幣價先漲 50 天（+64.5%），再跌 50 天（-39.4%），最終接近原點（-0.5%），第 101 天起持平。A 小幅虧損，B 第 150 天完整出局 2,500U。' },
+  3: { key:'s3', label:'走向三：先跌後漲 → 持平', icon:'🏔️', color:'#6d28d9', desc:'幣價先跌 50 天（-39.5%），再漲 50 天（+64.5%），最終接近原點（-0.5%），第 101 天起持平。A 仍小幅虧損，B 第 150 天完整出局 2,500U。' },
+  4: { key:'s4', label:'走向四：連跌100天 → 持平', icon:'📉', color:'#dc2626', desc:'ROAM 幣價連跌 100 天（每天-1%，累計-63.4%），第 101 天起持平。熊市行情 A 嚴重虧損 -63.4%，B 依然在第 150 天穩定出局，領回 2,500U。' }
+};
+
+const SCENARIOS2_VI = {
+  1: { key:'s1', label:'Xu hướng 1: Tăng liên tục 100 ngày → Ổn định', icon:'📈', color:'#059669', desc:'Giá ROAM tăng liên tục 100 ngày (mỗi ngày +1%, tổng cộng +170,5%), từ ngày 101 giá giữ nguyên. B hoàn thành thoát vào ngày 150, nhận lại 2,500U.' },
+  2: { key:'s2', label:'Xu hướng 2: Tăng trước giảm sau → Ổn định', icon:'⛰️', color:'#c8962a', desc:'Giá tăng 50 ngày (+64,5%), sau đó giảm 50 ngày (-39,4%), cuối cùng gần điểm xuất phát (-0,5%), từ ngày 101 ổn định. A lỗ nhẹ, B thoát hoàn toàn ngày 150 với 2,500U.' },
+  3: { key:'s3', label:'Xu hướng 3: Giảm trước tăng sau → Ổn định', icon:'🏔️', color:'#6d28d9', desc:'Giá giảm 50 ngày (-39,5%), sau đó tăng 50 ngày (+64,5%), cuối cùng gần điểm xuất phát (-0,5%), từ ngày 101 ổn định. A vẫn lỗ nhẹ, B thoát hoàn toàn ngày 150 với 2,500U.' },
+  4: { key:'s4', label:'Xu hướng 4: Giảm liên tục 100 ngày → Ổn định', icon:'📉', color:'#dc2626', desc:'Giá ROAM giảm liên tục 100 ngày (mỗi ngày -1%, tổng cộng -63,4%), từ ngày 101 ổn định. Thị trường giảm A thua lỗ nặng -63,4%, B vẫn thoát ổn định vào ngày 150, nhận lại 2,500U.' }
+};
+
+const SUMMARY2_ZH = [
+  { s:1, market:'連漲100天→持平', A:'$2,704.81', B:'$2,500.00', diff:'-$204.81', winner:'A', wc:'#059669' },
+  { s:2, market:'先漲後跌→持平', A:'$995.01', B:'$2,500.00', diff:'+$1,504.99', winner:'B', wc:'#c8962a' },
+  { s:3, market:'先跌後漲→持平', A:'$995.01', B:'$2,500.00', diff:'+$1,504.99', winner:'B', wc:'#c8962a' },
+  { s:4, market:'連跌100天→持平', A:'$366.03', B:'$2,500.00', diff:'+$2,133.97', winner:'B', wc:'#c8962a' }
+];
+
+const SUMMARY2_VI = [
+  { s:1, market:'Tăng liên tục 100 ngày→Ổn định', A:'$2,704.81', B:'$2,500.00', diff:'-$204.81', winner:'A', wc:'#059669' },
+  { s:2, market:'Tăng trước giảm sau→Ổn định', A:'$995.01', B:'$2,500.00', diff:'+$1,504.99', winner:'B', wc:'#c8962a' },
+  { s:3, market:'Giảm trước tăng sau→Ổn định', A:'$995.01', B:'$2,500.00', diff:'+$1,504.99', winner:'B', wc:'#c8962a' },
+  { s:4, market:'Giảm liên tục 100 ngày→Ổn định', A:'$366.03', B:'$2,500.00', diff:'+$2,133.97', winner:'B', wc:'#c8962a' }
+];
+
+let currentLang = 'zh';
+let SCENARIOS2 = SCENARIOS2_ZH;
+let SUMMARY2 = SUMMARY2_ZH;
+let currentScenario = 1;
+let docChart = null;
+
+function buildDocSummaryTable() {
+  const tb = document.getElementById('doc-summary-table');
+  if (!tb) return;
+  const sl = currentLang === 'vi' ? 'Xu hướng' : '走向';
+  tb.innerHTML = SUMMARY2.map(r => {
+    const sc = SCENARIOS2[r.s];
+    return `<tr>
+      <td class="label">${sc.icon} ${sl} ${r.s}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${r.market}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:rgba(220,38,38,0.85)">${r.A}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--gold)">${r.B}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:${r.winner==='B'?'var(--green)':'var(--teal)'}"> ${r.diff}</td>
+      <td style="text-align:center"><span style="background:${r.wc}22;border:1px solid ${r.wc}55;color:${r.wc};padding:2px 9px;border-radius:100px;font-size:11px;font-weight:700">${r.winner}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function buildDocResultCards(sc) {
+  const d = DATA2[sc.key];
+  const A250=d.A[250], B250=d.B[250];
+  const AdiffFinal=((A250-1000)/1000*100).toFixed(1);
+  const winner = A250>B250?'A':'B';
+  const isVi = currentLang === 'vi';
+  const cards = [
+    { label: isVi?'B Thời gian thoát':'B 出局時間', val: isVi?'Ngày 150':'第 150 天', sub: isVi?'Tích lũy $2,500U hoàn thành':'累積 $2,500U 完成', c:'var(--gold)', bg:'var(--gold-bg)', border:'var(--gold-border)' },
+    { label: isVi?'B Thoát cuối cùng':'B 最終出局', val:'$2,500', sub: isVi?'Tính theo U ROI +150%':'U 本位 ROI +150%', c:'var(--gold)', bg:'var(--gold-bg)', border:'var(--gold-border)' },
+    { label: isVi?'A Cuối cùng (Ngày 250)':'A 最終（第250天）', val:'$'+A250.toFixed(0), sub:(AdiffFinal>=0?'+':'')+AdiffFinal+'% '+(isVi?'lãi/lỗ':'損益'), c:'#dc2626', bg:'#fef2f2', border:'#fecaca' },
+    { label: isVi?'Chênh lệch cuối cùng':'最終差距', val:(winner==='B'?'+$':'-$')+Math.abs(B250-A250).toFixed(0), sub:winner+(isVi?' thắng':' 勝出'), c:winner==='B'?'var(--green)':'#dc2626', bg:winner==='B'?'var(--green-bg)':'#fef2f2', border:winner==='B'?'var(--green-border)':'#fecaca' }
+  ];
+  const el = document.getElementById('doc-result-cards');
+  if (!el) return;
+  el.innerHTML = cards.map(c=>`
+    <div style="background:${c.bg};border:1px solid ${c.border};border-radius:9px;padding:14px;text-align:center">
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;line-height:1.4">${c.label}</div>
+      <div style="font-size:20px;font-weight:800;color:${c.c};font-family:'JetBrains Mono',monospace;line-height:1">${c.val}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+function setScenario2(num) {
+  currentScenario = num;
+  document.querySelectorAll('.sc-btn2').forEach((b,i)=>b.classList.toggle('active',i+1===num));
+  const sc=SCENARIOS2[num], d=DATA2[sc.key];
+  const desc2=document.getElementById('sc-desc2');
+  if(desc2) desc2.innerHTML=`<strong style="color:${sc.color}">${sc.icon} ${sc.label}</strong><br>${sc.desc}`;
+  buildDocResultCards(sc);
+  const labels=Array.from({length:251},(_,i)=>i);
+  const exitLine=Array(251).fill(null); exitLine[150]=2500;
+  const isVi = currentLang === 'vi';
+  const chartData={
+    labels,
+    datasets:[
+      { label: isVi?'A — Giữ ROAM':'A — 持有 ROAM', data:d.A, borderColor:'rgba(220,38,38,0.8)', backgroundColor:'rgba(220,38,38,0.04)', borderWidth:2, fill:false, tension:0.3, pointRadius:0, pointHoverRadius:5 },
+      { label: isVi?'B — Nikola (thoát 2,500U)':'B — Nikola（出局 2,500U）', data:d.B, borderColor:'#c8962a', backgroundColor:'rgba(200,150,42,0.04)', borderWidth:2.5, fill:false, tension:0.1, pointRadius:0, pointHoverRadius:5 },
+      { label: isVi?'Vốn ban đầu $1,000':'初始資金 $1,000', data:Array(251).fill(1000), borderColor:'rgba(0,0,0,0.12)', borderWidth:1, borderDash:[5,4], fill:false, pointRadius:0, tension:0 },
+      { label: isVi?'B Điểm thoát (Ngày 150)':'B 出局點（第150天）', data:exitLine, borderColor:'#c8962a', backgroundColor:'#c8962a', borderWidth:0, pointRadius:exitLine.map(v=>v?8:0), pointStyle:'star', pointHoverRadius:10 }
+    ]
+  };
+  if(docChart){ docChart.data=chartData; docChart.options.plugins.title.text=sc.label; docChart.update('active'); }
+  else{
+    const ctx=document.getElementById('docChart');
+    if(!ctx) return;
+    docChart=new Chart(ctx.getContext('2d'),{
+      type:'line', data:chartData,
+      options:{
+        responsive:true, animation:{duration:350},
+        interaction:{intersect:false,mode:'index'},
+        plugins:{
+          title:{ display:true, text:sc.label, color:'#1a2035', font:{size:13,family:"'Noto Sans TC',sans-serif",weight:'600'}, padding:{bottom:16} },
+          legend:{ labels:{ color:'#8896aa', font:{size:11}, boxWidth:14, padding:18 } },
+          tooltip:{
+            backgroundColor:'#fff', borderColor:'#e4e8f0', borderWidth:1,
+            titleColor:'#1a2035', bodyColor:'#4a5568', padding:10,
+            callbacks:{
+              title:items=>(isVi?'Ngày ':'第 ')+items[0].label+(isVi?'':' 天'),
+              label:item=>{ if(item.datasetIndex===3) return null; const v=item.raw; if(v===null) return null; const d2=((v-1000)/1000*100).toFixed(1); return `  ${item.dataset.label.substring(0,8)}: $${v.toFixed(0)}  (${d2>=0?'+':''}${d2}%)`; }
+            }
+          }
+        },
+        scales:{
+          x:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#8896aa',maxTicksLimit:13,callback:v=>isVi?'Ngày '+v:'第'+v+'天'} },
+          y:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#8896aa',callback:v=>'$'+v.toLocaleString()} }
+        }
+      }
+    });
+  }
+}
+
+const cs2=document.createElement('script');
+cs2.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+cs2.onload=()=>{ buildDocSummaryTable(); setScenario2(1); };
+document.head.appendChild(cs2);
+
+const i18n = {"zh":{"k1":"✅ v3.1 · 修正視覺模組 · 2026-03-27","k2":"Nikola Protocol 資料庫內容說明","k3":"本文件為資料庫 v2 版本的完整內容說明，涵蓋項目概覽、收益機制（正確版）、合夥人方案、官方連結及參與流程，供社媒推廣、群組使用及 Bot 知識庫參考。","k4":"目錄","k5":"01 項目概覽","k6":"什麼是 Nikola","k7":"生態背書","k8":"02 收益機制","k9":"每日釋放說明","k10":"分層出局制度","k11":"O1 正確說明","k12":"O3 分享獎勵","k13":"O4 團隊獎勵","k14":"03 合夥人方案","k15":"兩種合夥人","k16":"手續費分紅","k17":"04 官方連結","k18":"官方連結","k19":"合約地址","k20":"05 參與流程","k21":"06 投資計算","k22":"計算一：1組直推","k23":"計算二：4組直推","k24":"對比總覽","k25":"07 視覺對照","k26":"A vs B 走向對比","k27":"四走向匯總表","k28":"📝 更新紀錄","k29":"項目概覽與核心運作","k30":"🌐 什麼是 Nikola Protocol？","k31":"Nikola Protocol 是建立在 <strong>ENI 公鏈</strong>上的 <strong>Web4.0 AI 量化孵化協議</strong>，以 TIF（Technology × Intelligent × Finance）為核心框架，融合多智能體協作系統與大規模 AI 模型數據能力，打造自我進化的智能孵化引擎。","k32":"💡 核心運作邏輯","k33":"資金方向","k34":"USDT 投入 → AI 算力量化系統運行 → U 本位每日累積 → 提現時換算 ROAM 提出","k35":"每日累積比例","k36":"本金的 <strong>1% / 天</strong>（U 本位，美元計價累積）","k37":"收益分配","k38":"85% O1（ROAM 方向）+ 10% NKT 算力積分 + 5% 服務費","k39":"實際有效收益率","k40":"<strong>95%</strong>（85% + 10%，5% 服務費 70% 回饋合夥人）","k41":"最低投入","k42":"100 USDT（須為 100 的倍數）","k43":"運行網絡","k44":"ENI 主網（ENI Mainnet）","k45":"NKT 定位","k46":"Nikola AI Agent 算力積分，內盤固定 1 NKT = 1 USDT，計劃上架 OKX","k47":"🔐 生態背書","k48":"生態項目","k49":"背書說明","k50":"狀態","k51":"WBA OpenRoaming 唯一 Web3 IDP，750萬+ 節點，190+ 國家，Samsung Next 投資，CertiK A 級","k52":"已上線","k53":"ENI 公鏈","k54":"ZKP 零知識證明技術，Ave.ai Top 11，268萬+ 鏈上地址，960萬+ 總交易數","k55":"運行中","k56":"ROAM 已在 Binance Alpha 上架交易對","k57":"✅ 已上線","k58":"其他交易所","k59":"流通中","k60":"+ Anagram + Volt Capital，2023年完成 500 萬美元戰略融資","k61":"已背書","k62":"收益機制說明（正確版 v2）","k63":"已修正","k64":"<strong>✅ v2 核心修正：O1 + O3 + O4 三層收益全部以 U 本位（美元）累積。</strong>無論 ROAM 幣價漲跌，每日累積額度不受影響。提現時統一依照 ROAM 實時價格換算，提出 ROAM 代幣到錢包。","k65":"🏆 分層出局制度","k66":"投入金額","k67":"出局倍數","k68":"舉例（總領回）","k69":"完成週期","k70":"💰 100U — 999U","k71":"投 500U → 領回 1,000U","k72":"約 200 天","k73":"💎 1,000U — 2,999U","k74":"投 1,000U → 領回 2,500U","k75":"約 250 天","k76":"👑 3,000U 及以上","k77":"投 3,000U → 領回 9,000U","k78":"約 300 天","k79":"📌 投入金額須為 100 的倍數（如 100U、500U、1,000U、3,000U）","k80":"🎁 三層收益結構詳解","k81":"基礎每日累積","k82":"本金 × 1% / 天 · U 本位 · 提現換算 ROAM 提出","k83":"✅ 修正版","k84":"結算方式","k84b":"結算方式","k84c":"結算方式","k85":"<strong>U 本位累積</strong>，提現時依照 ROAM 實時價格換算，提出 ROAM 代幣到錢包","k86":"幣價影響","k87":"✅ <strong>不受影響</strong>——每日 $10 累積額度鎖定，幣價只影響提現時換得的 ROAM 數量","k88":"計算公式","k88b":"計算公式","k89":"每日累積 = 本金 × 1%（例：投 1,000U → $10/天）","k90":"舉例說明","k91":"投 1,000U，每天累積 $10（U 本位）<br>提現時 ROAM $0.5 → 提出 20 ROAM<br>提現時 ROAM $1.0 → 提出 10 ROAM<br>提現時 ROAM $2.0 → 提出 5 ROAM","k92":"NKT 積分","k93":"同時每日累積 NKT：投 1,000U → 1 NKT/天（內盤 $1）","k94":"分享與生態貢獻獎勵","k95":"U 本位累積 · 直推人數解鎖代數 · 最高 +15%","k96":"<strong>U 本位累積</strong>，提現時才轉換為 ROAM，幣價波動不影響","k97":"獎勵性質","k98":"加速釋放獎勵，直接疊加進每日總累積額","k99":"直推人數","k100":"解鎖代數","k101":"獎勵比例明細","k102":"合計比例","k103":"≥ 1 人","k104":"1 代","k105":"第 1 代：5%","k106":"≥ 3 人","k107":"5 代","k108":"第 1 代：5%｜第 2 代：2%｜第 3~5 代：各 1%","k109":"≥ 5 人","k110":"10 代","k111":"第 1 代：5%｜第 2 代：2%｜第 3~10 代：各 1%","k112":"團隊貢獻獎勵","k113":"U 本位累積 · V 等級決定比例 · V1（15%）→ V8（50%）","k114":"<strong>U 本位累積</strong>，提現時才轉換為 ROAM，幣價波動不影響","k115":"O4 日收益 = 小區（團隊）每日總累積額 × V 等級比例","k116":"V1/V2 門檻","k117":"以整體團隊業績計算（V1：0.5萬U；V2：2萬U）","k118":"V3–V8 門檻","k119":"以小區（最大腿以外的支線）業績計算","k120":"等級","k121":"業績門檻","k122":"O4 比例","k123":"團隊 0.5 萬U","k124":"團隊 2 萬U","k125":"小區 10 萬U","k126":"小區 40 萬U","k127":"小區 150 萬U","k128":"小區 600 萬U","k129":"小區 1,500 萬U","k130":"小區 3,000 萬U","k131":"<strong>🔑 三層收益結算一致性：</strong>O1 + O3 + O4 三層均以 U 本位（美元）累積，提現時統一按 ROAM 實時價換算提出。幣價上漲時，提現可換到較少 ROAM 但等值 USD 不變；幣價下跌時，可換到更多 ROAM。三層收益的 USD 累積額度不受影響。","k132":"合夥人節點方案","k133":"💎 兩種合夥人對比","k134":"🌟 社區合夥人","k134b":"🌟 社區合夥人","k135":"全球限 999 個名額","k136":"<strong>8 萬</strong> ENI 公鏈積分","k137":"<strong>V2 等級</strong>直升（O4 獎勵 20%）","k138":"手續費分紅池 <strong>45%</strong> 均分","k139":"NKT <strong>2,000 枚</strong>（內盤 $2,000）","k140":"AI 智能體量化算力分紅","k140b":"AI 智能體量化算力分紅","k141":"💎 聯創合夥人","k141b":"💎 聯創合夥人","k142":"全球限 299 個名額","k143":"<strong>22 萬</strong> ENI 公鏈積分","k144":"<strong>V3 等級</strong>直升（O4 獎勵 25%）","k145":"手續費分紅池 <strong>25%</strong> 均分","k146":"NKT <strong>5,000 枚</strong>（內盤 $5,000）","k147":"💡 <strong>聯創合夥人性價比：</strong>購買 1,000U，附帶 5,000 枚 NKT（內盤價值 $5,000）+ V3 等級直升。等同於成本由 NKT 覆蓋，V3 分紅權及手續費分紅為純額外收益。","k148":"💰 手續費分紅機制","k149":"分配對象","k150":"佔比","k151":"名額","k152":"說明","k153":"限 999 個","k154":"每日均分，用戶越多每人分得越多","k155":"限 299 個","k156":"每日均分，名額更稀缺，人均佔比更高","k157":"⚙️ 平台","k158":"平台運營及技術維護","k159":"每筆用戶投入產生 <strong>5% 服務費</strong>，其中 <strong>70% 回饋合夥人生態</strong>。平台用戶規模越大，每日手續費池越大，合夥人每日被動分紅越豐厚。","k160":"官方連結與合約地址","k161":"⚠️ <strong>安全提醒：</strong>所有合約地址及官方連結以官方 TG 頻道 @Nikola_Eni 公告為準。遇可疑連結請在官方群組求證，切勿向任何人透露私鑰或助記詞。","k162":"🔗 官方連結","k163":"🟣 Nikola 協議入口","k164":"📱 官方 TG 頻道","k165":"🔷 ENI 公鏈官網","k166":"🌐 ENI 區塊鏈瀏覽器","k167":"🟢 ROAM 官網","k168":"💼 Bitget Wallet 下載","k169":"📋 ROAM 合約地址（三鏈）","k170":"🔷 ENI 主網 — Nikola 協議使用此鏈","k171":"🟡 BSC 鏈 — PancakeSwap / Binance Alpha","k172":"🟣 Solana — Meteora DEX","k173":"參與流程","k174":"<strong>下載 Bitget Wallet App</strong>（iOS / Android 均可）<br>官方下載：<a href=\"https://web3.bitget.com\" target=\"_blank\">https://web3.bitget.com</a><br>創建或導入 Web3 錢包，確保支援 ENI 主網。","k175":"<strong>準備 USDT，轉入 ENI 主網</strong><br>在交易所購買 USDT，跨鏈轉入 ENI 主網地址。<br>最低 100 USDT，投入金額須為 100 的倍數。","k176":"<strong>進入 Nikola 協議頁面</strong>：<a href=\"https://nikola.global/\" target=\"_blank\">https://nikola.global/</a><br>選擇投入金額，確認投入。投入金額決定出局倍數：<br>100U~999U × 2 ｜ 1,000U~2,999U × 2.5 ｜ 3,000U+ × 3","k177":"<strong>每日系統自動以 U 本位累積收益</strong><br>O1（85%）+ NKT（10%）+ 服務費（5%）每日自動計入。<br>達到對應出局倍數後，提現時依照 ROAM 實時價格換算，提出 ROAM 代幣到錢包。","k178":"<strong>收到的 ROAM 可選擇：</strong>持有等待升值 ／ 再投入 Nikola 複利 ／ 提現兌換 USDT","k179":"投資計算實例","k180":"📌 <strong>計算前提：</strong>所有收益均以 U 本位（美元）累積，不受 ROAM 幣價影響。O3 按直推人數解鎖代數，O4 按傘下總業績晉升 V 等級。回本周期 = 出局目標 ÷ 每日總收益。","k181":"📊 計算一：A 直推 1 組（B + C + D）","k183":"A（你）","k183b":"A（你）","k185":"B（直推）","k186":"C（直推）","k187":"D（直推）","k189":"傘下總業績：1,000 + 1,000 + 3,000 = <strong style=\"color:var(--text)\">5,000U</strong> → V1 門檻（0.5萬U）✅ 直推人數：3 人 → 解鎖 O3 <strong style=\"color:var(--text)\">1~5 代</strong>","k190":"收益層","k190b":"收益層","k191":"計算過程","k191b":"計算過程","k192":"每日收益（U 本位）","k192b":"每日收益（U 本位）","k193":"🟢 O1 基礎累積","k193b":"🟢 O1 基礎累積","k194":"A 本金 1,000U × 1%","k194b":"A 本金 1,000U × 1%","k195":"🔵 O3 第 1 代（5%）","k196":"(B $10 + C $10 + D $30) × 5% = $50 × 5%","k197":"🔵 O3 第 2~5 代","k198":"B、C、D 無下線 → $0","k199":"🟡 O4（V1，15%）","k200":"團隊日總 $50 × 15%","k201":"每日總計","k201b":"每日總計","k202":"V 等級","k203":"業績 5,000U（≥ 0.5萬U）","k204":"每日總收益","k204b":"每日總收益","k205":"回本周期","k206":"出局周期","k207":"<strong style=\"color:var(--text)\">計算說明：</strong>A 投入 1,000U，出局倍數 2.5x，需累積 $2,500。每日收益 $20。<br>回本（收回本金 $1,000）：$1,000 ÷ $20 = <strong style=\"color:var(--teal)\">50 天</strong>　｜　出局（累積達 $2,500）：$2,500 ÷ $20 = <strong style=\"color:var(--gold)\">125 天</strong>。<br>總領回 2,500U，淨賺 <strong>1,500U（ROI +150%）</strong>。","k208":"📊 計算二：A 直推 4 組（共 12 人）","k209":"第 1 組","k210":"第 2 組","k211":"第 3 組","k212":"第 4 組","k213":"傘下總業績：4 × 5,000 = <strong style=\"color:var(--text)\">20,000U</strong> → A 晉升 <strong style=\"color:var(--teal)\">V2</strong>（20%）✅ 傘下 4 組各達 5,000U → 各晉 <strong style=\"color:var(--purple)\">V1</strong>（15%）✅ 極差獎勵：V2 - V1 = <strong style=\"color:var(--gold)\">5%</strong> 直推人數：12 人 → 解鎖 O3 1~10 代","k214":"🔵 O3 第 1 代（5%）","k215":"4組 × (B $10 + C $10 + D $30) × 5% = $200 × 5%","k216":"🔵 O3 第 2~10 代","k217":"各組無下線 → $0","k218":"🟡 O4 極差獎勵（V2-V1=5%）","k219":"A 拿極差部分：團隊日總 $200 × 5%<br><span style=\"font-size:11px;color:var(--text-muted)\">（V1 各組自領 15%，A 僅領超出部分 5%）</span>","k220":"A 等級 / 傘下等級","k221":"A: V2（20%）<br>傘下 4 組各: V1（15%）<br>極差: 5%","k222":"回本 / 出局","k223":"回本 $1,000÷$30<br>出局 $2,500÷$30","k224":"<strong style=\"color:var(--text)\">出局計算：</strong>A 投入 1,000U，出局倍數 2.5x，需累積 $2,500。每日收益 $30（極差 O4 $10），回本（$1,000）需 <strong style=\"color:var(--teal)\">34 天</strong>，出局（$2,500）需 <strong style=\"color:var(--gold)\">84 天</strong>。總領回 2,500U，淨賺 <strong>1,500U（ROI +150%）</strong>。","k225":"⚡ 計算一 vs 計算二 對比總覽","k226":"項目","k227":"計算一（1 組直推）","k228":"計算二（4 組直推）","k229":"差距","k230":"A 本金投入","k231":"直推人數","k232":"3 人","k233":"12 人","k234":"4 倍","k235":"傘下總業績","k236":"O1 基礎","k237":"O3 推薦加速","k238":"O4 團隊獎勵","k239":"$7.50 / 天（V1 15%）","k240":"$10.00 / 天（極差 V2-V1=5%）","k241":"每日總收益","k242":"1.5x 速度","k243":"回本周期","k244":"快 16 天","k245":"出局周期","k246":"快 41 天","k247":"淨賺（ROI）","k249":"💡 <strong>關鍵洞察：</strong>A 的本金與最終淨利完全相同（1,000U 本金，淨賺 1,500U），計算二引入 <strong>極差獎勵機制</strong>（V2-V1=5%），A 的 O4 由 $7.50 調整為 $10，每日收益 $30，出局由 125 天縮短至 <strong>84 天</strong>，回本由 50 天縮短至 <strong>34 天</strong>，提早 41 天出局複投。同時傘下 4 個 V1 各自也在領取 15% 的 O4，形成多層收益結構。","k250":"視覺對照 — 四種市場走向投資結果","k251":"互動圖表","k252":"📌 <strong>對照說明：</strong>A = 1,000U 一次性買入 ROAM 持有；B = 1,000U 參加 Nikola（每日 U 本位累積 1%，不受 ROAM 幣價波動影響）。以下四種走向模擬 100 天後的資產變化。","k253":"A — 持有 ROAM","k254":"1,000U 買入 ROAM，長期持有。資產完全跟隨幣價漲跌。","k255":"B — 參加 Nikola","k256":"1,000U 投入 Nikola，每日 U 本位累積 1%（$10/天），三層收益不受幣價影響。","k257":"📈 走向一","k258":"連漲 100 天","k259":"⛰️ 走向二","k260":"先漲後跌各 50 天","k261":"🏔️ 走向三","k262":"先跌後漲各 50 天","k263":"📉 走向四","k264":"連跌 100 天","k265":"📋 四種走向第 100 天結果匯總","k266":"走向","k267":"市場情況","k268":"A 持有 ROAM","k269":"B Nikola","k270":"差距","k271":"勝出","k272":"💡 <strong>核心結論：</strong>B（Nikola）在走向二、三、四共 3 種場景勝出。走向一（持續牛市）A 勝出，但 B 仍在第 150 天完整出局，領回 <strong>2,500U（ROI +150%）</strong>。B 的核心優勢是 <strong>U 本位保值機制</strong>——無論幣價如何波動，B 都在第 150 天穩定完成 2.5x 出局，收益路徑完全不受市場影響。","k273":"v2 更新紀錄","k274":"修正","k275":"<strong>O1 結算方式修正：</strong>原描述「每日以當天幣價換算，直接進入錢包」→ 正確為「U 本位累積，提現時依照 ROAM 實時價格換算提出」","k276":"更新","k277":"<strong>三層收益說明統一：</strong>明確 O1 + O3 + O4 三層均為 U 本位累積，不受 ROAM 幣價波動影響","k278":"<strong>交易所列表新增：</strong>ROAM 已在 Binance Alpha 上架交易對，列入官方交易所清單","k279":"替換","k280":"<strong>錢包替換：</strong>參與錢包由 DeBox App 更換為 <strong>Bitget Wallet</strong>，官方下載連結：https://web3.bitget.com","k281":"新增","k282":"<strong>視覺對照模組（v3 新增）：</strong>加入互動式圖表 — 四種 ROAM 幣價走向下，A（持有 ROAM）vs B（Nikola）100 天資產對照，含結果卡片、匯總表與核心結論","k283":"<strong>FAQ Q2 修正：</strong>每日 1% 釋放機制說明更新為正確版本，加入 U 本位累積說明與提現換算舉例","k284":"Nikola Protocol 資料庫說明文件 · v2 · 2026年3月26日","k285":"僅供社區推廣及教育用途 · 不構成任何投資建議","k286":"U 本位 / 天","k287":"$1,000 ÷ $20/天","k288":"$2,500 ÷ $20/天","k295":"U 本位","k295b":"U 本位","k300":"U 本位","k301":"結構配置","k302":"投入 1,000U","k303":"O1 = $10/天","k304":"投入 1,000U","k305":"O1 = $10/天","k306":"投入 1,000U","k307":"O1 = $10/天","k308":"投入 3,000U","k309":"O1 = $30/天","k310":"$20.00 / 天","k311":"50 天","k312":"125 天","k313":"投入 1,000U","k314":"O1 = $10/天","k315":"$30.00 / 天","k316":"U 本位 / 天","k317":"34 / 84 天","k318":"V 等級","k319":"$20 / 天","k320":"$30 / 天","k321":"50 天","k322":"34 天","k323":"125 天","k324":"84 天","k325":"$10.00 / 天","k326":"$2.50 / 天","k327":"$7.50 / 天","k328":"$10.00 / 天","k329":"$10.00 / 天","k330":"$10.00 / 天","k331":"$10 / 天","k332":"$10 / 天","k333":"$2.50 / 天","k334":"$10.00 / 天","k335":"$10.00 / 天","k336":"$10.00 / 天"},"vi":{"k1":"✅ v3.1 · Sửa module trực quan · 2026-03-27","k2":"Nikola Protocol Mô tả nội dung cơ sở dữ liệu","k3":"Tài liệu này là mô tả đầy đủ nội dung phiên bản v2 của cơ sở dữ liệu, bao gồm tổng quan dự án, cơ chế thu nhập (phiên bản chính xác), chương trình đối tác, liên kết chính thức và quy trình tham gia, dùng cho quảng bá truyền thông xã hội, nhóm cộng đồng và tham khảo kho kiến thức Bot.","k4":"Mục lục","k5":"01 Tổng quan dự án","k6":"Nikola là gì","k7":"Hệ sinh thái bảo chứng","k8":"02 Cơ chế thu nhập","k9":"Giải thích phát hành hàng ngày","k10":"Hệ thống thoát theo tầng","k11":"O1 Giải thích chính xác","k12":"O3 Thưởng giới thiệu","k13":"O4 Thưởng đội nhóm","k14":"03 Chương trình đối tác","k15":"Hai loại đối tác","k16":"Chia sẻ phí giao dịch","k17":"04 Liên kết chính thức","k18":"Liên kết chính thức","k19":"Địa chỉ hợp đồng","k20":"05 Quy trình tham gia","k21":"06 Tính toán đầu tư","k22":"Tính toán 1: 1 nhóm giới thiệu trực tiếp","k23":"Tính toán 2: 4 nhóm giới thiệu trực tiếp","k24":"Tổng quan so sánh","k25":"07 So sánh trực quan","k26":"A vs B So sánh xu hướng","k27":"Bảng tổng hợp 4 xu hướng","k28":"📝 Nhật ký cập nhật","k29":"Tổng quan dự án và vận hành cốt lõi","k30":"🌐 Nikola Protocol là gì?","k31":"Nikola Protocol là <strong>giao thức ươm tạo lượng tử AI Web4.0</strong> được xây dựng trên <strong>chuỗi công khai ENI</strong>, với khung cốt lõi TIF (Technology × Intelligent × Finance), kết hợp hệ thống đa tác tử hợp tác và năng lực dữ liệu mô hình AI quy mô lớn, tạo nên động cơ ươm tạo thông minh tự tiến hóa.","k32":"💡 Logic vận hành cốt lõi","k33":"Hướng vốn","k34":"Nạp USDT → Hệ thống lượng tử AI vận hành → Tích lũy hàng ngày theo U → Quy đổi ROAM khi rút","k35":"Tỷ lệ tích lũy hàng ngày","k36":"<strong>1% / ngày</strong> trên vốn gốc (tính theo U, tích lũy bằng USD)","k37":"Phân phối thu nhập","k38":"85% O1 (hướng ROAM) + 10% điểm sức mạnh tính toán NKT + 5% phí dịch vụ","k39":"Tỷ suất lợi nhuận thực tế","k40":"<strong>95%</strong> (85% + 10%, 70% của 5% phí dịch vụ hoàn lại cho đối tác)","k41":"Mức đầu tư tối thiểu","k42":"100 USDT (phải là bội số của 100)","k43":"Mạng vận hành","k44":"ENI Mainnet","k45":"Định vị NKT","k46":"Điểm sức mạnh tính toán Nikola AI Agent, nội bộ cố định 1 NKT = 1 USDT, dự kiến niêm yết trên OKX","k47":"🔐 Hệ sinh thái bảo chứng","k48":"Dự án hệ sinh thái","k49":"Mô tả bảo chứng","k50":"Trạng thái","k51":"IDP Web3 duy nhất của WBA OpenRoaming, 7,5 triệu+ nút, 190+ quốc gia, đầu tư bởi Samsung Next, CertiK hạng A","k52":"Đã ra mắt","k53":"Chuỗi công khai ENI","k54":"Công nghệ ZKP chứng minh không tri thức, Ave.ai Top 11, 2,68 triệu+ địa chỉ on-chain, 9,6 triệu+ tổng giao dịch","k55":"Đang vận hành","k56":"ROAM đã niêm yết cặp giao dịch trên Binance Alpha","k57":"✅ Đã ra mắt","k58":"Sàn giao dịch khác","k59":"Đang lưu thông","k60":"+ Anagram + Volt Capital, hoàn thành gọi vốn chiến lược 5 triệu USD năm 2023","k61":"Đã bảo chứng","k62":"Giải thích cơ chế thu nhập (phiên bản chính xác v2)","k63":"Đã sửa","k64":"<strong>✅ Sửa đổi cốt lõi v2: Thu nhập 3 tầng O1 + O3 + O4 đều tích lũy theo U (USD).</strong> Bất kể giá ROAM tăng hay giảm, mức tích lũy hàng ngày không bị ảnh hưởng. Khi rút, quy đổi thống nhất theo giá ROAM thời gian thực, rút token ROAM về ví.","k65":"🏆 Hệ thống thoát theo tầng","k66":"Số tiền đầu tư","k67":"Hệ số thoát","k68":"Ví dụ (tổng nhận lại)","k69":"Thời gian hoàn thành","k70":"💰 100U — 999U","k71":"Đầu tư 500U → Nhận lại 1,000U","k72":"Khoảng 200 ngày","k73":"💎 1,000U — 2,999U","k74":"Đầu tư 1,000U → Nhận lại 2,500U","k75":"Khoảng 250 ngày","k76":"👑 3,000U trở lên","k77":"Đầu tư 3,000U → Nhận lại 9,000U","k78":"Khoảng 300 ngày","k79":"📌 Số tiền đầu tư phải là bội số của 100 (ví dụ: 100U, 500U, 1,000U, 3,000U)","k80":"🎁 Chi tiết cấu trúc thu nhập 3 tầng","k81":"Tích lũy cơ bản hàng ngày","k82":"Vốn gốc × 1% / ngày · Tính theo U · Quy đổi ROAM khi rút","k83":"✅ Phiên bản sửa","k84":"Phương thức thanh toán","k84b":"Phương thức thanh toán","k84c":"Phương thức thanh toán","k85":"<strong>Tích lũy theo U</strong>, khi rút quy đổi theo giá ROAM thời gian thực, rút token ROAM về ví","k86":"Ảnh hưởng giá coin","k87":"✅ <strong>Không bị ảnh hưởng</strong> — Mức tích lũy $10/ngày được khóa cố định, giá coin chỉ ảnh hưởng số lượng ROAM nhận được khi rút","k88":"Công thức tính","k88b":"Công thức tính","k89":"Tích lũy hàng ngày = Vốn gốc × 1% (Ví dụ: Đầu tư 1,000U → $10/ngày)","k90":"Ví dụ minh họa","k91":"Đầu tư 1,000U, tích lũy $10 mỗi ngày (tính theo U)<br>Khi rút ROAM $0.5 → Rút 20 ROAM<br>Khi rút ROAM $1.0 → Rút 10 ROAM<br>Khi rút ROAM $2.0 → Rút 5 ROAM","k92":"Điểm NKT","k93":"Đồng thời tích lũy NKT hàng ngày: Đầu tư 1,000U → 1 NKT/ngày (nội bộ $1)","k94":"Thưởng chia sẻ và đóng góp hệ sinh thái","k95":"Tích lũy theo U · Mở khóa thế hệ theo số người giới thiệu trực tiếp · Tối đa +15%","k96":"<strong>Tích lũy theo U</strong>, chỉ chuyển đổi sang ROAM khi rút, biến động giá coin không ảnh hưởng","k97":"Tính chất thưởng","k98":"Thưởng phát hành tăng tốc, cộng trực tiếp vào tổng tích lũy hàng ngày","k99":"Số người giới thiệu trực tiếp","k100":"Thế hệ mở khóa","k101":"Chi tiết tỷ lệ thưởng","k102":"Tổng tỷ lệ","k103":"≥ 1 người","k104":"1 thế hệ","k105":"Thế hệ 1: 5%","k106":"≥ 3 người","k107":"5 thế hệ","k108":"Thế hệ 1: 5% | Thế hệ 2: 2% | Thế hệ 3~5: mỗi thế hệ 1%","k109":"≥ 5 người","k110":"10 thế hệ","k111":"Thế hệ 1: 5% | Thế hệ 2: 2% | Thế hệ 3~10: mỗi thế hệ 1%","k112":"Thưởng đóng góp đội nhóm","k113":"Tích lũy theo U · Tỷ lệ theo cấp V · V1 (15%) → V8 (50%)","k114":"<strong>Tích lũy theo U</strong>, chỉ chuyển đổi sang ROAM khi rút, biến động giá coin không ảnh hưởng","k115":"Thu nhập O4 hàng ngày = Tổng tích lũy hàng ngày của tiểu khu (đội nhóm) × Tỷ lệ cấp V","k116":"Ngưỡng V1/V2","k117":"Tính theo hiệu suất toàn đội (V1: 0,5 vạn U; V2: 2 vạn U)","k118":"Ngưỡng V3–V8","k119":"Tính theo hiệu suất tiểu khu (nhánh phụ ngoài nhánh lớn nhất)","k120":"Cấp bậc","k121":"Ngưỡng hiệu suất","k122":"Tỷ lệ O4","k123":"Đội nhóm 0,5 vạn U","k124":"Đội nhóm 2 vạn U","k125":"Tiểu khu 10 vạn U","k126":"Tiểu khu 40 vạn U","k127":"Tiểu khu 150 vạn U","k128":"Tiểu khu 600 vạn U","k129":"Tiểu khu 1.500 vạn U","k130":"Tiểu khu 3.000 vạn U","k131":"<strong>🔑 Tính nhất quán thanh toán 3 tầng thu nhập:</strong> O1 + O3 + O4 cả 3 tầng đều tích lũy theo U (USD), khi rút quy đổi thống nhất theo giá ROAM thời gian thực. Khi giá tăng, rút được ít ROAM hơn nhưng giá trị USD tương đương không đổi; khi giá giảm, rút được nhiều ROAM hơn. Mức tích lũy USD của 3 tầng thu nhập không bị ảnh hưởng.","k132":"Chương trình nút đối tác","k133":"💎 So sánh hai loại đối tác","k134":"🌟 Đối tác cộng đồng","k134b":"🌟 Đối tác cộng đồng","k135":"Giới hạn 999 suất toàn cầu","k136":"<strong>80.000</strong> điểm chuỗi công khai ENI","k137":"Thăng trực tiếp <strong>cấp V2</strong> (thưởng O4 20%)","k138":"Chia đều <strong>45%</strong> quỹ chia sẻ phí giao dịch","k139":"NKT <strong>2.000 token</strong> (nội bộ $2,000)","k140":"Chia sẻ sức mạnh tính toán lượng tử AI Agent","k140b":"Chia sẻ sức mạnh tính toán lượng tử AI Agent","k141":"💎 Đối tác đồng sáng lập","k141b":"💎 Đối tác đồng sáng lập","k142":"Giới hạn 299 suất toàn cầu","k143":"<strong>220.000</strong> điểm chuỗi công khai ENI","k144":"Thăng trực tiếp <strong>cấp V3</strong> (thưởng O4 25%)","k145":"Chia đều <strong>25%</strong> quỹ chia sẻ phí giao dịch","k146":"NKT <strong>5.000 token</strong> (nội bộ $5,000)","k147":"💡 <strong>Giá trị đối tác đồng sáng lập:</strong> Mua 1,000U, kèm theo 5.000 NKT (giá trị nội bộ $5,000) + thăng trực tiếp cấp V3. Tương đương chi phí được NKT bù đắp, quyền chia sẻ V3 và chia sẻ phí giao dịch là thu nhập bổ sung thuần túy.","k148":"💰 Cơ chế chia sẻ phí giao dịch","k149":"Đối tượng phân phối","k150":"Tỷ lệ","k151":"Số suất","k152":"Mô tả","k153":"Giới hạn 999","k154":"Chia đều hàng ngày, càng nhiều người dùng mỗi người nhận càng nhiều","k155":"Giới hạn 299","k156":"Chia đều hàng ngày, suất khan hiếm hơn, tỷ lệ mỗi người cao hơn","k157":"⚙️ Nền tảng","k158":"Vận hành nền tảng và bảo trì kỹ thuật","k159":"Mỗi khoản đầu tư của người dùng tạo ra <strong>5% phí dịch vụ</strong>, trong đó <strong>70% hoàn lại cho hệ sinh thái đối tác</strong>. Quy mô người dùng nền tảng càng lớn, quỹ phí hàng ngày càng lớn, thu nhập thụ động hàng ngày của đối tác càng hậu hĩnh.","k160":"Liên kết chính thức và địa chỉ hợp đồng","k161":"⚠️ <strong>Nhắc nhở an toàn:</strong> Tất cả địa chỉ hợp đồng và liên kết chính thức lấy theo thông báo kênh TG chính thức @Nikola_Eni. Gặp liên kết đáng ngờ xin xác minh trong nhóm chính thức, tuyệt đối không tiết lộ khóa riêng tư hoặc cụm từ ghi nhớ cho bất kỳ ai.","k162":"🔗 Liên kết chính thức","k163":"🟣 Cổng giao thức Nikola","k164":"📱 Kênh TG chính thức","k165":"🔷 Website chính thức chuỗi ENI","k166":"🌐 Trình duyệt blockchain ENI","k167":"🟢 Website chính thức ROAM","k168":"💼 Tải Bitget Wallet","k169":"📋 Địa chỉ hợp đồng ROAM (3 chuỗi)","k170":"🔷 ENI Mainnet — Nikola Protocol sử dụng chuỗi này","k171":"🟡 Chuỗi BSC — PancakeSwap / Binance Alpha","k172":"🟣 Solana — Meteora DEX","k173":"Quy trình tham gia","k174":"<strong>Tải Bitget Wallet App</strong> (hỗ trợ cả iOS / Android)<br>Tải chính thức: <a href=\"https://web3.bitget.com\" target=\"_blank\">https://web3.bitget.com</a><br>Tạo hoặc nhập ví Web3, đảm bảo hỗ trợ ENI Mainnet.","k175":"<strong>Chuẩn bị USDT, chuyển vào ENI Mainnet</strong><br>Mua USDT trên sàn giao dịch, chuyển cross-chain vào địa chỉ ENI Mainnet.<br>Tối thiểu 100 USDT, số tiền đầu tư phải là bội số của 100.","k176":"<strong>Vào trang giao thức Nikola</strong>: <a href=\"https://nikola.global/\" target=\"_blank\">https://nikola.global/</a><br>Chọn số tiền đầu tư, xác nhận đầu tư. Số tiền đầu tư quyết định hệ số thoát:<br>100U~999U × 2 | 1,000U~2,999U × 2.5 | 3,000U+ × 3","k177":"<strong>Hệ thống tự động tích lũy thu nhập theo U hàng ngày</strong><br>O1 (85%) + NKT (10%) + Phí dịch vụ (5%) tự động ghi nhận hàng ngày.<br>Sau khi đạt hệ số thoát tương ứng, khi rút quy đổi theo giá ROAM thời gian thực, rút token ROAM về ví.","k178":"<strong>ROAM nhận được có thể chọn:</strong> Giữ chờ tăng giá / Tái đầu tư Nikola lãi kép / Rút đổi USDT","k179":"Ví dụ tính toán đầu tư","k180":"📌 <strong>Điều kiện tính toán:</strong> Tất cả thu nhập tích lũy theo U (USD), không bị ảnh hưởng bởi giá ROAM. O3 mở khóa thế hệ theo số người giới thiệu trực tiếp, O4 thăng cấp V theo tổng hiệu suất dưới tuyến. Thời gian hoàn vốn = Mục tiêu thoát ÷ Tổng thu nhập hàng ngày.","k181":"📊 Tính toán 1: A giới thiệu trực tiếp 1 nhóm (B + C + D)","k183":"A (Bạn)","k183b":"A (Bạn)","k185":"B (Giới thiệu trực tiếp)","k186":"C (Giới thiệu trực tiếp)","k187":"D (Giới thiệu trực tiếp)","k189":"Tổng hiệu suất dưới tuyến: 1,000 + 1,000 + 3,000 = <strong style=\"color:var(--text)\">5,000U</strong> → Ngưỡng V1 (0,5 vạn U) ✅ Số người giới thiệu trực tiếp: 3 → Mở khóa O3 <strong style=\"color:var(--text)\">thế hệ 1~5</strong>","k190":"Tầng thu nhập","k190b":"Tầng thu nhập","k191":"Quá trình tính toán","k191b":"Quá trình tính toán","k192":"Thu nhập hàng ngày (tính theo U)","k192b":"Thu nhập hàng ngày (tính theo U)","k193":"🟢 O1 Tích lũy cơ bản","k193b":"🟢 O1 Tích lũy cơ bản","k194":"Vốn gốc A 1,000U × 1%","k194b":"Vốn gốc A 1,000U × 1%","k195":"🔵 O3 Thế hệ 1 (5%)","k196":"(B $10 + C $10 + D $30) × 5% = $50 × 5%","k197":"🔵 O3 Thế hệ 2~5","k198":"B, C, D không có tuyến dưới → $0","k199":"🟡 O4 (V1, 15%)","k200":"Tổng đội nhóm hàng ngày $50 × 15%","k201":"Tổng hàng ngày","k201b":"Tổng hàng ngày","k202":"Cấp V","k203":"Hiệu suất 5,000U (≥ 0,5 vạn U)","k204":"Tổng thu nhập hàng ngày","k204b":"Tổng thu nhập hàng ngày","k205":"Thời gian hoàn vốn","k206":"Thời gian thoát","k207":"<strong style=\"color:var(--text)\">Giải thích tính toán:</strong> A đầu tư 1,000U, hệ số thoát 2.5x, cần tích lũy $2,500. Thu nhập hàng ngày $20.<br>Hoàn vốn (thu hồi vốn gốc $1,000): $1,000 ÷ $20 = <strong style=\"color:var(--teal)\">50 ngày</strong> | Thoát (tích lũy đạt $2,500): $2,500 ÷ $20 = <strong style=\"color:var(--gold)\">125 ngày</strong>.<br>Tổng nhận lại 2,500U, lãi ròng <strong>1,500U (ROI +150%)</strong>.","k208":"📊 Tính toán 2: A giới thiệu trực tiếp 4 nhóm (tổng 12 người)","k209":"Nhóm 1","k210":"Nhóm 2","k211":"Nhóm 3","k212":"Nhóm 4","k213":"Tổng hiệu suất dưới tuyến: 4 × 5,000 = <strong style=\"color:var(--text)\">20,000U</strong> → A thăng <strong style=\"color:var(--teal)\">V2</strong> (20%) ✅ 4 nhóm dưới tuyến đều đạt 5,000U → Mỗi nhóm thăng <strong style=\"color:var(--purple)\">V1</strong> (15%) ✅ Thưởng chênh lệch: V2 - V1 = <strong style=\"color:var(--gold)\">5%</strong> Số người giới thiệu trực tiếp: 12 → Mở khóa O3 thế hệ 1~10","k214":"🔵 O3 Thế hệ 1 (5%)","k215":"4 nhóm × (B $10 + C $10 + D $30) × 5% = $200 × 5%","k216":"🔵 O3 Thế hệ 2~10","k217":"Các nhóm không có tuyến dưới → $0","k218":"🟡 O4 Thưởng chênh lệch (V2-V1=5%)","k219":"A nhận phần chênh lệch: Tổng đội nhóm hàng ngày $200 × 5%<br><span style=\"font-size:11px;color:var(--text-muted)\">(Mỗi nhóm V1 tự nhận 15%, A chỉ nhận phần vượt 5%)</span>","k220":"Cấp A / Cấp dưới tuyến","k221":"A: V2 (20%)<br>4 nhóm dưới tuyến: V1 (15%)<br>Chênh lệch: 5%","k222":"Hoàn vốn / Thoát","k223":"Hoàn vốn $1,000÷$30<br>Thoát $2,500÷$30","k224":"<strong style=\"color:var(--text)\">Tính toán thoát:</strong> A đầu tư 1,000U, hệ số thoát 2.5x, cần tích lũy $2,500. Thu nhập hàng ngày $30 (chênh lệch O4 $10), hoàn vốn ($1,000) cần <strong style=\"color:var(--teal)\">34 ngày</strong>, thoát ($2,500) cần <strong style=\"color:var(--gold)\">84 ngày</strong>. Tổng nhận lại 2,500U, lãi ròng <strong>1,500U (ROI +150%)</strong>.","k225":"⚡ Tổng quan so sánh Tính toán 1 vs Tính toán 2","k226":"Hạng mục","k227":"Tính toán 1 (1 nhóm giới thiệu trực tiếp)","k228":"Tính toán 2 (4 nhóm giới thiệu trực tiếp)","k229":"Chênh lệch","k230":"Vốn đầu tư A","k231":"Số người giới thiệu trực tiếp","k232":"3 người","k233":"12 người","k234":"Gấp 4 lần","k235":"Tổng hiệu suất dưới tuyến","k236":"O1 Cơ bản","k237":"O3 Tăng tốc giới thiệu","k238":"O4 Thưởng đội nhóm","k239":"$7,50 / ngày (V1 15%)","k240":"$10,00 / ngày (chênh lệch V2-V1=5%)","k241":"Tổng thu nhập hàng ngày","k242":"Tốc độ 1.5x","k243":"Thời gian hoàn vốn","k244":"Nhanh hơn 16 ngày","k245":"Thời gian thoát","k246":"Nhanh hơn 41 ngày","k247":"Lãi ròng (ROI)","k249":"💡 <strong>Nhận định quan trọng:</strong> Vốn gốc và lãi ròng cuối cùng của A hoàn toàn giống nhau (vốn gốc 1,000U, lãi ròng 1,500U), Tính toán 2 áp dụng <strong>cơ chế thưởng chênh lệch</strong> (V2-V1=5%), O4 của A điều chỉnh từ $7,50 lên $10, thu nhập hàng ngày $30, thoát rút ngắn từ 125 ngày xuống <strong>84 ngày</strong>, hoàn vốn từ 50 ngày xuống <strong>34 ngày</strong>, thoát sớm 41 ngày để tái đầu tư. Đồng thời 4 nhóm V1 dưới tuyến mỗi nhóm cũng nhận 15% O4, hình thành cấu trúc thu nhập đa tầng.","k250":"So sánh trực quan — Kết quả đầu tư theo 4 xu hướng thị trường","k251":"Biểu đồ tương tác","k252":"📌 <strong>Giải thích so sánh:</strong> A = Mua 1,000U ROAM một lần và giữ; B = Đầu tư 1,000U vào Nikola (tích lũy 1% theo U hàng ngày, không bị ảnh hưởng bởi biến động giá ROAM). Dưới đây mô phỏng thay đổi tài sản sau 100 ngày theo 4 xu hướng.","k253":"A — Giữ ROAM","k254":"Mua 1,000U ROAM, giữ dài hạn. Tài sản hoàn toàn theo giá coin tăng giảm.","k255":"B — Tham gia Nikola","k256":"1,000U đầu tư vào Nikola, tích lũy 1% theo U hàng ngày ($10/ngày), thu nhập 3 tầng không bị ảnh hưởng bởi giá coin.","k257":"📈 Xu hướng 1","k258":"Tăng liên tục 100 ngày","k259":"⛰️ Xu hướng 2","k260":"Tăng trước giảm sau mỗi giai đoạn 50 ngày","k261":"🏔️ Xu hướng 3","k262":"Giảm trước tăng sau mỗi giai đoạn 50 ngày","k263":"📉 Xu hướng 4","k264":"Giảm liên tục 100 ngày","k265":"📋 Tổng hợp kết quả ngày 100 theo 4 xu hướng","k266":"Xu hướng","k267":"Tình hình thị trường","k268":"A Giữ ROAM","k269":"B Nikola","k270":"Chênh lệch","k271":"Thắng","k272":"💡 <strong>Kết luận cốt lõi:</strong> B (Nikola) thắng trong 3 kịch bản xu hướng 2, 3, 4. Xu hướng 1 (thị trường tăng liên tục) A thắng, nhưng B vẫn thoát hoàn toàn vào ngày 150, nhận lại <strong>2,500U (ROI +150%)</strong>. Ưu thế cốt lõi của B là <strong>cơ chế bảo toàn giá trị theo U</strong> — bất kể giá coin biến động thế nào, B đều hoàn thành thoát 2.5x ổn định vào ngày 150, lộ trình thu nhập hoàn toàn không bị ảnh hưởng bởi thị trường.","k273":"Nhật ký cập nhật v2","k274":"Sửa lỗi","k275":"<strong>Sửa phương thức thanh toán O1:</strong> Mô tả cũ \"Quy đổi theo giá coin hàng ngày, chuyển trực tiếp vào ví\" → Chính xác là \"Tích lũy theo U, khi rút quy đổi theo giá ROAM thời gian thực\"","k276":"Cập nhật","k277":"<strong>Thống nhất giải thích 3 tầng thu nhập:</strong> Xác nhận rõ O1 + O3 + O4 cả 3 tầng đều tích lũy theo U, không bị ảnh hưởng bởi biến động giá ROAM","k278":"<strong>Bổ sung danh sách sàn giao dịch:</strong> ROAM đã niêm yết cặp giao dịch trên Binance Alpha, được thêm vào danh sách sàn giao dịch chính thức","k279":"Thay thế","k280":"<strong>Thay đổi ví:</strong> Ví tham gia đổi từ DeBox App sang <strong>Bitget Wallet</strong>, liên kết tải chính thức: https://web3.bitget.com","k281":"Thêm mới","k282":"<strong>Module so sánh trực quan (v3 mới):</strong> Thêm biểu đồ tương tác — So sánh tài sản 100 ngày giữa A (Giữ ROAM) vs B (Nikola) theo 4 xu hướng giá ROAM, bao gồm thẻ kết quả, bảng tổng hợp và kết luận cốt lõi","k283":"<strong>Sửa FAQ Q2:</strong> Cập nhật giải thích cơ chế phát hành 1% hàng ngày thành phiên bản chính xác, thêm giải thích tích lũy theo U và ví dụ quy đổi khi rút","k284":"Tài liệu mô tả cơ sở dữ liệu Nikola Protocol · v2 · Ngày 26 tháng 3 năm 2026","k285":"Chỉ dùng cho mục đích quảng bá cộng đồng và giáo dục · Không cấu thành bất kỳ lời khuyên đầu tư nào","k286":"Tính theo U / ngày","k287":"$1.000 ÷ $20/ngày","k288":"$2.500 ÷ $20/ngày","k295":"Tính theo U","k295b":"Tính theo U","k300":"Tính theo U","k301":"CẤU HÌNH CẤU TRÚC","k302":"Nạp 1.000U","k303":"O1 = $10/ngày","k304":"Nạp 1.000U","k305":"O1 = $10/ngày","k306":"Nạp 1.000U","k307":"O1 = $10/ngày","k308":"Nạp 3.000U","k309":"O1 = $30/ngày","k310":"$20,00 / ngày","k311":"50 ngày","k312":"125 ngày","k313":"Nạp 1.000U","k314":"O1 = $10/ngày","k315":"$30,00 / ngày","k316":"Tính theo U / ngày","k317":"34 / 84 ngày","k318":"Cấp V","k319":"$20 / ngày","k320":"$30 / ngày","k321":"50 ngày","k322":"34 ngày","k323":"125 ngày","k324":"84 ngày","k325":"$10,00 / ngày","k326":"$2,50 / ngày","k327":"$7,50 / ngày","k328":"$10,00 / ngày","k329":"$10,00 / ngày","k330":"$10,00 / ngày","k331":"$10 / ngày","k332":"$10 / ngày","k333":"$2,50 / ngày","k334":"$10,00 / ngày","k335":"$10,00 / ngày","k336":"$10,00 / ngày"}};
+
+function setLang(lang) {
+  currentLang = lang;
+  SCENARIOS2 = lang === 'vi' ? SCENARIOS2_VI : SCENARIOS2_ZH;
+  SUMMARY2 = lang === 'vi' ? SUMMARY2_VI : SUMMARY2_ZH;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[lang] && i18n[lang][key] !== undefined) {
+      el.innerHTML = i18n[lang][key];
+    }
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (lang === 'zh' ? '中文' : 'Tiếng Việt'));
+  });
+  buildDocSummaryTable();
+  if (docChart) { docChart.destroy(); docChart = null; }
+  setScenario2(currentScenario);
+}
+
+</script>
+</body>
+</html>
