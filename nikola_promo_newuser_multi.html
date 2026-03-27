@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikola Protocol · 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #08090c;
+    --dark: #0e1117;
+    --card: #13161f;
+    --gold: #d4a843;
+    --gold-light: #f0c96a;
+    --gold-dim: rgba(212,168,67,0.15);
+    --gold-border: rgba(212,168,67,0.3);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.12);
+    --teal-border: rgba(45,212,191,0.25);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.1);
+    --text: #e8eaf0;
+    --text-muted: #6b7280;
+    --text-soft: #9ca3af;
+    --border: rgba(255,255,255,0.07);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--black); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; overflow-x: hidden; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.4; }
+
+  /* LANG SWITCHER */
+  .lang-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; background: rgba(8,9,12,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; justify-content: center; gap: 4px; padding: 10px 16px; }
+  .lang-btn { padding: 6px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .lang-btn:hover { border-color: var(--gold-border); color: var(--text); }
+  .lang-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 600; }
+  body { padding-top: 52px; }
+
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 80px 24px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 65%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+  .hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 40% at 10% 90%, rgba(45,212,191,0.06) 0%, transparent 60%), radial-gradient(ellipse 40% 50% at 90% 10%, rgba(212,168,67,0.07) 0%, transparent 60%); pointer-events: none; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 100px; padding: 6px 18px; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 32px; animation: fadeUp 0.6s ease both; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(42px, 8vw, 88px); font-weight: 900; line-height: 1.05; margin-bottom: 24px; animation: fadeUp 0.6s 0.1s ease both; }
+  .hero-title .line1 { color: #fff; display: block; }
+  .hero-title .line2 { display: block; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--teal) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-sub { font-size: 18px; color: var(--text-soft); max-width: 560px; margin: 0 auto 48px; font-weight: 300; animation: fadeUp 0.6s 0.2s ease both; }
+  .hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.6s 0.3s ease both; }
+  .hero-stat { text-align: center; }
+  .hero-stat .val { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 500; color: var(--gold-light); display: block; }
+  .hero-stat .lbl { font-size: 12px; color: var(--text-muted); letter-spacing: 0.5px; }
+  .divider { width: 1px; height: 40px; background: var(--border); margin: auto 0; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 80px 0; border-top: 1px solid var(--border); }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.2; }
+  .section-desc { font-size: 16px; color: var(--text-soft); max-width: 600px; font-weight: 300; margin-bottom: 48px; }
+  .trust-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .trust-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
+  .trust-card:hover { border-color: var(--gold-border); transform: translateY(-3px); }
+  .trust-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.3s; }
+  .trust-card:hover::before { opacity: 1; }
+  .trust-icon { font-size: 28px; margin-bottom: 14px; }
+  .trust-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+  .trust-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .trust-tag { display: inline-block; margin-top: 12px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); }
+  .mechanism-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px; margin-bottom: 24px; }
+  .flow { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center; margin: 32px 0; }
+  .flow-step { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 140px; transition: border-color 0.3s; }
+  .flow-step:hover { border-color: var(--teal-border); }
+  .flow-step .fs-icon { font-size: 24px; margin-bottom: 6px; }
+  .flow-step .fs-label { font-size: 13px; color: var(--text-soft); }
+  .flow-step .fs-val { font-size: 15px; font-weight: 600; color: #fff; }
+  .flow-arrow { font-size: 20px; color: var(--gold); flex-shrink: 0; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  @media (max-width: 640px) { .tiers { grid-template-columns: 1fr; } .flow { flex-direction: column; } .flow-arrow { transform: rotate(90deg); } .partner-grid { grid-template-columns: 1fr !important; } .income-row { grid-template-columns: 50px 1fr !important; } .income-tag { display: none; } }
+  .tier-card { border-radius: 16px; padding: 28px 24px; text-align: center; border: 1px solid; transition: transform 0.3s; }
+  .tier-card:hover { transform: translateY(-4px); }
+  .tier-card.t1 { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.25); }
+  .tier-card.t2 { background: rgba(212,168,67,0.07); border-color: var(--gold-border); position: relative; }
+  .tier-card.t2::before { content: attr(data-popular); position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 100px; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+  .tier-card.t3 { background: rgba(45,212,191,0.06); border-color: var(--teal-border); }
+  .tier-range { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+  .tier-mult { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+  .t1 .tier-mult { color: var(--green); } .t2 .tier-mult { color: var(--gold-light); } .t3 .tier-mult { color: var(--teal); }
+  .tier-label { font-size: 13px; color: var(--text-soft); margin-bottom: 16px; }
+  .tier-example { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 10px 12px; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text-soft); line-height: 1.8; }
+  .income-layers { display: flex; flex-direction: column; gap: 16px; }
+  .income-row { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 28px; transition: border-color 0.3s; }
+  .income-row:hover { border-color: var(--gold-border); }
+  .income-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; text-align: center; line-height: 1; }
+  .income-num.o1 { color: var(--green); } .income-num.o3 { color: var(--teal); } .income-num.o4 { color: var(--gold-light); }
+  .income-info .income-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .income-info .income-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .income-tag { white-space: nowrap; padding: 5px 14px; border-radius: 100px; font-size: 12px; font-family: 'DM Mono', monospace; font-weight: 500; border: 1px solid; }
+  .income-tag.green { background: var(--green-dim); border-color: rgba(34,197,94,0.3); color: var(--green); }
+  .income-tag.teal { background: var(--teal-dim); border-color: var(--teal-border); color: var(--teal); }
+  .income-tag.gold { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .partner-card { border-radius: 20px; padding: 36px 32px; border: 1px solid; transition: transform 0.3s; position: relative; overflow: hidden; }
+  .partner-card:hover { transform: translateY(-4px); }
+  .partner-card.community { background: linear-gradient(135deg, rgba(123,92,240,0.08), rgba(13,22,40,0.5)); border-color: rgba(123,92,240,0.3); }
+  .partner-card.cofounder { background: linear-gradient(135deg, rgba(212,168,67,0.1), rgba(13,22,40,0.5)); border-color: var(--gold-border); }
+  .partner-card.cofounder::after { content: attr(data-recommend); position: absolute; top: 16px; right: 16px; background: var(--gold); color: #000; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px; font-family: 'DM Mono', monospace; }
+  .partner-type { font-size: 12px; font-family: 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .community .partner-type { color: #a78bfa; } .cofounder .partner-type { color: var(--gold); }
+  .partner-price { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 900; color: #fff; margin-bottom: 4px; line-height: 1; }
+  .partner-quota { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+  .partner-benefits { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .partner-benefits li { font-size: 13px; color: var(--text-soft); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+  .partner-benefits li::before { content: '\25B8'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  .partner-benefits li strong { color: #fff; }
+  .partner-highlight { margin-top: 20px; padding: 12px 16px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 10px; font-size: 13px; color: var(--gold-light); line-height: 1.7; }
+  .steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .steps::before { content: ''; position: absolute; left: 28px; top: 40px; bottom: 40px; width: 1px; background: linear-gradient(to bottom, var(--gold), var(--teal)); }
+  .step { display: grid; grid-template-columns: 56px 1fr; gap: 24px; padding: 24px 0; position: relative; }
+  .step-num { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; flex-shrink: 0; position: relative; z-index: 1; }
+  .step:nth-child(1) .step-num { background: var(--gold-dim); border: 2px solid var(--gold); color: var(--gold); }
+  .step:nth-child(2) .step-num { background: var(--teal-dim); border: 2px solid var(--teal); color: var(--teal); }
+  .step:nth-child(3) .step-num { background: var(--green-dim); border: 2px solid rgba(34,197,94,0.5); color: var(--green); }
+  .step:nth-child(4) .step-num { background: rgba(212,168,67,0.2); border: 2px solid var(--gold); color: var(--gold-light); }
+  .step-content { padding-top: 12px; }
+  .step-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+  .step-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 16px; border-radius: 8px; font-size: 13px; font-family: 'DM Mono', monospace; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); text-decoration: none; transition: background 0.2s; }
+  .step-link:hover { background: rgba(212,168,67,0.25); }
+  .disclaimer-box { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 12px; padding: 20px 24px; font-size: 12px; color: #6b7280; line-height: 1.8; margin-top: 40px; }
+  footer { text-align: center; padding: 60px 24px 40px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; line-height: 2; }
+  footer a { color: var(--teal); text-decoration: none; } footer a:hover { text-decoration: underline; }
+  .callout { background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(45,212,191,0.05)); border: 1px solid var(--gold-border); border-radius: 16px; padding: 28px 32px; margin: 28px 0; display: flex; gap: 20px; align-items: flex-start; }
+  .callout-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .callout-text { font-size: 15px; color: var(--text-soft); line-height: 1.8; }
+  .callout-text strong { color: var(--gold-light); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE SWITCHER -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+  <button class="lang-btn" onclick="setLang('en')">English</button>
+  <button class="lang-btn" onclick="setLang('th')">ภาษาไทย</button>
+  <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">◆ Web4.0 · AI · ENI</div>
+  <h1 class="hero-title">
+    <span class="line1" data-i18n="hero_line1"></span>
+    <span class="line2" data-i18n="hero_line2"></span>
+  </h1>
+  <p class="hero-sub" data-i18n="hero_sub"></p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="val">750萬+</span><span class="lbl" data-i18n="stat_nodes"></span></div>
+    <div class="divider"></div>
+    <div class="hero-stat"><span class="val">CertiK A</span><span class="lbl" data-i18n="stat_security"></span></div>
+    <div class="divider"></div>
+    <div class="hero-stat"><span class="val">3x</span><span class="lbl" data-i18n="stat_max"></span></div>
+    <div class="divider"></div>
+    <div class="hero-stat"><span class="val">100U</span><span class="lbl" data-i18n="stat_min"></span></div>
+  </div>
+</section>
+
+<!-- 01 TRUST -->
+<section><div class="container">
+  <div class="reveal">
+    <p class="section-label" data-i18n="s1_label"></p>
+    <h2 class="section-title" data-i18n="s1_title"></h2>
+    <p class="section-desc" data-i18n="s1_desc"></p>
+  </div>
+  <div class="trust-grid reveal">
+    <div class="trust-card"><div class="trust-icon">📡</div><div class="trust-title" data-i18n="t1_title"></div><div class="trust-desc" data-i18n="t1_desc"></div><span class="trust-tag" data-i18n="t1_tag"></span></div>
+    <div class="trust-card"><div class="trust-icon">🏦</div><div class="trust-title" data-i18n="t2_title"></div><div class="trust-desc" data-i18n="t2_desc"></div><span class="trust-tag" data-i18n="t2_tag"></span></div>
+    <div class="trust-card"><div class="trust-icon">🔐</div><div class="trust-title" data-i18n="t3_title"></div><div class="trust-desc" data-i18n="t3_desc"></div><span class="trust-tag" data-i18n="t3_tag"></span></div>
+    <div class="trust-card"><div class="trust-icon">🔷</div><div class="trust-title" data-i18n="t4_title"></div><div class="trust-desc" data-i18n="t4_desc"></div><span class="trust-tag" data-i18n="t4_tag"></span></div>
+    <div class="trust-card"><div class="trust-icon">📈</div><div class="trust-title" data-i18n="t5_title"></div><div class="trust-desc" data-i18n="t5_desc"></div><span class="trust-tag" data-i18n="t5_tag"></span></div>
+    <div class="trust-card"><div class="trust-icon">🤖</div><div class="trust-title" data-i18n="t6_title"></div><div class="trust-desc" data-i18n="t6_desc"></div><span class="trust-tag" data-i18n="t6_tag"></span></div>
+  </div>
+</div></section>
+
+<!-- 02 MECHANISM -->
+<section><div class="container">
+  <div class="reveal">
+    <p class="section-label" data-i18n="s2_label"></p>
+    <h2 class="section-title" data-i18n="s2_title"></h2>
+    <p class="section-desc" data-i18n="s2_desc"></p>
+  </div>
+  <div class="mechanism-box reveal">
+    <div style="font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:12px" data-i18n="flow_label"></div>
+    <div class="flow">
+      <div class="flow-step"><div class="fs-icon">💵</div><div class="fs-label" data-i18n="flow1_label"></div><div class="fs-val">USDT</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fs-icon">🤖</div><div class="fs-label" data-i18n="flow2_label"></div><div class="fs-val">ENI</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fs-icon">📊</div><div class="fs-label" data-i18n="flow3_label"></div><div class="fs-val">1% /day</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fs-icon">🪙</div><div class="fs-label" data-i18n="flow4_label"></div><div class="fs-val">ROAM</div></div>
+    </div>
+    <div class="callout"><div class="callout-icon">💡</div><div class="callout-text" data-i18n="flow_callout"></div></div>
+  </div>
+
+  <div class="reveal">
+    <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:16px" data-i18n="tier_heading"></div>
+    <div class="tiers">
+      <div class="tier-card t1"><div class="tier-range" data-i18n="tier1_range"></div><div class="tier-mult">2x</div><div class="tier-label" data-i18n="tier_exit"></div><div class="tier-example" data-i18n="tier1_example"></div></div>
+      <div class="tier-card t2" data-popular=""><div class="tier-range" data-i18n="tier2_range"></div><div class="tier-mult">2.5x</div><div class="tier-label" data-i18n="tier_exit"></div><div class="tier-example" data-i18n="tier2_example"></div></div>
+      <div class="tier-card t3"><div class="tier-range" data-i18n="tier3_range"></div><div class="tier-mult">3x</div><div class="tier-label" data-i18n="tier_exit"></div><div class="tier-example" data-i18n="tier3_example"></div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);text-align:center" data-i18n="tier_note"></div>
+  </div>
+
+  <div style="margin-top:40px" class="reveal">
+    <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:20px" data-i18n="income_heading"></div>
+    <div class="income-layers">
+      <div class="income-row"><div class="income-num o1">O1</div><div class="income-info"><div class="income-title" data-i18n="o1_title"></div><div class="income-desc" data-i18n="o1_desc"></div></div><div class="income-tag green" data-i18n="o1_tag"></div></div>
+      <div class="income-row"><div class="income-num o3">O3</div><div class="income-info"><div class="income-title" data-i18n="o3_title"></div><div class="income-desc" data-i18n="o3_desc"></div></div><div class="income-tag teal" data-i18n="o3_tag"></div></div>
+      <div class="income-row"><div class="income-num o4">O4</div><div class="income-info"><div class="income-title" data-i18n="o4_title"></div><div class="income-desc" data-i18n="o4_desc"></div></div><div class="income-tag gold" data-i18n="o4_tag"></div></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 03 PARTNER -->
+<section><div class="container">
+  <div class="reveal">
+    <p class="section-label" data-i18n="s3_label"></p>
+    <h2 class="section-title" data-i18n="s3_title"></h2>
+    <p class="section-desc" data-i18n="s3_desc"></p>
+  </div>
+  <div class="partner-grid reveal">
+    <div class="partner-card community">
+      <div class="partner-type" data-i18n="p1_type"></div>
+      <div class="partner-price">500U</div>
+      <div class="partner-quota" data-i18n="p1_quota"></div>
+      <ul class="partner-benefits"><li data-i18n="p1_b1"></li><li data-i18n="p1_b2"></li><li data-i18n="p1_b3"></li><li data-i18n="p1_b4"></li><li data-i18n="p1_b5"></li></ul>
+    </div>
+    <div class="partner-card cofounder" data-recommend="">
+      <div class="partner-type" data-i18n="p2_type"></div>
+      <div class="partner-price">1,000U</div>
+      <div class="partner-quota" data-i18n="p2_quota"></div>
+      <ul class="partner-benefits"><li data-i18n="p2_b1"></li><li data-i18n="p2_b2"></li><li data-i18n="p2_b3"></li><li data-i18n="p2_b4"></li><li data-i18n="p2_b5"></li></ul>
+      <div class="partner-highlight" data-i18n="p2_highlight"></div>
+    </div>
+  </div>
+  <div class="callout reveal"><div class="callout-icon">🔑</div><div class="callout-text" data-i18n="partner_callout"></div></div>
+</div></section>
+
+<!-- 04 STEPS -->
+<section><div class="container">
+  <div class="reveal">
+    <p class="section-label" data-i18n="s4_label"></p>
+    <h2 class="section-title" data-i18n="s4_title"></h2>
+    <p class="section-desc" data-i18n="s4_desc"></p>
+  </div>
+  <div class="steps reveal">
+    <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title" data-i18n="step1_title"></div><div class="step-desc" data-i18n="step1_desc"></div><a href="https://web3.bitget.com" target="_blank" class="step-link">📲 web3.bitget.com</a></div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title" data-i18n="step2_title"></div><div class="step-desc" data-i18n="step2_desc"></div></div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title" data-i18n="step3_title"></div><div class="step-desc" data-i18n="step3_desc"></div><a href="https://nikola.global/" target="_blank" class="step-link">🟣 nikola.global</a></div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-content"><div class="step-title" data-i18n="step4_title"></div><div class="step-desc" data-i18n="step4_desc"></div></div></div>
+  </div>
+
+  <div class="mechanism-box reveal" style="margin-top:40px">
+    <div style="font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:20px" data-i18n="links_label"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+      <div>
+        <div style="color:var(--text-muted);margin-bottom:10px;font-size:12px;font-family:'DM Mono',monospace" data-i18n="links_official"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>🟣 <span data-i18n="link_protocol"></span>：<a href="https://nikola.global/" style="color:var(--teal)">nikola.global</a></div>
+          <div>📱 <span data-i18n="link_tg"></span>：<a href="https://t.me/Nikola_Eni" style="color:var(--teal)">t.me/Nikola_Eni</a></div>
+          <div>🔷 ENI：<a href="https://eniac.network/" style="color:var(--teal)">eniac.network</a></div>
+          <div>🟢 ROAM：<a href="https://weroam.xyz/" style="color:var(--teal)">weroam.xyz</a></div>
+          <div>💼 Bitget Wallet：<a href="https://web3.bitget.com" style="color:var(--teal)">web3.bitget.com</a></div>
+        </div>
+      </div>
+      <div>
+        <div style="color:var(--text-muted);margin-bottom:10px;font-size:12px;font-family:'DM Mono',monospace" data-i18n="links_contract"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px"><span style="color:var(--teal)">🔷 ENI：</span><br><span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">0x23958cBa555AC52C9495Df9b121ff73003e39dBb</span></div>
+          <div style="font-size:12px"><span style="color:var(--gold)">🟡 BSC：</span><br><span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">0x3fefe29dA25BEa166fB5f6ADe7b5976D2b0e586B</span></div>
+          <div style="font-size:12px"><span style="color:#a78bfa">🟣 Solana：</span><br><span style="font-family:'DM Mono',monospace;color:var(--text-muted);font-size:11px;word-break:break-all">RoamA1USA8xjvpTJZ6RvvxyDRzNh6GCA1zVGKSiMVkn</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="disclaimer-box reveal" data-i18n="disclaimer"></div>
+</div></section>
+
+<footer>
+  <div style="margin-bottom:12px;font-size:16px">
+    <a href="https://nikola.global/">nikola.global</a> &nbsp;·&nbsp;
+    <a href="https://t.me/Nikola_Eni">t.me/Nikola_Eni</a>
+  </div>
+  <span data-i18n="footer"></span>
+</footer>
+
+<script>
+const i18n = {
+  zh: {
+    hero_line1: "讓資產", hero_line2: "每天自動增值",
+    hero_sub: "Nikola Protocol — 建立在 ENI 公鏈的 AI 量化孵化協議。USDT 投入，系統每日自動以 U 本位累積收益，提現時換算 ROAM 提出。",
+    stat_nodes: "ROAM 全球節點", stat_security: "安全評級", stat_max: "最高本金出局倍數", stat_min: "最低起投門檻",
+    s1_label: "01 · 項目背書與安全性", s1_title: "為什麼值得信任？", s1_desc: "Nikola Protocol 建立在多重有公信力背書的生態之上，不是空氣項目。",
+    t1_title: "ROAM — 全球最大 DePIN WiFi 項目", t1_desc: "750萬+ 全球節點，覆蓋 190+ 國家，230萬+ 真實用戶。WBA OpenRoaming 計劃 11 個企業聯盟中唯一 Web3 IDP 項目方。", t1_tag: "真實節點 · 真實用戶",
+    t2_title: "Samsung Next 戰略投資", t2_desc: "Samsung Next + Anagram + Volt Capital 聯合背書，2023年完成 500 萬美元戰略融資。頂級機構認可的項目。", t2_tag: "機構背書",
+    t3_title: "CertiK A 級安全認證", t3_desc: "ENI 公鏈通過 CertiK A 級安全審計，Ave.ai 全球公鏈榜單 Top 11，268萬+ 鏈上地址數，960萬+ 總交易數。", t3_tag: "CertiK A 級",
+    t4_title: "ENI 企業級公鏈底座", t4_desc: "基於零知識證明（ZKP）技術，模組化多鏈架構。Nikola 唯一的企業級公鏈底座，所有交易可在鏈上公開查驗。", t4_tag: "ZKP 技術 · 鏈上可查",
+    t5_title: "Binance Alpha 已上線", t5_desc: "ROAM 已在 Binance Alpha 上架交易，同時在 Bybit、Bitget、Gate.io、KuCoin、MEXC 等多家主流交易所流通，流動性有保障。", t5_tag: "Binance Alpha ✅",
+    t6_title: "AI 算力量化系統", t6_desc: "融合 BloombergGPT 市場分析、DeepSeek R1 鏈上洞察、Claude 3 策略設計，多智能體協作，AI 全自動運行。", t6_tag: "AI 全自動",
+    s2_label: "02 · 收益機制說明", s2_title: "錢是怎麼運作的？", s2_desc: "機制透明簡單，三層收益全部以 U 本位累積，不受 ROAM 幣價波動影響。",
+    flow_label: "核心流程", flow1_label: "你投入", flow2_label: "AI 系統運行", flow3_label: "每日 U 本位累積", flow4_label: "提現時換算",
+    flow_callout: "<strong>U 本位保值機制</strong>：O1 + O3 + O4 三層收益全部以美元（U 本位）累積，無論 ROAM 幣價漲跌，你的每日累積額度不受影響。提現時才依照當時 ROAM 實時價格換算提出。",
+    tier_heading: "🏆 分層出局制度 — 投越多，倍數越高", tier_exit: "本金出局", popular: "最熱門",
+    tier1_range: "投入 100U – 999U", tier1_example: "投 500U\n→ 共領回 1,000U\n約 200 天完成",
+    tier2_range: "投入 1,000U – 2,999U", tier2_example: "投 1,000U\n→ 共領回 2,500U\n約 250 天完成",
+    tier3_range: "投入 3,000U 及以上", tier3_example: "投 3,000U\n→ 共領回 9,000U\n約 300 天完成",
+    tier_note: "📌 最低 100U 起投，投入金額須為 100 的倍數",
+    income_heading: "🎁 三層收益結構 — 多維加速出局",
+    o1_title: "基礎每日累積", o1_desc: "自己本金的 1%/天（U 本位）。提現時按 ROAM 實時價換算提出。例：投 1,000U → 每天累積 $10，約 250 天達到 2.5x 出局。", o1_tag: "本金 × 1%/天",
+    o3_title: "分享加速獎勵（U 本位）", o3_desc: "直推人數越多，解鎖獎勵代數越深。最高解鎖 10 代，合計最高 +15%/天。直推 1 人解鎖 +5%，3 人解鎖 +10%，5 人解鎖 +15%。", o3_tag: "最高 +15%",
+    o4_title: "團隊貢獻獎勵（U 本位）", o4_desc: "每天獲得整個傘下團隊總日累積額的固定比例，由 V 等級決定。V1（15%）→ V8（50%）。團隊越大，每天 O4 越豐厚。", o4_tag: "V1 15% → V8 50%",
+    s3_label: "03 · 合夥人節點價值", s3_title: "早期加入，稀缺紅利", s3_desc: "合夥人節點是參與 Nikola 生態的最強姿態。名額有限，越早加入，長期收益越豐厚。",
+    p1_type: "🌟 社區合夥人", p1_quota: "全球限 999 個名額",
+    p1_b1: "<strong>8 萬</strong> ENI 公鏈積分", p1_b2: "<strong>V2 等級</strong>直升（O4 獎勵 20%）", p1_b3: "每日手續費分紅池 <strong>45%</strong> 均分", p1_b4: "NKT 算力代幣 <strong>2,000 枚</strong>（內盤 $2,000）", p1_b5: "AI 智能體量化算力分紅",
+    p2_type: "💎 聯創合夥人", p2_quota: "全球限 299 個名額", recommend: "★ 推薦",
+    p2_b1: "<strong>22 萬</strong> ENI 公鏈積分", p2_b2: "<strong>V3 等級</strong>直升（O4 獎勵 25%）", p2_b3: "每日手續費分紅池 <strong>25%</strong> 均分", p2_b4: "NKT 算力代幣 <strong>5,000 枚</strong>（內盤 $5,000）", p2_b5: "AI 智能體量化算力分紅",
+    p2_highlight: "💡 <strong>買入即回本邏輯：</strong>1,000U 購買，附帶 5,000 枚 NKT（內盤價值 $5,000）+ V3 等級直升，相當於成本由 NKT 覆蓋，V3 分紅權為純額外收益。",
+    partner_callout: "<strong>手續費分紅的複利邏輯：</strong>平台每筆用戶投入產生 5% 服務費，其中 70% 回饋給合夥人生態。平台用戶越多、每天服務費池越大，合夥人每天被動分紅越豐厚。名額稀缺（999/299），早期加入人均佔比最高。",
+    s4_label: "04 · 如何開始參與", s4_title: "四步完成，全程簡單", s4_desc: "從零到開始每日累積，只需完成以下四個步驟。",
+    step1_title: "下載 Bitget Wallet，創建錢包", step1_desc: "下載 Bitget Wallet App（iOS / Android 均可），創建或導入 Web3 錢包。Bitget Wallet 支持 ENI 主網，是參與 Nikola 的指定錢包。",
+    step2_title: "準備 USDT，轉入 ENI 主網", step2_desc: "在交易所購買 USDT，跨鏈轉入 ENI 主網地址。最低 100 USDT 起，投入金額須為 100 的倍數。",
+    step3_title: "進入 Nikola 協議，選擇投入金額", step3_desc: "進入官方協議頁面，選擇投入金額並確認。投入金額決定你的出局倍數（100U~999U×2 / 1,000U~2,999U×2.5 / 3,000U+×3）。",
+    step4_title: "每日自動累積，靜待出局", step4_desc: "系統每日自動以 U 本位累積收益，達到出局倍數後提現，依照 ROAM 實時價格換算提出到錢包。",
+    links_label: "📋 官方連結 & ROAM 合約地址", links_official: "官方連結", links_contract: "ROAM 合約地址（核實後再操作）",
+    link_protocol: "協議入口", link_tg: "官方 TG",
+    disclaimer: "⚠️ 本文件僅供推廣教育用途，不構成任何投資建議。加密貨幣投資存在市場風險，請根據自身財務狀況謹慎評估，切勿投入超出承受能力的資金。收益數據基於官方白皮書模型計算，實際結果因市場變動而有所差異。合約地址及官方資訊以 Nikola Protocol 官方 TG 頻道公告為準，謹防釣魚詐騙。切勿向任何人透露私鑰或助記詞。",
+    footer: "Nikola Protocol 推廣資料庫 · 2026<br>僅供社區推廣使用 · 不構成投資建議"
+  },
+  en: {
+    hero_line1: "Let Your Assets", hero_line2: "Grow Every Day",
+    hero_sub: "Nikola Protocol — An AI quantitative incubation protocol built on the ENI blockchain. Deposit USDT, the system automatically accumulates daily returns in USD-based value, withdraw in ROAM.",
+    stat_nodes: "ROAM Global Nodes", stat_security: "Security Rating", stat_max: "Max Exit Multiplier", stat_min: "Min Investment",
+    s1_label: "01 · Trust & Security", s1_title: "Why Trust Us?", s1_desc: "Nikola Protocol is built on multiple credible ecosystems with real backing — not a hollow project.",
+    t1_title: "ROAM — World's Largest DePIN WiFi", t1_desc: "7.5M+ global nodes across 190+ countries, 2.3M+ real users. The only Web3 IDP in WBA OpenRoaming's 11-member enterprise alliance.", t1_tag: "Real Nodes · Real Users",
+    t2_title: "Samsung Next Strategic Investment", t2_desc: "Backed by Samsung Next + Anagram + Volt Capital. Completed $5M strategic funding in 2023. Recognized by top-tier institutions.", t2_tag: "Institutional Backing",
+    t3_title: "CertiK A Security Rating", t3_desc: "ENI blockchain passed CertiK A-level audit. Ranked Top 11 on Ave.ai global chain list. 2.68M+ on-chain addresses, 9.6M+ total transactions.", t3_tag: "CertiK Grade A",
+    t4_title: "ENI Enterprise Blockchain", t4_desc: "Built on Zero-Knowledge Proof (ZKP) technology with modular multi-chain architecture. All transactions are publicly verifiable on-chain.", t4_tag: "ZKP · On-chain Verifiable",
+    t5_title: "Listed on Binance Alpha", t5_desc: "ROAM is live on Binance Alpha and traded on Bybit, Bitget, Gate.io, KuCoin, MEXC and other major exchanges with strong liquidity.", t5_tag: "Binance Alpha ✅",
+    t6_title: "AI Quantitative System", t6_desc: "Integrating BloombergGPT market analysis, DeepSeek R1 on-chain insights, and Claude 3 strategy design. Multi-agent AI, fully automated.", t6_tag: "Fully Automated AI",
+    s2_label: "02 · Earning Mechanism", s2_title: "How Does It Work?", s2_desc: "Transparent and simple. Three layers of earnings all accumulated in USD-based value, unaffected by ROAM price fluctuations.",
+    flow_label: "CORE FLOW", flow1_label: "You Deposit", flow2_label: "AI System Runs", flow3_label: "Daily USD Accumulation", flow4_label: "Withdraw As",
+    flow_callout: "<strong>USD-Based Value Protection</strong>: All three layers (O1 + O3 + O4) accumulate in USD value. Regardless of ROAM price changes, your daily accumulation remains stable. ROAM conversion only happens at withdrawal.",
+    tier_heading: "🏆 Tiered Exit System — More Investment, Higher Multiplier", tier_exit: "Principal Exit", popular: "Most Popular",
+    tier1_range: "Deposit 100U – 999U", tier1_example: "Deposit 500U\n→ Total return 1,000U\n~200 days",
+    tier2_range: "Deposit 1,000U – 2,999U", tier2_example: "Deposit 1,000U\n→ Total return 2,500U\n~250 days",
+    tier3_range: "Deposit 3,000U+", tier3_example: "Deposit 3,000U\n→ Total return 9,000U\n~300 days",
+    tier_note: "📌 Minimum 100U, amounts must be multiples of 100",
+    income_heading: "🎁 Three Income Layers — Accelerate Your Exit",
+    o1_title: "Daily Base Accumulation", o1_desc: "1%/day of your principal (USD-based). Withdraw as ROAM at real-time price. E.g.: Deposit 1,000U → $10/day, ~250 days to 2.5x exit.", o1_tag: "Principal × 1%/day",
+    o3_title: "Referral Acceleration (USD)", o3_desc: "More referrals unlock deeper reward tiers. Up to 10 levels, max +15%/day total. 1 referral = +5%, 3 = +10%, 5 = +15%.", o3_tag: "Up to +15%",
+    o4_title: "Team Contribution Reward (USD)", o4_desc: "Earn a fixed percentage of your entire team's daily accumulation, determined by V-level. V1 (15%) → V8 (50%). Bigger team = bigger daily O4.", o4_tag: "V1 15% → V8 50%",
+    s3_label: "03 · Partner Node Value", s3_title: "Join Early, Earn Scarcity Bonus", s3_desc: "Partner nodes are the strongest position in the Nikola ecosystem. Limited slots — the earlier you join, the greater the long-term returns.",
+    p1_type: "🌟 Community Partner", p1_quota: "Limited to 999 slots globally",
+    p1_b1: "<strong>80,000</strong> ENI chain points", p1_b2: "<strong>V2 rank</strong> direct upgrade (O4 reward 20%)", p1_b3: "Daily fee pool <strong>45%</strong> share", p1_b4: "NKT tokens <strong>2,000</strong> (internal value $2,000)", p1_b5: "AI agent quantitative dividends",
+    p2_type: "💎 Co-Founder Partner", p2_quota: "Limited to 299 slots globally", recommend: "★ Recommended",
+    p2_b1: "<strong>220,000</strong> ENI chain points", p2_b2: "<strong>V3 rank</strong> direct upgrade (O4 reward 25%)", p2_b3: "Daily fee pool <strong>25%</strong> share", p2_b4: "NKT tokens <strong>5,000</strong> (internal value $5,000)", p2_b5: "AI agent quantitative dividends",
+    p2_highlight: "💡 <strong>Instant ROI Logic:</strong> 1,000U purchase includes 5,000 NKT (internal value $5,000) + V3 rank upgrade. Cost is effectively covered by NKT, V3 dividend rights are pure bonus.",
+    partner_callout: "<strong>Fee Dividend Compounding:</strong> Each user deposit generates 5% service fee, 70% of which goes back to the partner ecosystem. More users = bigger daily fee pool = bigger passive dividends for partners. Scarce slots (999/299) — early joiners get the highest per-capita share.",
+    s4_label: "04 · How to Get Started", s4_title: "Four Simple Steps", s4_desc: "From zero to daily accumulation in just four steps.",
+    step1_title: "Download Bitget Wallet", step1_desc: "Download Bitget Wallet App (iOS/Android). Create or import a Web3 wallet. Bitget Wallet supports ENI mainnet and is the designated wallet for Nikola.",
+    step2_title: "Prepare USDT, Transfer to ENI", step2_desc: "Buy USDT on an exchange and cross-chain transfer to ENI mainnet. Minimum 100 USDT, amounts must be multiples of 100.",
+    step3_title: "Enter Nikola Protocol, Choose Amount", step3_desc: "Go to the official protocol page, select your deposit amount and confirm. Your amount determines exit multiplier (100-999U×2 / 1,000-2,999U×2.5 / 3,000U+×3).",
+    step4_title: "Daily Auto-Accumulation, Await Exit", step4_desc: "The system automatically accumulates USD-based returns daily. Upon reaching exit multiplier, withdraw as ROAM at real-time price.",
+    links_label: "📋 Official Links & ROAM Contracts", links_official: "Official Links", links_contract: "ROAM Contract Addresses (verify before use)",
+    link_protocol: "Protocol", link_tg: "Official TG",
+    disclaimer: "⚠️ This document is for promotional and educational purposes only and does not constitute investment advice. Cryptocurrency investments carry market risks. Please evaluate carefully based on your financial situation. Never invest more than you can afford to lose. Yield data is based on official whitepaper models; actual results may vary. Verify contract addresses and official info via Nikola Protocol's official TG channel. Beware of phishing. Never share your private keys or seed phrases.",
+    footer: "Nikola Protocol Promo Library · 2026<br>For community promotion only · Not investment advice"
+  },
+  th: {
+    hero_line1: "ให้สินทรัพย์ของคุณ", hero_line2: "เติบโตทุกวัน",
+    hero_sub: "Nikola Protocol — โปรโตคอล AI เชิงปริมาณบนบล็อกเชน ENI ฝาก USDT ระบบสะสมผลตอบแทนรายวันเป็นมูลค่า USD ถอนเป็น ROAM",
+    stat_nodes: "โหนด ROAM ทั่วโลก", stat_security: "ระดับความปลอดภัย", stat_max: "ตัวคูณสูงสุด", stat_min: "ลงทุนขั้นต่ำ",
+    s1_label: "01 · ความน่าเชื่อถือ", s1_title: "ทำไมถึงไว้วางใจได้?", s1_desc: "Nikola Protocol สร้างบนระบบนิเวศที่มีการรับรองจริง ไม่ใช่โปรเจกต์ลม",
+    t1_title: "ROAM — DePIN WiFi ใหญ่ที่สุดในโลก", t1_desc: "โหนดทั่วโลก 7.5 ล้าน+ ครอบคลุม 190+ ประเทศ ผู้ใช้จริง 2.3 ล้าน+ เป็น Web3 IDP เดียวในพันธมิตร WBA OpenRoaming", t1_tag: "โหนดจริง · ผู้ใช้จริง",
+    t2_title: "Samsung Next ลงทุนเชิงกลยุทธ์", t2_desc: "ได้รับการสนับสนุนจาก Samsung Next + Anagram + Volt Capital ระดมทุน 5 ล้านดอลลาร์ในปี 2023", t2_tag: "สถาบันรับรอง",
+    t3_title: "CertiK ระดับ A", t3_desc: "บล็อกเชน ENI ผ่านการตรวจสอบ CertiK ระดับ A ติด Top 11 ในรายการ Ave.ai ที่อยู่บนเชน 2.68 ล้าน+ ธุรกรรมรวม 9.6 ล้าน+", t3_tag: "CertiK ระดับ A",
+    t4_title: "ENI บล็อกเชนระดับองค์กร", t4_desc: "ใช้เทคโนโลยี Zero-Knowledge Proof (ZKP) สถาปัตยกรรมมัลติเชนแบบโมดูลาร์ ธุรกรรมทั้งหมดตรวจสอบได้บนเชน", t4_tag: "ZKP · ตรวจสอบได้",
+    t5_title: "จดทะเบียนบน Binance Alpha", t5_desc: "ROAM เปิดซื้อขายบน Binance Alpha และ Bybit, Bitget, Gate.io, KuCoin, MEXC สภาพคล่องมีการรับประกัน", t5_tag: "Binance Alpha ✅",
+    t6_title: "ระบบ AI เชิงปริมาณ", t6_desc: "รวม BloombergGPT วิเคราะห์ตลาด, DeepSeek R1 ข้อมูลบนเชน, Claude 3 ออกแบบกลยุทธ์ AI อัตโนมัติเต็มรูปแบบ", t6_tag: "AI อัตโนมัติ",
+    s2_label: "02 · กลไกรายได้", s2_title: "เงินทำงานอย่างไร?", s2_desc: "กลไกโปร่งใสเรียบง่าย รายได้ 3 ชั้นสะสมเป็นมูลค่า USD ไม่ได้รับผลกระทบจากราคา ROAM",
+    flow_label: "กระบวนการหลัก", flow1_label: "คุณฝาก", flow2_label: "ระบบ AI ทำงาน", flow3_label: "สะสม USD รายวัน", flow4_label: "ถอนเป็น",
+    flow_callout: "<strong>กลไกรักษามูลค่า USD</strong>: รายได้ทั้ง 3 ชั้น (O1+O3+O4) สะสมเป็นมูลค่า USD ไม่ว่าราคา ROAM จะขึ้นหรือลง ยอดสะสมรายวันของคุณไม่เปลี่ยนแปลง แปลงเป็น ROAM เมื่อถอนเท่านั้น",
+    tier_heading: "🏆 ระบบทางออกแบบขั้น — ลงทุนมาก ตัวคูณสูง", tier_exit: "ทางออกเงินต้น", popular: "ยอดนิยม",
+    tier1_range: "ฝาก 100U – 999U", tier1_example: "ฝาก 500U\n→ รับคืน 1,000U\n~200 วัน",
+    tier2_range: "ฝาก 1,000U – 2,999U", tier2_example: "ฝาก 1,000U\n→ รับคืน 2,500U\n~250 วัน",
+    tier3_range: "ฝาก 3,000U ขึ้นไป", tier3_example: "ฝาก 3,000U\n→ รับคืน 9,000U\n~300 วัน",
+    tier_note: "📌 ขั้นต่ำ 100U จำนวนต้องเป็นทวีคูณของ 100",
+    income_heading: "🎁 โครงสร้างรายได้ 3 ชั้น — เร่งทางออก",
+    o1_title: "สะสมรายวันพื้นฐาน", o1_desc: "1%/วัน ของเงินต้น (มูลค่า USD) ถอนเป็น ROAM ตามราคาปัจจุบัน เช่น ฝาก 1,000U → สะสม $10/วัน ~250 วันถึง 2.5x", o1_tag: "เงินต้น × 1%/วัน",
+    o3_title: "โบนัสแนะนำ (USD)", o3_desc: "แนะนำมากขึ้น ปลดล็อกชั้นรางวัลลึกขึ้น สูงสุด 10 ชั้น +15%/วัน แนะนำ 1 คน = +5%, 3 คน = +10%, 5 คน = +15%", o3_tag: "สูงสุด +15%",
+    o4_title: "รางวัลทีม (USD)", o4_desc: "รับส่วนแบ่งจากยอดสะสมรายวันของทั้งทีม ตามระดับ V V1(15%) → V8(50%) ทีมใหญ่ = O4 มากขึ้น", o4_tag: "V1 15% → V8 50%",
+    s3_label: "03 · มูลค่าโหนดพาร์ทเนอร์", s3_title: "เข้าร่วมก่อน รับโบนัสหายาก", s3_desc: "โหนดพาร์ทเนอร์คือตำแหน่งที่แข็งแกร่งที่สุดในระบบนิเวศ Nikola จำนวนจำกัด เข้าร่วมเร็ว ผลตอบแทนระยะยาวสูง",
+    p1_type: "🌟 พาร์ทเนอร์ชุมชน", p1_quota: "จำกัด 999 ตำแหน่งทั่วโลก",
+    p1_b1: "<strong>80,000</strong> คะแนน ENI", p1_b2: "อัปเกรดเป็น <strong>V2</strong> ทันที (O4 20%)", p1_b3: "ส่วนแบ่งค่าธรรมเนียมรายวัน <strong>45%</strong>", p1_b4: "โทเค็น NKT <strong>2,000</strong> (มูลค่า $2,000)", p1_b5: "ปันผลจาก AI เชิงปริมาณ",
+    p2_type: "💎 ผู้ร่วมก่อตั้ง", p2_quota: "จำกัด 299 ตำแหน่งทั่วโลก", recommend: "★ แนะนำ",
+    p2_b1: "<strong>220,000</strong> คะแนน ENI", p2_b2: "อัปเกรดเป็น <strong>V3</strong> ทันที (O4 25%)", p2_b3: "ส่วนแบ่งค่าธรรมเนียมรายวัน <strong>25%</strong>", p2_b4: "โทเค็น NKT <strong>5,000</strong> (มูลค่า $5,000)", p2_b5: "ปันผลจาก AI เชิงปริมาณ",
+    p2_highlight: "💡 <strong>ตรรกะคืนทุนทันที:</strong> ซื้อ 1,000U ได้ NKT 5,000 (มูลค่า $5,000) + อัปเกรด V3 ต้นทุนครอบคลุมโดย NKT สิทธิ์ปันผล V3 เป็นกำไรสุทธิ",
+    partner_callout: "<strong>ตรรกะทบต้นจากค่าธรรมเนียม:</strong> การฝากแต่ละครั้งสร้างค่าบริการ 5% โดย 70% คืนสู่ระบบนิเวศพาร์ทเนอร์ ผู้ใช้ยิ่งมาก = กองทุนค่าธรรมเนียมยิ่งใหญ่ = ปันผลรายวันยิ่งมาก ตำแหน่งหายาก (999/299) เข้าร่วมเร็วได้ส่วนแบ่งมากที่สุด",
+    s4_label: "04 · วิธีเริ่มต้น", s4_title: "สี่ขั้นตอนง่ายๆ", s4_desc: "จากศูนย์สู่การสะสมรายวันใน 4 ขั้นตอน",
+    step1_title: "ดาวน์โหลด Bitget Wallet", step1_desc: "ดาวน์โหลด Bitget Wallet (iOS/Android) สร้างหรือนำเข้ากระเป๋า Web3 Bitget Wallet รองรับ ENI mainnet",
+    step2_title: "เตรียม USDT โอนเข้า ENI", step2_desc: "ซื้อ USDT จากตลาดแลกเปลี่ยน โอนข้ามเชนเข้า ENI ขั้นต่ำ 100 USDT จำนวนต้องเป็นทวีคูณของ 100",
+    step3_title: "เข้า Nikola เลือกจำนวนฝาก", step3_desc: "เข้าหน้าโปรโตคอลอย่างเป็นทางการ เลือกจำนวนฝากและยืนยัน จำนวนกำหนดตัวคูณทางออก",
+    step4_title: "สะสมอัตโนมัติรายวัน รอทางออก", step4_desc: "ระบบสะสมผลตอบแทน USD อัตโนมัติทุกวัน เมื่อถึงตัวคูณ ถอนเป็น ROAM ตามราคาปัจจุบัน",
+    links_label: "📋 ลิงก์อย่างเป็นทางการ & สัญญา ROAM", links_official: "ลิงก์อย่างเป็นทางการ", links_contract: "ที่อยู่สัญญา ROAM (ตรวจสอบก่อนใช้)",
+    link_protocol: "โปรโตคอล", link_tg: "TG อย่างเป็นทางการ",
+    disclaimer: "⚠️ เอกสารนี้เพื่อการส่งเสริมและการศึกษาเท่านั้น ไม่ถือเป็นคำแนะนำการลงทุน การลงทุนในคริปโตมีความเสี่ยง โปรดประเมินตามสถานะการเงินของคุณ อย่าลงทุนเกินกว่าที่คุณรับได้ ข้อมูลผลตอบแทนอ้างอิงจากโมเดลใน whitepaper ผลลัพธ์จริงอาจแตกต่าง ตรวจสอบที่อยู่สัญญาผ่านช่อง TG อย่างเป็นทางการ ระวังฟิชชิง อย่าเปิดเผย private key",
+    footer: "Nikola Protocol · 2026<br>สำหรับการส่งเสริมชุมชนเท่านั้น · ไม่ใช่คำแนะนำการลงทุน"
+  },
+  vi: {
+    hero_line1: "Để tài sản", hero_line2: "tăng trưởng mỗi ngày",
+    hero_sub: "Nikola Protocol — Giao thức AI định lượng trên blockchain ENI. Nạp USDT, hệ thống tự động tích lũy lợi nhuận hàng ngày theo giá trị USD, rút bằng ROAM.",
+    stat_nodes: "Node ROAM toàn cầu", stat_security: "Xếp hạng bảo mật", stat_max: "Hệ số thoát tối đa", stat_min: "Đầu tư tối thiểu",
+    s1_label: "01 · Uy tín & Bảo mật", s1_title: "Tại sao đáng tin cậy?", s1_desc: "Nikola Protocol được xây dựng trên hệ sinh thái có bảo chứng thực sự, không phải dự án rỗng.",
+    t1_title: "ROAM — DePIN WiFi lớn nhất thế giới", t1_desc: "7,5 triệu+ node toàn cầu, phủ sóng 190+ quốc gia, 2,3 triệu+ người dùng thực. Là Web3 IDP duy nhất trong liên minh WBA OpenRoaming.", t1_tag: "Node thực · Người dùng thực",
+    t2_title: "Samsung Next đầu tư chiến lược", t2_desc: "Được Samsung Next + Anagram + Volt Capital bảo trợ. Hoàn thành gọi vốn 5 triệu USD năm 2023. Được các tổ chức hàng đầu công nhận.", t2_tag: "Tổ chức bảo trợ",
+    t3_title: "CertiK hạng A", t3_desc: "Blockchain ENI đạt kiểm toán CertiK hạng A. Top 11 trên Ave.ai. 2,68 triệu+ địa chỉ on-chain, 9,6 triệu+ giao dịch.", t3_tag: "CertiK Hạng A",
+    t4_title: "ENI — Blockchain doanh nghiệp", t4_desc: "Dựa trên công nghệ Zero-Knowledge Proof (ZKP), kiến trúc multi-chain module. Mọi giao dịch có thể xác minh công khai trên chain.", t4_tag: "ZKP · Xác minh trên chain",
+    t5_title: "Đã lên Binance Alpha", t5_desc: "ROAM đã giao dịch trên Binance Alpha, cùng Bybit, Bitget, Gate.io, KuCoin, MEXC. Thanh khoản được đảm bảo.", t5_tag: "Binance Alpha ✅",
+    t6_title: "Hệ thống AI định lượng", t6_desc: "Tích hợp BloombergGPT phân tích thị trường, DeepSeek R1 dữ liệu on-chain, Claude 3 thiết kế chiến lược. AI tự động hoàn toàn.", t6_tag: "AI tự động",
+    s2_label: "02 · Cơ chế lợi nhuận", s2_title: "Tiền hoạt động như thế nào?", s2_desc: "Cơ chế minh bạch đơn giản. Ba tầng lợi nhuận đều tích lũy theo giá trị USD, không bị ảnh hưởng bởi giá ROAM.",
+    flow_label: "QUY TRÌNH CHÍNH", flow1_label: "Bạn nạp", flow2_label: "AI vận hành", flow3_label: "Tích lũy USD hàng ngày", flow4_label: "Rút thành",
+    flow_callout: "<strong>Cơ chế bảo toàn giá trị USD</strong>: Cả 3 tầng (O1+O3+O4) đều tích lũy theo giá trị USD. Dù giá ROAM tăng hay giảm, số tích lũy hàng ngày của bạn không thay đổi. Chỉ quy đổi ROAM khi rút.",
+    tier_heading: "🏆 Hệ thống thoát theo bậc — Đầu tư nhiều, hệ số cao", tier_exit: "Thoát vốn gốc", popular: "Phổ biến nhất",
+    tier1_range: "Nạp 100U – 999U", tier1_example: "Nạp 500U\n→ Nhận lại 1.000U\n~200 ngày",
+    tier2_range: "Nạp 1.000U – 2.999U", tier2_example: "Nạp 1.000U\n→ Nhận lại 2.500U\n~250 ngày",
+    tier3_range: "Nạp 3.000U trở lên", tier3_example: "Nạp 3.000U\n→ Nhận lại 9.000U\n~300 ngày",
+    tier_note: "📌 Tối thiểu 100U, số tiền phải là bội số của 100",
+    income_heading: "🎁 Ba tầng lợi nhuận — Tăng tốc thoát vốn",
+    o1_title: "Tích lũy cơ bản hàng ngày", o1_desc: "1%/ngày trên vốn gốc (giá trị USD). Rút bằng ROAM theo giá thực tế. VD: Nạp 1.000U → $10/ngày, ~250 ngày đạt 2.5x.", o1_tag: "Vốn × 1%/ngày",
+    o3_title: "Thưởng giới thiệu (USD)", o3_desc: "Giới thiệu nhiều người hơn, mở khóa nhiều tầng thưởng hơn. Tối đa 10 tầng, +15%/ngày. 1 người = +5%, 3 người = +10%, 5 người = +15%.", o3_tag: "Tối đa +15%",
+    o4_title: "Thưởng đội nhóm (USD)", o4_desc: "Nhận tỷ lệ cố định từ tổng tích lũy hàng ngày của toàn đội, theo cấp V. V1(15%) → V8(50%). Đội lớn = O4 nhiều hơn.", o4_tag: "V1 15% → V8 50%",
+    s3_label: "03 · Giá trị node đối tác", s3_title: "Tham gia sớm, nhận ưu đãi khan hiếm", s3_desc: "Node đối tác là vị trí mạnh nhất trong hệ sinh thái Nikola. Số lượng có hạn — tham gia càng sớm, lợi nhuận dài hạn càng lớn.",
+    p1_type: "🌟 Đối tác cộng đồng", p1_quota: "Giới hạn 999 suất toàn cầu",
+    p1_b1: "<strong>80.000</strong> điểm ENI", p1_b2: "Nâng cấp trực tiếp <strong>V2</strong> (O4 20%)", p1_b3: "Chia sẻ phí hàng ngày <strong>45%</strong>", p1_b4: "Token NKT <strong>2.000</strong> (giá trị $2.000)", p1_b5: "Cổ tức AI định lượng",
+    p2_type: "💎 Đồng sáng lập", p2_quota: "Giới hạn 299 suất toàn cầu", recommend: "★ Khuyến nghị",
+    p2_b1: "<strong>220.000</strong> điểm ENI", p2_b2: "Nâng cấp trực tiếp <strong>V3</strong> (O4 25%)", p2_b3: "Chia sẻ phí hàng ngày <strong>25%</strong>", p2_b4: "Token NKT <strong>5.000</strong> (giá trị $5.000)", p2_b5: "Cổ tức AI định lượng",
+    p2_highlight: "💡 <strong>Logic hoàn vốn ngay:</strong> Mua 1.000U được 5.000 NKT (giá trị $5.000) + nâng cấp V3. Chi phí được NKT bù đắp, quyền cổ tức V3 là lợi nhuận thuần.",
+    partner_callout: "<strong>Logic lãi kép từ phí:</strong> Mỗi lần nạp tạo 5% phí dịch vụ, 70% trả lại hệ sinh thái đối tác. Nhiều người dùng = quỹ phí lớn hơn = cổ tức thụ động lớn hơn. Suất khan hiếm (999/299) — tham gia sớm được chia nhiều nhất.",
+    s4_label: "04 · Cách bắt đầu", s4_title: "Bốn bước đơn giản", s4_desc: "Từ số 0 đến tích lũy hàng ngày chỉ trong 4 bước.",
+    step1_title: "Tải Bitget Wallet", step1_desc: "Tải Bitget Wallet (iOS/Android). Tạo hoặc nhập ví Web3. Bitget Wallet hỗ trợ ENI mainnet.",
+    step2_title: "Chuẩn bị USDT, chuyển vào ENI", step2_desc: "Mua USDT trên sàn giao dịch, chuyển cross-chain vào ENI. Tối thiểu 100 USDT, số tiền phải là bội số của 100.",
+    step3_title: "Vào Nikola, chọn số tiền nạp", step3_desc: "Vào trang giao thức chính thức, chọn số tiền nạp và xác nhận. Số tiền quyết định hệ số thoát.",
+    step4_title: "Tích lũy tự động, chờ thoát", step4_desc: "Hệ thống tự động tích lũy lợi nhuận USD hàng ngày. Khi đạt hệ số, rút bằng ROAM theo giá thực tế.",
+    links_label: "📋 Liên kết & Hợp đồng ROAM", links_official: "Liên kết chính thức", links_contract: "Địa chỉ hợp đồng ROAM (xác minh trước khi dùng)",
+    link_protocol: "Giao thức", link_tg: "TG chính thức",
+    disclaimer: "⚠️ Tài liệu này chỉ dùng cho mục đích quảng bá và giáo dục, không cấu thành lời khuyên đầu tư. Đầu tư tiền điện tử có rủi ro thị trường. Hãy đánh giá cẩn thận theo tình hình tài chính. Không đầu tư quá khả năng chịu đựng. Dữ liệu lợi nhuận dựa trên mô hình whitepaper, kết quả thực tế có thể khác. Xác minh địa chỉ hợp đồng qua kênh TG chính thức. Cẩn thận lừa đảo. Không chia sẻ khóa riêng.",
+    footer: "Nikola Protocol · 2026<br>Chỉ dùng cho quảng bá cộng đồng · Không phải lời khuyên đầu tư"
+  }
+};
+
+let currentLang = 'zh';
+
+function setLang(lang) {
+  currentLang = lang;
+  const dict = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) {
+      el.innerHTML = dict[key];
+    }
+  });
+  // Update dynamic attributes
+  document.querySelectorAll('.tier-card.t2').forEach(el => el.setAttribute('data-popular', dict.popular || ''));
+  document.querySelectorAll('.partner-card.cofounder').forEach(el => el.setAttribute('data-recommend', dict.recommend || ''));
+  // Update buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  // Update html lang
+  document.documentElement.lang = lang === 'zh' ? 'zh-TW' : lang === 'th' ? 'th' : lang === 'vi' ? 'vi' : 'en';
+}
+
+// Init
+setLang('zh');
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
