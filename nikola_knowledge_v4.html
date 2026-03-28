@@ -151,6 +151,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 <div class="lang-bar">
   <button class="lang-btn active" onclick="setLang('zh')">中文</button>
   <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+  <button class="lang-btn" onclick="setLang('en')">English</button>
 </div>
 
 <!-- NAV -->
@@ -564,9 +565,59 @@ clt:'Nhật ký cập nhật',cl1t:'Sửa đổi',cl1d:'<strong>Phương thức 
 cl2t:'Cập nhật',cl2d:'<strong>Thống nhất 3 tầng</strong> → O1+O3+O4 đều tính theo U',cl3t:'Cập nhật',cl3d:'<strong>Sàn giao dịch</strong> → Thêm Binance Alpha',
 cl4t:'Thay thế',cl4d:'<strong>Ví</strong> → DeBox đổi sang Bitget Wallet',cl5t:'Thêm mới',cl5d:'<strong>So sánh trực quan</strong> → 4 kịch bản giá ROAM A vs B',
 ftr:'Nikola Protocol · 2026 · Chỉ dùng cho quảng bá · Không phải lời khuyên đầu tư'
+},
+en:{
+nav1:'Overview',nav2:'Earnings',nav3:'Partners',nav4:'Links',nav5:'How to Join',nav6:'Calculations',nav7:'Comparison',
+h1:'Knowledge Base Guide',h2:'Covers project overview, earnings mechanism, partner programs, official links & participation process',
+s1t:'Project Overview & Core Operations',s1a:'🌐 What is Nikola Protocol?',s1b:'Nikola Protocol is a <strong>Web4.0 AI Quantitative Incubation Protocol</strong> built on the <strong>ENI blockchain</strong>, with TIF (Technology × Intelligent × Finance) as its core framework, combining multi-agent collaboration systems and large-scale AI model data capabilities to create a self-evolving intelligent incubation engine.',
+s1c:'💡 Core Operating Logic',s1d:'Fund Flow',s1e:'USDT Deposit → AI Quantitative Computing → Daily U-denominated Accumulation → Withdraw as ROAM',s1f:'Daily Accumulation',s1g:'Principal <strong style="color:#fff">1%/day</strong> (U-denominated)',s1h:'Revenue Split',s1i:'85% O1 + 10% NKT + 5% Service Fee',s1j:'Effective Yield',s1k:'Minimum Deposit',s1l:'100 USDT (multiples of 100)',s1m:'Network',s1n:'ENI Mainnet',s1o:'AI Agent computing credits, 1 NKT = 1 USDT',
+s1p:'🔐 Ecosystem Endorsements',s1q:'Project',s1r:'Description',s1s:'Status',s1t1:'WBA OpenRoaming sole Web3 IDP, 7.5M+ nodes, 190+ countries',s1t2:'Live',s1t3:'ZKP technology, Ave.ai Top 11, 2.68M+ addresses',s1t4:'Running',s1t5:'ROAM listed for trading',s1t6:'Exchanges',s1t7:'In Circulation',s1t8:'$5M strategic funding (2023)',s1t9:'Endorsed',
+s2t:'Earnings Mechanism',s2tag:'v2 Revised',s2a:'✅ <strong>Core Update:</strong> All 3 tiers O1 + O3 + O4 accumulate in U-denominated (USD) value. Regardless of ROAM price fluctuations, daily accumulation remains unaffected. Withdrawals are converted to ROAM at real-time price.',
+s2b:'🏆 Tiered Exit System',s2c:'Principal Exit',s2c2:'Principal Exit',s2c3:'Principal Exit',
+s2d:'Deposit 500U<br>→ Receive 1,000U<br>~200 days',s2e:'Deposit 1,000U<br>→ Receive 2,500U<br>~250 days',s2f:'Deposit 3,000U<br>→ Receive 9,000U<br>~300 days',
+s2g:'📌 Minimum 100U, amount must be multiples of 100',s2h:'🎁 Three-Tier Earnings Structure',
+o1n:'Basic Daily Accumulation',o1s:'Principal × 1%/day · U-denominated',o1a:'Settlement',o1b:'<strong style="color:#fff">U-denominated accumulation</strong>, converted to ROAM at real-time price upon withdrawal',o1c:'Price Impact',o1d:'✅ No impact, only affects ROAM quantity at withdrawal',o1e:'Example',o1f:'Deposit 1,000U → $10/day<br>Withdraw when ROAM $0.5 → 20 ROAM<br>ROAM $1.0 → 10 ROAM<br>ROAM $2.0 → 5 ROAM',o1g:'Simultaneous accumulation: 1,000U → 1 NKT/day',
+o3n:'Referral Acceleration Bonus',o3s:'U-denominated · Up to +15%',o3a:'Direct Referrals',o3b:'Unlocked Generations',o3c:'Total',o3d:'≥ 1 person',o3e:'1 generation',o3f:'≥ 3 people',o3g:'5 generations',o3h:'≥ 5 people',o3i:'10 generations',
+o4n:'Team Contribution Bonus',o4a:'Level',o4b:'Threshold',o4c:'Team 5,000U',o4d:'Team 20,000U',o4e:'Small branch 100,000U',o4f:'Small branch 400,000U',o4g:'Small branch 1,500,000U',o4h:'Small branch 6,000,000U',o4i:'Small branch 15,000,000U',o4j:'Small branch 30,000,000U',
+s2z:'🔑 <strong>Three-Tier Consistency:</strong> O1+O3+O4 all accumulate in USD, converted to ROAM at real-time price upon withdrawal. Price fluctuations do not affect daily accumulation.',
+s3t:'Partner Node Programs',s3a:'💎 Two Types of Partners',
+p1t:'🌟 Community Partner',p1q:'Limited to 999 globally',p1a:'<strong>80,000</strong> ENI credits',p1b:'Direct upgrade to <strong>V2</strong> (O4 20%)',p1c:'Fee pool <strong>45%</strong>',p1d:'NKT <strong>2,000</strong> ($2,000)',p1e:'AI computing dividends',
+p2t:'💎 Co-Founder Partner',p2q:'Limited to 299 globally',p2a:'<strong>220,000</strong> ENI credits',p2b:'Direct upgrade to <strong>V3</strong> (O4 25%)',p2c:'Fee pool <strong>25%</strong>',p2d:'NKT <strong>5,000</strong> ($5,000)',p2e:'AI computing dividends',
+s3b:'💡 <strong>Co-Founder Value:</strong> Purchase at 1,000U, includes 5,000 NKT ($5,000) + V3 upgrade. Cost covered by NKT, V3 dividends are pure extra profit.',
+s3c:'💰 Service Fee Dividends',s3d:'Recipient',s3e:'Share',s3f:'Slots',s3g:'🌟 Community',s3h:'999 slots',s3i:'💎 Co-Founder',s3j:'299 slots',s3k:'⚙️ Platform',
+s3l:'Each deposit generates a <strong>5% service fee</strong>, of which <strong>70% is returned to partners</strong>. More users → Larger fee pool → Greater daily passive dividends.',
+s4t:'Official Links & Contracts',s4a:'⚠️ All links are subject to official TG @Nikola_Eni announcements. Never share your private key or seed phrase with anyone.',
+s4b:'🔗 Official Links',s4c:'🟣 Protocol Entry',s4d:'📱 Official TG',s4e:'💼 Wallet',s4f:'📋 ROAM Contract Addresses',s4g:'🔷 ENI Mainnet',s4h:'🟡 BSC Chain',
+s5t:'How to Participate',st1t:'Download Bitget Wallet',st1d:'Available on iOS / Android, create a Web3 wallet.<br><a href="https://web3.bitget.com">📲 web3.bitget.com</a>',
+st2t:'Prepare USDT, Transfer to ENI',st2d:'Buy USDT on an exchange, cross-chain transfer to ENI Mainnet. Minimum 100U, must be multiples of 100.',
+st3t:'Enter Nikola Protocol',st3d:'Select deposit amount and confirm.<br><a href="https://nikola.global/">🟣 nikola.global</a>',
+st4t:'Automatic Daily Accumulation',st4d:'System accumulates earnings in U-denominated value daily. Withdraw and convert to ROAM upon reaching the multiplier.',
+st5t:'ROAM Uses',st5d:'Hold for appreciation / Reinvest for compound returns / Exchange for USDT',
+s6t:'Investment Calculation Examples',s6a:'📌 All earnings accumulate in U-denominated value, unaffected by price. Payback period = Exit target ÷ Total daily earnings.',
+c1t:'📊 Calculation 1: 1 Group Referral (3 people)',c1p:'A deposits 1,000U｜B deposits 1,000U｜C deposits 1,000U｜D deposits 3,000U<br>Total volume 5,000U → V1 ✅ 3 direct referrals → O3 unlocks 5 generations',
+c_th1:'Earnings Tier',c_th2:'Calculation',c_th3:'Daily',c_sum:'Total',c1daily:'$20/day',
+c1r:'Payback <strong style="color:var(--teal)">50 days</strong> ($1,000÷$20) ｜ Exit <strong style="color:var(--gold)">125 days</strong> ($2,500÷$20) ｜ Net profit <strong style="color:#fff">1,500U (+150%)</strong>',
+c2t:'📊 Calculation 2: 4 Group Referrals (12 people)',c2p:'A deposits 1,000U｜4 groups × 5,000U｜Total 20,000U → V2 ✅<br>Sub-groups at V1, differential V2-V1 = 5%｜12 referrals → O3 unlocks 10 generations',
+c_th1b:'Earnings Tier',c_th2b:'Calculation',c_th3b:'Daily',c2o4:'🟡 O4',c2o4v:'$200 × 5% (differential)',c_sum2:'Total',c2daily:'$30/day',
+c2r:'Payback <strong style="color:var(--teal)">34 days</strong> ($1,000÷$30) ｜ Exit <strong style="color:var(--gold)">84 days</strong> ($2,500÷$30) ｜ Net profit <strong style="color:#fff">1,500U (+150%)</strong>',
+cmp:'⚡ Comparison Overview',cmpa:'Item',cmpb:'Calc 1',cmpc:'Calc 2',
+cmpd:'Referrals',cmpe:'3 people',cmpf:'12 people',cmpg:'V Level',
+cmph:'$2.5/day',cmpi:'$10/day',cmpj:'$7.5/day',cmpk:'$10/day',
+cmpl:'Daily Total',cmpm:'$20/day',cmpn:'$30/day',
+cmpo:'Payback',cmpp:'50 days',cmpq:'34 days',
+cmpr:'Exit',cmps:'125 days',cmpt:'84 days',
+cmpz:'💡 Same 1,000U principal, net profit 1,500U. Calculation 2 uses differential bonus, exit shortened from 125 to <strong>84 days</strong>, 41 days earlier for reinvestment.',
+s7t:'Four Scenario Comparison',s7a:'A = 1,000U buy & hold ROAM｜B = 1,000U join Nikola (daily +$10 U-denominated)',
+s7h1:'Scenario',s7h2:'Market',s7h3:'Winner',
+s7r1:'100-day continuous rise',s7r2:'Rise then fall',s7r3:'Fall then rise',s7r4:'100-day continuous drop',
+s7z:'💡 <strong>Conclusion:</strong> B (Nikola) wins in 3 out of 4 scenarios. Only in a sustained bull market does A win slightly, but B still steadily completes 2.5x exit by day 150 (<strong>ROI +150%</strong>). The U-denominated value preservation mechanism makes the earnings path completely unaffected by price.',
+clt:'Changelog',cl1t:'Fix',cl1d:'<strong>O1 Settlement</strong> → U-denominated accumulation, converted to ROAM at real-time price upon withdrawal',
+cl2t:'Update',cl2d:'<strong>Three-tier unification</strong> → O1+O3+O4 all U-denominated',cl3t:'Update',cl3d:'<strong>Exchanges</strong> → Added Binance Alpha',
+cl4t:'Replace',cl4d:'<strong>Wallet</strong> → DeBox replaced with Bitget Wallet',cl5t:'New',cl5d:'<strong>Visual comparison</strong> → 4 ROAM price scenarios A vs B',
+ftr:'Nikola Protocol · 2026 · For promotional use only · Not investment advice'
 }
 };
-const hotText={zh:'熱門',vi:'Hot'};
+const hotText={zh:'熱門',vi:'Hot',en:'Hot'};
 function setLang(lang){
   const dict=i18n[lang];if(!dict)return;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -576,7 +627,8 @@ function setLang(lang){
   const t2=document.querySelector('.t2');
   if(t2) t2.setAttribute('data-hot',hotText[lang]||hotText.zh);
   document.querySelectorAll('.lang-btn').forEach(b=>{
-    b.classList.toggle('active',b.textContent.includes(lang==='zh'?'中文':'Tiếng'));
+    const langLabel={zh:'中文',vi:'Tiếng',en:'English'};
+    b.classList.toggle('active',b.textContent.includes(langLabel[lang]));
   });
 }
 </script>
