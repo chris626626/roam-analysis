@@ -463,31 +463,31 @@ async function main() {
       </div>
       <div class="stat-card">
         <div class="label">ROAM 儲備</div>
-        <div class="value" style="font-size:18px;color:var(--accent)">\${fmtNum(lpRoam, 0)}</div>
-        <div style="color:var(--text2);font-size:11px">\${(lpRoam / totalSupply * 100).toFixed(1)}% 總供應量</div>
+        <div class="value" style="font-size:18px;color:var(--accent)">${fmtNum(lpRoam, 0)}</div>
+        <div style="color:var(--text2);font-size:11px">${(lpRoam / totalSupply * 100).toFixed(1)}% 總供應量</div>
       </div>
       <div class="stat-card">
         <div class="label">USDT 儲備</div>
-        <div class="value" style="font-size:18px;color:var(--green)">\${fmtNum(lpUsdt, 0)}</div>
+        <div class="value" style="font-size:18px;color:var(--green)">${fmtNum(lpUsdt, 0)}</div>
         <div style="color:var(--text2);font-size:11px">池深度</div>
       </div>
       <div class="stat-card">
         <div class="label">LP 提供者</div>
-        <div class="value" style="font-size:18px;color:var(--red)">\${lpHolders.length}</div>
+        <div class="value" style="font-size:18px;color:var(--red)">${lpHolders.length}</div>
         <div style="color:var(--text2);font-size:11px">個地址</div>
       </div>
     </div>
     <h3 style="font-size:14px;margin-bottom:10px;color:var(--text2)">LP 持有者明細</h3>
     <table>
       <tr><th>#</th><th>地址</th><th>LP 佔比</th><th>角色</th></tr>
-      \${lpHolderRows.map((h, i) => \`<tr>
-        <td>\${i + 1}</td>
-        <td class="addr" style="word-break:break-all">\${h.addr}</td>
-        <td class="amount" style="color:\${h.pct > 50 ? 'var(--red)' : 'var(--text)'}">\${h.pct.toFixed(3)}%</td>
-        <td>\${h.pct > 99 ? '<span class="tag tag-high">項目方 / 唯一流動性</span>' : h.pct > 50 ? '<span class="tag tag-mid">主要 LP</span>' : '<span class="tag tag-low">小額</span>'}</td>
-      </tr>\`).join('')}
+      ${lpHolderRows.map((h, i) => `<tr>
+        <td>${i + 1}</td>
+        <td class="addr" style="word-break:break-all">${h.addr}</td>
+        <td class="amount" style="color:${h.pct > 50 ? 'var(--red)' : 'var(--text)'}">${h.pct.toFixed(3)}%</td>
+        <td>${h.pct > 99 ? '<span class="tag tag-high">項目方 / 唯一流動性</span>' : h.pct > 50 ? '<span class="tag tag-mid">主要 LP</span>' : '<span class="tag tag-low">小額</span>'}</td>
+      </tr>`).join('')}
     </table>
-    <div class="insight" style="margin-top:12px;"><strong>集中度警告：</strong>\${lpHolderRows[0]?.pct > 99 ? '最大 LP 持有者佔 ' + lpHolderRows[0].pct.toFixed(3) + '% 的流動性，且同時也是 ROAM 鑄造接收者和資金池注資者（0x274D...f78c）。若該地址撤除流動性，ROAM 將無法交易。' : 'LP 分散度尚可。'}</div>
+    <div class="insight" style="margin-top:12px;"><strong>集中度警告：</strong>${lpHolderRows[0]?.pct > 99 ? '最大 LP 持有者佔 ' + lpHolderRows[0].pct.toFixed(3) + '% 的流動性，且同時也是 ROAM 鑄造接收者和資金池注資者（0x274D...f78c）。若該地址撤除流動性，ROAM 將無法交易。' : 'LP 分散度尚可。'}</div>
     <div class="insight warn"><strong>已掃描未發現其他池：</strong>UniswapV2Factory x4（僅 0x548C...269d 有 1 個 ROAM 配對）、UniswapV3Factory x3（0 個）、DODO Factory x2（0 個）。無 ROAM/ENI、ROAM/WETH 或其他配對。</div>
   </div>
 
