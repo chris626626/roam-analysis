@@ -96,7 +96,7 @@ async function main() {
 
   // 4. Fund pool token transfers (all pages)
   console.log('4. Fetching fund pool transfers...');
-  const transfers = await fetchAllPages(`${BASE}/addresses/${FUND_POOL}/token-transfers?type=ERC-20&sort=asc`);
+  const transfers = await fetchAllPages(`${BASE}/addresses/${FUND_POOL}/token-transfers?type=ERC-20&sort=asc`, 100);
   console.log(`   Total transfers: ${transfers.length}`);
 
   // Separate inbound and outbound
@@ -152,7 +152,7 @@ async function main() {
 
   // 5. Mint events to funder
   console.log('5. Fetching mint events...');
-  const allTokenTransfers = await fetchAllPages(`${BASE}/tokens/${ROAM_TOKEN}/transfers?type=ERC-20&sort=asc`, 15);
+  const allTokenTransfers = await fetchAllPages(`${BASE}/tokens/${ROAM_TOKEN}/transfers?type=ERC-20&sort=asc`, 100);
   const mints = allTokenTransfers.filter(t =>
     t.from?.hash === '0x0000000000000000000000000000000000000000'
   ).map(t => ({
