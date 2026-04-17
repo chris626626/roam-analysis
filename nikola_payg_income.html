@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nikola PAYG 收益說明</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0c10;--card:#14171e;--border:#1e2330;--text:#d8dce6;--muted:#6b7a90;--soft:#8e9bb3;--gold:#d4a843;--goldbg:rgba(212,168,67,.1);--goldbdr:rgba(212,168,67,.25);--teal:#2dd4bf;--tealbg:rgba(45,212,191,.08);--tealbdr:rgba(45,212,191,.2);--green:#3fb950;--greenbg:rgba(63,185,80,.08);--greenbdr:rgba(63,185,80,.2);--red:#f85149;--redbg:rgba(248,81,73,.08);--redbdr:rgba(248,81,73,.2)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;line-height:1.7;padding:0 0 60px;-webkit-text-size-adjust:100%}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;padding:10px 16px;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;color:var(--muted);text-decoration:none;border:1px solid transparent;transition:all .2s}
+.nav a:hover,.nav a:active{color:var(--gold);border-color:var(--goldbdr)}
+
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+
+.hdr{padding:32px 0 24px;text-align:center}
+.hdr h1{font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.3}
+.hdr p{font-size:13px;color:var(--muted);line-height:1.6}
+.ver{display:inline-block;background:var(--greenbg);border:1px solid var(--greenbdr);color:var(--green);font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;margin-bottom:12px}
+
+.sec{margin-top:20px}
+.sec-head{display:flex;align-items:center;gap:10px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px 12px 0 0}
+.sec-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.sec-head h2{font-size:16px;font-weight:700;color:#fff;flex:1}
+.sec-body{background:var(--card);border:1px solid var(--border);border-top:0;border-radius:0 0 12px 12px;padding:16px;font-size:14px}
+
+.callout{border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.7;border-left:3px solid}
+.c-gold{background:var(--goldbg);border-color:var(--gold);color:#e0c070}
+.c-green{background:var(--greenbg);border-color:var(--green);color:#7dd89a}
+.c-teal{background:var(--tealbg);border-color:var(--teal);color:#6ee4d0}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.tbl th{background:rgba(255,255,255,.04);color:var(--soft);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--soft);vertical-align:top;line-height:1.6}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl .lbl{color:var(--text);font-weight:500;white-space:nowrap}
+.tbl .hi{font-weight:700;color:#fff}
+.tbl .row-green td{background:var(--greenbg)}
+.tbl .row-teal td{background:var(--tealbg)}
+.tbl .row-gold td{background:var(--goldbg)}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.tag-green{background:var(--greenbg);border:1px solid var(--greenbdr);color:var(--green)}
+.tag-gold{background:var(--goldbg);border:1px solid var(--goldbdr);color:var(--gold)}
+.tag-teal{background:var(--tealbg);border:1px solid var(--tealbdr);color:var(--teal)}
+
+.sub{font-size:14px;font-weight:700;color:#fff;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
+.sub:first-child{margin-top:0}
+
+.layer{border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.layer-h{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
+.layer-id{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.layer-id.o1{background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)}
+.layer-id.o3{background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)}
+.layer-id.o4{background:var(--goldbg);color:var(--gold);border:1px solid var(--goldbdr)}
+.layer-name{font-size:14px;font-weight:700;color:#fff}
+.layer-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.layer-b{padding:12px 14px;font-size:13px}
+
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.tier{border-radius:10px;padding:14px 10px;text-align:center;border:1px solid}
+.tier .range{font-size:11px;color:var(--muted);margin-bottom:4px}
+.tier .mult{font-size:32px;font-weight:900;line-height:1}
+.tier .lbl2{font-size:11px;color:var(--soft);margin:4px 0 8px}
+.tier .ex{background:rgba(0,0,0,.3);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--muted);line-height:1.7;text-align:left}
+.t1{background:rgba(63,185,80,.05);border-color:var(--greenbdr)} .t1 .mult{color:var(--green)}
+.t2{background:rgba(212,168,67,.06);border-color:var(--goldbdr);position:relative} .t2 .mult{color:var(--gold)}
+.t2::after{content:attr(data-hot);position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:9px;font-weight:800;padding:2px 8px;border-radius:10px}
+.t3{background:rgba(45,212,191,.05);border-color:var(--tealbdr)} .t3 .mult{color:var(--teal)}
+
+.win{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800}
+.win-a{background:var(--greenbg);border:1px solid var(--greenbdr);color:var(--green)}
+.win-b{background:var(--goldbg);border:1px solid var(--goldbdr);color:var(--gold)}
+
+/* Example highlight box */
+.ex-box{background:rgba(45,212,191,.06);border:1px solid var(--tealbdr);border-radius:10px;padding:16px;margin-bottom:14px}
+.ex-box .ex-title{font-size:14px;font-weight:700;color:var(--teal);margin-bottom:10px}
+.ex-box .ex-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(45,212,191,.1);font-size:13px}
+.ex-box .ex-row:last-child{border:none}
+.ex-box .ex-label{color:var(--muted)}
+.ex-box .ex-value{color:#fff;font-weight:600}
+.ex-box .ex-total{margin-top:10px;padding-top:10px;border-top:2px solid var(--tealbdr);display:flex;justify-content:space-between;font-size:15px;font-weight:700}
+.ex-box .ex-total .ex-label{color:var(--text)}
+.ex-box .ex-total .ex-value{color:var(--gold);font-size:18px}
+
+.ex-box2{background:rgba(212,168,67,.06);border:1px solid var(--goldbdr);border-radius:10px;padding:16px;margin-bottom:14px}
+.ex-box2 .ex-title{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px}
+.ex-box2 .ex-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(212,168,67,.1);font-size:13px}
+.ex-box2 .ex-row:last-child{border:none}
+.ex-box2 .ex-label{color:var(--muted)}
+.ex-box2 .ex-value{color:#fff;font-weight:600}
+.ex-box2 .ex-total{margin-top:10px;padding-top:10px;border-top:2px solid var(--goldbdr);display:flex;justify-content:space-between;font-size:15px;font-weight:700}
+.ex-box2 .ex-total .ex-label{color:var(--text)}
+.ex-box2 .ex-total .ex-value{color:var(--teal);font-size:18px}
+
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.result-card{border-radius:10px;padding:14px;text-align:center;border:1px solid}
+.result-card.rc-green{background:var(--greenbg);border-color:var(--greenbdr)}
+.result-card.rc-gold{background:var(--goldbg);border-color:var(--goldbdr)}
+.result-card.rc-teal{background:var(--tealbg);border-color:var(--tealbdr)}
+.result-card .rc-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.result-card .rc-value{font-size:22px;font-weight:900;line-height:1}
+.result-card.rc-green .rc-value{color:var(--green)}
+.result-card.rc-gold .rc-value{color:var(--gold)}
+.result-card.rc-teal .rc-value{color:var(--teal)}
+
+.ftr{text-align:center;padding:32px 16px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:24px;line-height:2}
+.ftr a{color:var(--teal);text-decoration:none}
+
+.btt{position:fixed;bottom:20px;right:16px;width:40px;height:40px;border-radius:50%;background:var(--gold);color:#000;border:0;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:99}
+
+@media(max-width:420px){
+  .tiers{grid-template-columns:1fr}
+  .result-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s1">靜態收益</a>
+  <a href="#s2">動態收益</a>
+  <a href="#s3">出局制度</a>
+  <a href="#s4">舉例一</a>
+  <a href="#s5">舉例二</a>
+  <a href="#s6">對比總覽</a>
+  <a href="#s7">四種走向</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hdr">
+  <div class="ver">收益專版 v2</div>
+  <h1>Nikola PAYG<br>收益機制說明</h1>
+  <p>靜態 + 動態 + 出局制度 + 計算舉例</p>
+</div>
+
+<div class="callout c-green">✅ <strong>核心機制：</strong>O1 + O3 + O4 三層收益全部以 U 本位（美元）累積。無論 PAYG 幣價漲跌，每日累積額度不受影響。提現時統一按 PAYG 實時價換算提出。</div>
+
+<!-- S1: 靜態 -->
+<div class="sec" id="s1">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)">01</div>
+    <h2>靜態收益（O1）</h2>
+    <span class="tag tag-green">每日自動累積</span>
+  </div>
+  <div class="sec-body">
+    <div class="layer">
+      <div class="layer-h">
+        <div class="layer-id o1">O1</div>
+        <div><div class="layer-name">基礎每日累積</div><div class="layer-sub">本金 × 1%/天 · U 本位</div></div>
+      </div>
+      <div class="layer-b">
+        <table class="tbl">
+          <tr><td class="lbl">收益率</td><td><strong style="color:#fff">本金 × 1%/天</strong></td></tr>
+          <tr><td class="lbl">結算方式</td><td><strong style="color:#fff">U 本位累積</strong>，提現時按 PAYG 實時價換算</td></tr>
+          <tr><td class="lbl">幣價影響</td><td>✅ 不受影響，只影響提現時 PAYG 數量</td></tr>
+          <tr><td class="lbl">NKT 同步</td><td>1,000U → 1 NKT/天</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="sub">📌 O1 舉例</div>
+    <div class="ex-box">
+      <div class="ex-title">投入 1,000U</div>
+      <div class="ex-row"><span class="ex-label">每日收益</span><span class="ex-value">1,000 × 1% = $10</span></div>
+      <div class="ex-row"><span class="ex-label">30 天累積</span><span class="ex-value">$300</span></div>
+      <div class="ex-row"><span class="ex-label">100 天累積</span><span class="ex-value">$1,000（回本）</span></div>
+    </div>
+
+    <div class="sub">💱 提現換算舉例</div>
+    <table class="tbl">
+      <tr><th>累積 U 本位</th><th>PAYG 實時價</th><th>提現數量</th></tr>
+      <tr><td>$10</td><td>$0.5</td><td><strong style="color:#fff">20 PAYG</strong></td></tr>
+      <tr><td>$10</td><td>$1.0</td><td><strong style="color:#fff">10 PAYG</strong></td></tr>
+      <tr><td>$10</td><td>$2.0</td><td><strong style="color:#fff">5 PAYG</strong></td></tr>
+    </table>
+    <div class="callout c-teal">💡 幣價越低拿到越多 PAYG，幣價越高拿到越少。但你的 U 本位累積額度完全不受影響。</div>
+  </div>
+</div>
+
+<!-- S2: 動態 -->
+<div class="sec" id="s2">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)">02</div>
+    <h2>動態收益（O3 + O4）</h2>
+    <span class="tag tag-teal">分享 + 團隊</span>
+  </div>
+  <div class="sec-body">
+
+    <!-- O3 -->
+    <div class="layer">
+      <div class="layer-h">
+        <div class="layer-id o3">O3</div>
+        <div><div class="layer-name">分享加速獎勵</div><div class="layer-sub">U 本位 · 最高 +15%</div></div>
+      </div>
+      <div class="layer-b">
+        <table class="tbl">
+          <tr><th>直推人數</th><th>解鎖代數</th><th>合計加速</th></tr>
+          <tr><td class="lbl">≥ 1 人</td><td>1 代</td><td><strong style="color:#fff">5%</strong></td></tr>
+          <tr><td class="lbl">≥ 3 人</td><td>5 代</td><td><strong style="color:#fff">10%</strong></td></tr>
+          <tr><td class="lbl">≥ 5 人</td><td>10 代</td><td><strong style="color:var(--teal)">15%</strong></td></tr>
+        </table>
+        <div class="callout c-teal">📌 O3 計算方式：下線每日 O1 收益 × 你的 O3 比例。直推越多人，解鎖越深代數。</div>
+      </div>
+    </div>
+
+    <!-- O3 舉例 -->
+    <div class="sub">📌 O3 舉例</div>
+    <div class="ex-box">
+      <div class="ex-title">你直推 3 人（各投 1,000U）</div>
+      <div class="ex-row"><span class="ex-label">解鎖</span><span class="ex-value">5 代，O3 = 10%</span></div>
+      <div class="ex-row"><span class="ex-label">3 人每日 O1 合計</span><span class="ex-value">$10 × 3 = $30</span></div>
+      <div class="ex-row"><span class="ex-label">你的 O3 每日收益</span><span class="ex-value">$30 × 5% = $1.5</span></div>
+      <div class="ex-total"><span class="ex-label">如果 5 代全部活躍（假設共 $500/天）</span><span class="ex-value">$25/天</span></div>
+    </div>
+
+    <!-- O4 -->
+    <div class="layer" style="margin-top:18px;">
+      <div class="layer-h">
+        <div class="layer-id o4">O4</div>
+        <div><div class="layer-name">團隊貢獻獎勵</div><div class="layer-sub">U 本位 · V1(15%) → V8(50%) · 極差制</div></div>
+      </div>
+      <div class="layer-b">
+        <table class="tbl">
+          <tr><th>等級</th><th>門檻</th><th>O4 比例</th></tr>
+          <tr><td class="lbl">V1</td><td>團隊 0.5 萬U</td><td><strong style="color:#fff">15%</strong></td></tr>
+          <tr><td class="lbl">V2</td><td>團隊 2 萬U</td><td><strong style="color:#fff">20%</strong></td></tr>
+          <tr><td class="lbl">V3</td><td>小區 10 萬U</td><td><strong style="color:#fff">25%</strong></td></tr>
+          <tr><td class="lbl">V4</td><td>小區 40 萬U</td><td><strong style="color:#fff">30%</strong></td></tr>
+          <tr><td class="lbl">V5</td><td>小區 150 萬U</td><td><strong style="color:#fff">35%</strong></td></tr>
+          <tr><td class="lbl">V6</td><td>小區 600 萬U</td><td><strong style="color:#fff">40%</strong></td></tr>
+          <tr><td class="lbl">V7</td><td>小區 1,500 萬U</td><td><strong style="color:#fff">45%</strong></td></tr>
+          <tr><td class="hi">V8</td><td>小區 3,000 萬U</td><td class="hi" style="color:var(--gold)">50%</td></tr>
+        </table>
+        <div class="callout c-gold">🔑 <strong>極差制：</strong>你的 O4 收益 = 你的 V 等級比例 − 下線最高 V 等級比例。例如你 V2(20%)，下線最高 V1(15%)，極差 = 5%。</div>
+      </div>
+    </div>
+
+    <!-- O4 舉例 -->
+    <div class="sub">📌 O4 舉例</div>
+    <div class="ex-box2">
+      <div class="ex-title">你是 V2（20%），下線最高 V1（15%）</div>
+      <div class="ex-row"><span class="ex-label">極差</span><span class="ex-value">20% − 15% = 5%</span></div>
+      <div class="ex-row"><span class="ex-label">團隊每日 O1 合計</span><span class="ex-value">$200</span></div>
+      <div class="ex-row"><span class="ex-label">你的 O4 每日收益</span><span class="ex-value">$200 × 5% = $10</span></div>
+    </div>
+
+    <div class="callout c-gold">🔑 <strong>三層結算一致性：</strong>O1 + O3 + O4 均以 USD 累積，提現時統一按 PAYG 實時價換算。幣價漲跌不影響每日累積額度。</div>
+  </div>
+</div>
+
+<!-- S3: 出局制度 -->
+<div class="sec" id="s3">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--goldbg);color:var(--gold);border:1px solid var(--goldbdr)">03</div>
+    <h2>分層出局制度</h2>
+  </div>
+  <div class="sec-body">
+    <div class="tiers">
+      <div class="tier t1"><div class="range">100U – 999U</div><div class="mult">2x</div><div class="lbl2">本金出局</div><div class="ex">投 500U<br>→ 領回 1,000U<br>約 200 天</div></div>
+      <div class="tier t2" data-hot="熱門"><div class="range">1,000U – 2,999U</div><div class="mult">2.5x</div><div class="lbl2">本金出局</div><div class="ex">投 1,000U<br>→ 領回 2,500U<br>約 250 天</div></div>
+      <div class="tier t3"><div class="range">3,000U+</div><div class="mult">3x</div><div class="lbl2">本金出局</div><div class="ex">投 3,000U<br>→ 領回 9,000U<br>約 300 天</div></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px">📌 最低 100U，金額須為 100 的倍數</p>
+
+    <div class="callout c-teal">💡 出局 = 你的累積收益（O1+O3+O4）達到倍數目標後，自動結算。之後可選擇複投或提現。</div>
+  </div>
+</div>
+
+<!-- S4: 舉例一 -->
+<div class="sec" id="s4">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)">04</div>
+    <h2>計算舉例一：直推 3 人</h2>
+    <span class="tag tag-teal">V1</span>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-teal">📋 你投 1,000U｜直推 B(1,000U)、C(1,000U)、D(3,000U)<br>團隊總業績 5,000U → <strong>V1 ✅</strong>｜直推 3 人 → O3 解鎖 5 代</div>
+
+    <div class="ex-box">
+      <div class="ex-title">每日收益拆解</div>
+      <div class="ex-row"><span class="ex-label">🟢 O1 靜態</span><span class="ex-value">1,000U × 1% = $10</span></div>
+      <div class="ex-row"><span class="ex-label">🔵 O3 分享</span><span class="ex-value">$50 × 5% = $2.5</span></div>
+      <div class="ex-row"><span class="ex-label">🟡 O4 團隊</span><span class="ex-value">$50 × 15%(V1) = $7.5</span></div>
+      <div class="ex-total"><span class="ex-label">每日合計</span><span class="ex-value">$20/天</span></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card rc-green">
+        <div class="rc-label">回本天數</div>
+        <div class="rc-value">50 天</div>
+      </div>
+      <div class="result-card rc-gold">
+        <div class="rc-label">出局天數（2.5x）</div>
+        <div class="rc-value">125 天</div>
+      </div>
+      <div class="result-card rc-teal">
+        <div class="rc-label">出局總領</div>
+        <div class="rc-value">2,500U</div>
+      </div>
+      <div class="result-card rc-gold">
+        <div class="rc-label">淨賺</div>
+        <div class="rc-value">+1,500U</div>
+      </div>
+    </div>
+
+    <div class="callout c-gold">💡 只靠靜態 O1，回本 100 天，出局 250 天。加上動態 O3+O4，回本縮短至 <strong>50 天</strong>，出局縮短至 <strong>125 天</strong>。</div>
+  </div>
+</div>
+
+<!-- S5: 舉例二 -->
+<div class="sec" id="s5">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--goldbg);color:var(--gold);border:1px solid var(--goldbdr)">05</div>
+    <h2>計算舉例二：直推 12 人</h2>
+    <span class="tag tag-gold">V2</span>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-gold">📋 你投 1,000U｜4 組各 5,000U｜團隊總業績 20,000U → <strong>V2 ✅</strong><br>傘下各組 V1，極差 V2-V1 = 5%｜直推 12 人 → O3 解鎖 10 代</div>
+
+    <div class="ex-box2">
+      <div class="ex-title">每日收益拆解</div>
+      <div class="ex-row"><span class="ex-label">🟢 O1 靜態</span><span class="ex-value">1,000U × 1% = $10</span></div>
+      <div class="ex-row"><span class="ex-label">🔵 O3 分享</span><span class="ex-value">$200 × 5% = $10</span></div>
+      <div class="ex-row"><span class="ex-label">🟡 O4 團隊</span><span class="ex-value">$200 × 5%(極差) = $10</span></div>
+      <div class="ex-total"><span class="ex-label">每日合計</span><span class="ex-value">$30/天</span></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card rc-green">
+        <div class="rc-label">回本天數</div>
+        <div class="rc-value">34 天</div>
+      </div>
+      <div class="result-card rc-gold">
+        <div class="rc-label">出局天數（2.5x）</div>
+        <div class="rc-value">84 天</div>
+      </div>
+      <div class="result-card rc-teal">
+        <div class="rc-label">出局總領</div>
+        <div class="rc-value">2,500U</div>
+      </div>
+      <div class="result-card rc-gold">
+        <div class="rc-label">淨賺</div>
+        <div class="rc-value">+1,500U</div>
+      </div>
+    </div>
+
+    <div class="callout c-gold">💡 同樣 1,000U 本金、同樣淨賺 1,500U。透過極差獎勵，出局由 125 天縮短至 <strong>84 天</strong>，提早 41 天可複投。</div>
+  </div>
+</div>
+
+<!-- S6: 對比 -->
+<div class="sec" id="s6">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)">06</div>
+    <h2>兩個舉例對比總覽</h2>
+  </div>
+  <div class="sec-body">
+    <table class="tbl">
+      <tr><th>項目</th><th>舉例一</th><th>舉例二</th></tr>
+      <tr><td class="lbl">本金</td><td>1,000U</td><td>1,000U</td></tr>
+      <tr><td class="lbl">直推人數</td><td>3 人</td><td>12 人</td></tr>
+      <tr><td class="lbl">V 等級</td><td><span class="tag tag-gold">V1</span></td><td><span class="tag tag-teal">V2</span></td></tr>
+      <tr><td class="lbl">🟢 O1 靜態</td><td>$10/天</td><td>$10/天</td></tr>
+      <tr><td class="lbl">🔵 O3 分享</td><td>$2.5/天</td><td>$10/天</td></tr>
+      <tr><td class="lbl">🟡 O4 團隊</td><td>$7.5/天</td><td>$10/天</td></tr>
+      <tr class="row-green"><td class="hi">每日總計</td><td class="hi">$20/天</td><td class="hi" style="color:var(--teal)">$30/天</td></tr>
+      <tr class="row-teal"><td class="hi">回本</td><td>50 天</td><td class="hi" style="color:var(--teal)">34 天</td></tr>
+      <tr class="row-gold"><td class="hi">出局（2.5x）</td><td>125 天</td><td class="hi" style="color:var(--gold)">84 天</td></tr>
+      <tr><td class="hi">淨賺</td><td class="hi" style="color:var(--green)">+1,500U (+150%)</td><td class="hi" style="color:var(--green)">+1,500U (+150%)</td></tr>
+    </table>
+
+    <div class="sub">⚡ 純靜態 vs 靜態+動態</div>
+    <table class="tbl">
+      <tr><th>模式</th><th>每日收益</th><th>回本</th><th>出局</th></tr>
+      <tr><td class="lbl">純靜態（O1）</td><td>$10/天</td><td>100 天</td><td>250 天</td></tr>
+      <tr class="row-teal"><td class="hi">靜態+動態（舉例一）</td><td class="hi">$20/天</td><td class="hi">50 天</td><td class="hi">125 天</td></tr>
+      <tr class="row-gold"><td class="hi">靜態+動態（舉例二）</td><td class="hi">$30/天</td><td class="hi">34 天</td><td class="hi">84 天</td></tr>
+    </table>
+
+    <div class="callout c-green">✅ 動態收益不是額外風險，是加速器。靜態保底每天 1%，動態讓你更快到達出局目標。</div>
+  </div>
+</div>
+
+<!-- S7: 四種走向 -->
+<div class="sec" id="s7">
+  <div class="sec-head">
+    <div class="sec-num" style="background:var(--tealbg);color:var(--teal);border:1px solid var(--tealbdr)">07</div>
+    <h2>四種幣價走向對照</h2>
+  </div>
+  <div class="sec-body">
+    <div class="callout c-teal">A = 1,000U 直接買入 PAYG 持有｜B = 1,000U 參加 Nikola（每日 +$10 U 本位）</div>
+
+    <table class="tbl">
+      <tr><th>走向</th><th>市場情境</th><th style="color:#f85149">A（買幣持有）</th><th style="color:var(--gold)">B（Nikola）</th><th>勝出</th></tr>
+      <tr><td class="lbl">📈 一</td><td style="font-size:11px">PAYG 連漲 100 天</td><td>$2,705</td><td>$2,500</td><td><span class="win win-a">A</span></td></tr>
+      <tr><td class="lbl">⛰️ 二</td><td style="font-size:11px">先漲後跌回原點</td><td>$995</td><td>$2,500</td><td><span class="win win-b">B</span></td></tr>
+      <tr><td class="lbl">🏔️ 三</td><td style="font-size:11px">先跌後漲回原點</td><td>$995</td><td>$2,500</td><td><span class="win win-b">B</span></td></tr>
+      <tr><td class="lbl">📉 四</td><td style="font-size:11px">PAYG 連跌 100 天</td><td>$366</td><td>$2,500</td><td><span class="win win-b">B</span></td></tr>
+    </table>
+
+    <div class="callout c-gold">💡 <strong>結論：</strong>B（Nikola）在 4 種場景中 3 種勝出。只有持續牛市 A 略勝，但 B 仍穩定在第 150 天完成 2.5x 出局（<strong>ROI +150%</strong>）。U 本位保值機制讓收益路徑完全不受幣價影響。</div>
+
+    <div class="sub">🎯 一句話總結</div>
+    <div class="callout c-green">
+      <strong>靜態（O1）</strong>= 你的保底，每天本金 1%，不管市場怎樣都在累積。<br>
+      <strong>動態（O3+O4）</strong>= 你的加速器，分享和團隊讓你更快出局。<br>
+      <strong>U 本位</strong>= 你的護盾，幣價漲跌不影響累積額度。<br><br>
+      三者結合 = <strong>穩定累積、加速出局、幣價免疫</strong>。
+    </div>
+  </div>
+</div>
+
+</div><!-- wrap -->
+
+<div class="ftr">
+  <a href="https://nikola.global/">nikola.global</a> · <a href="https://t.me/Paygo_eni">t.me/Paygo_eni</a> · <a href="https://www.paygo.ac">paygo.ac</a><br>
+  Nikola Protocol · 2026 · 僅供推廣用途 · 不構成投資建議
+</div>
+
+<button class="btt" id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+window.addEventListener('scroll',()=>{document.getElementById('btt').style.display=window.scrollY>300?'flex':'none'});
+</script>
+
+</body>
+</html>
